@@ -10,5 +10,6 @@ public class WanderingWarriorEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("WanderingWarrior");
-	}
+        ExtraModuleNames.Add("WanderingWarriorSettings");
+    }
 }

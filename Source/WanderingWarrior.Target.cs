@@ -10,5 +10,6 @@ public class WanderingWarriorTarget : TargetRules
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("WanderingWarrior");
+		ExtraModuleNames.Add("WanderingWarriorSettings");
 	}
 }

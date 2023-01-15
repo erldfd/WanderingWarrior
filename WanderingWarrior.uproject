@@ -5,11 +5,24 @@
 	"Description": "",
 	"Modules": [
 		{
+			"Name": "WanderingWarriorSettings",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"AdditionalDependencies": [
+				"Engine",
+				"CoreUObject"
+			]
+		},
+		{
 			"Name": "WanderingWarrior",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"WanderingWarriorSettings",
+				"AIModule",
+				"UMG",
+				"CoreUObject"
 			]
 		}
 	],
