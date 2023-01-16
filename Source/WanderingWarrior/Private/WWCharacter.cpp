@@ -211,7 +211,7 @@ void AWWCharacter::AttackCheck()
 		GetActorLocation(),
 		GetActorLocation() + GetActorForwardVector() * AttackRange,
 		FQuat::Identity,
-		ECollisionChannel::ECC_GameTraceChannel2,
+		ECollisionChannel::ECC_GameTraceChannel6,
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params);
 

@@ -31,9 +31,17 @@ int UInventoryTabObject::GetSlotCount()
 	return SlotCount;
 }
 
+void UInventoryTabObject::SetSlotCount(int NewSlotCount)
+{
+	// 임시 함수... 퀵슬롯의 슬롯이 8개이기 때문에 ㅎ므....... 어쩌지......
+
+	SlotCount = NewSlotCount;
+}
+
 UInventorySlotObject* UInventoryTabObject::GetSlotFromIndex(int Index)
 {
-	ensure(InventorySlotArray.IsValidIndex(Index));
+	if (ensure(InventorySlotArray.IsValidIndex(Index)) == false) return nullptr;
+
 	return InventorySlotArray[Index];
 }
 

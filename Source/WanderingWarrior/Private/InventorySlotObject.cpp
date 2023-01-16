@@ -62,7 +62,7 @@ bool UInventorySlotObject::UseSlotItem()
 
 	SlotItem->Use();
 	HoldedItemCount--;
-
+	UE_LOG(LogTemp, Warning, TEXT("HOldedItemCount : %d"), HoldedItemCount);
 	if (HoldedItemCount == 0)
 	{
 		SlotItem == nullptr;

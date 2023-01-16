@@ -10,6 +10,7 @@
 #include "Weapon.h"
 #include "MiscItem.h"
 #include "PlayerSkillComponent.h"
+#include "QuickSlotComponent.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -55,6 +56,7 @@ APlayerCharacter::APlayerCharacter()
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	PlayerSkillComponent = CreateDefaultSubobject<UPlayerSkillComponent>(TEXT("PlayerSkill"));
+	QuickSlotComponent = CreateDefaultSubobject<UQuickSlotComponent>(TEXT("QuickSlot"));
 
 	Tags.Init("", 1);
 	Tags[0] = TEXT("Player");
@@ -76,6 +78,9 @@ void APlayerCharacter::BeginPlay()
 	InventoryComponent->ObtainItem(Cast<UWWGameInstance>(GetGameInstance())->GetMiscItem(EMiscItemName::HPPotion));
 	InventoryComponent->ObtainItem(Cast<UWWGameInstance>(GetGameInstance())->GetMiscItem(EMiscItemName::HPPotion));
 	InventoryComponent->ObtainItem(Cast<UWWGameInstance>(GetGameInstance())->GetMiscItem(EMiscItemName::HPPotion));
+
+	QuickSlotComponent->ObtainItem(Cast<UWWGameInstance>(GetGameInstance())->GetWeapon(EWeaponName::BlackSword));
+	QuickSlotComponent->ObtainItem(Cast<UWWGameInstance>(GetGameInstance())->GetMiscItem(EMiscItemName::HPPotion));
 }
 
 // Called every frame
@@ -109,6 +114,12 @@ UPlayerSkillComponent* APlayerCharacter::GetPlayerSkillComponenet()
 {
 	check(PlayerSkillComponent != nullptr);
 	return PlayerSkillComponent;
+}
+
+class UQuickSlotComponent* APlayerCharacter::GetQuickSlotComponent()
+{
+	check(QuickSlotComponent != nullptr);
+	return QuickSlotComponent;
 }
 
 void APlayerCharacter::Attack(float Value)

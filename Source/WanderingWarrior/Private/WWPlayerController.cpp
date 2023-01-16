@@ -8,6 +8,8 @@
 #include "PlayerCharacter.h"
 #include "InventoryComponent.h"
 #include "PlayerSkillComponent.h"
+#include "QuickSlotComponent.h"
+#include "QuickSlotWidget.h"
 
 AWWPlayerController::AWWPlayerController()
 {
@@ -25,6 +27,13 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 
 	PlayerCharacter = Cast<APlayerCharacter>(aPawn);
 	CharacterStat = PlayerCharacter->GetCharacterStatComponent();
+
+	InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
+	check(InGameWidget != nullptr);
+
+	InGameWidget->AddToViewport();
+
+	PlayerCharacter->GetQuickSlotComponent()->SetQuickSlotWidget(InGameWidget->GetQuickSlotWidget());
 }
 
 UInGameWidget* AWWPlayerController::GetInGameWidget()
@@ -37,10 +46,12 @@ void AWWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
+	/*InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
 	check(InGameWidget != nullptr);
 
 	InGameWidget->AddToViewport();
+
+	PlayerCharacter->GetQuickSlotComponent()->SetQuickSlotWidget(InGameWidget->GetQuickSlotWidget());*/
 
 	CharacterStat->OnHPChangedDelegate.AddUObject(this, &AWWPlayerController::OnHPChanged);
 }
@@ -51,6 +62,15 @@ void AWWPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("InventoryOpenAndClose", EInputEvent::IE_Released, this, &AWWPlayerController::OpenAndCloseInventory);
 	InputComponent->BindAction("MouseRightClick", EInputEvent::IE_Released, this, &AWWPlayerController::OnMouseRightButtonClicked);
+
+	InputComponent->BindAction("Number1", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot0);
+	InputComponent->BindAction("Number2", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot1);
+	InputComponent->BindAction("Number3", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot2);
+	InputComponent->BindAction("Number4", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot3);
+	InputComponent->BindAction("Number5", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot4);
+	InputComponent->BindAction("Number6", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot5);
+	InputComponent->BindAction("Number7", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot6);
+	InputComponent->BindAction("Number8", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot7);
 }
 
 void AWWPlayerController::OnHPChanged()
@@ -88,4 +108,44 @@ void AWWPlayerController::OnMouseRightButtonClicked()
 {
 	UPlayerSkillComponent* PlayerSkill = PlayerCharacter->GetPlayerSkillComponenet();
 	PlayerSkill->JumpToGroundSkillImplement();
+}
+
+void AWWPlayerController::UseQuickSlot0()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(0);
+}
+
+void AWWPlayerController::UseQuickSlot1()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(1);
+}
+
+void AWWPlayerController::UseQuickSlot2()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(2);
+}
+
+void AWWPlayerController::UseQuickSlot3()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(3);
+}
+
+void AWWPlayerController::UseQuickSlot4()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(4);
+}
+
+void AWWPlayerController::UseQuickSlot5()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(5);
+}
+
+void AWWPlayerController::UseQuickSlot6()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(6);
+}
+
+void AWWPlayerController::UseQuickSlot7()
+{
+	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(7);
 }

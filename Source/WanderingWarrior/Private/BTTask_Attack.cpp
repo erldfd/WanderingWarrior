@@ -28,13 +28,6 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	}
 
 	Character->Attack(1);
-	bIsAttacking = true;
-
-	if (bIsAddedLambda == false)
-	{
-		AnimInstance->OnAttackEndDelegate.AddLambda([this]()->void {bIsAttacking = false; });
-		bIsAddedLambda = true;
-	}
 
 	return EBTNodeResult::InProgress;
 }
@@ -43,10 +36,16 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	if (bIsAttacking)
+	AWWCharacter* Character = Cast <AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	check(Character != nullptr);
+
+	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
+	check(AnimInstance != nullptr);
+
+	if (AnimInstance->GetIsAttacking())
 	{
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("TickTask"));
+
 	FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 }

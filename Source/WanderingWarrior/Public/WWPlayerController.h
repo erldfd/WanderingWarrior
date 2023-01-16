@@ -38,6 +38,15 @@ private:
 
 	void OnMouseRightButtonClicked();
 
+	void UseQuickSlot0();
+	void UseQuickSlot1();
+	void UseQuickSlot2();
+	void UseQuickSlot3();
+	void UseQuickSlot4();
+	void UseQuickSlot5();
+	void UseQuickSlot6();
+	void UseQuickSlot7();
+
 private:
 
 	UPROPERTY()

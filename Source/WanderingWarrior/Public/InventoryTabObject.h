@@ -11,7 +11,8 @@
 enum class ETabType
 {
 	WeaponTab,
-	MiscTab
+	MiscTab,
+	QuickSlotTab
 };
 /**
  * 
@@ -28,6 +29,7 @@ public:
 	//virtual void PostInitProperties() override;
 
 	int GetSlotCount();
+	void SetSlotCount(int NewSlotCount);
 
 	class UInventorySlotObject* GetSlotFromIndex(int Index);
 
@@ -38,8 +40,6 @@ public:
 
 	ETabType GetTabType();
 	void SetTabType(ETabType NewTabType);
-
-protected:
 
 private:
 

@@ -64,9 +64,6 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlotWidgetImage>> MiscTabSlotImageArray;
 
-	UPROPERTY()
-	TObjectPtr<class UInventorySlotWidgetImage> TestSlotImage;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTexture2D> EmptySlotTexture;
 

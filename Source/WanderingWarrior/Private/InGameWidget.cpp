@@ -4,6 +4,7 @@
 #include "InGameWidget.h"
 
 #include "CharacterStatComponent.h"
+#include "QuickSlotWidget.h"
 
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
@@ -29,6 +30,12 @@ void UInGameWidget::SetMyHPBarPercent(float Percent)
 {
 	check(MyHPBar != nullptr);
 	MyHPBar->SetPercent(Percent);
+}
+
+UQuickSlotWidget* UInGameWidget::GetQuickSlotWidget()
+{
+	check(QuickSlotWidget != nullptr);
+	return QuickSlotWidget;
 }
 
 void UInGameWidget::NativeOnInitialized()

@@ -33,6 +33,8 @@ public:
 
 	class UPlayerSkillComponent* GetPlayerSkillComponenet();
 
+	class UQuickSlotComponent* GetQuickSlotComponent();
+
 	virtual void Attack(float Value) override;
 
 protected:
@@ -62,4 +64,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
+
+	UPROPERTY()
+	TObjectPtr<class UQuickSlotComponent> QuickSlotComponent;
 };

@@ -22,6 +22,8 @@ public:
 	void SetEnemyHPBarPercent(float Percent);
 	void SetMyHPBarPercent(float Percent);
 
+	class UQuickSlotWidget* GetQuickSlotWidget();
+
 protected:
 
 	virtual void NativeOnInitialized() override;
@@ -33,16 +35,19 @@ private:
 private:
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* EnemyNameTextBlock;
+	TObjectPtr<class UTextBlock> EnemyNameTextBlock;
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* EnemyHPBar;
+	TObjectPtr<class UProgressBar> EnemyHPBar;
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* MyHPBar;
+	TObjectPtr<class UProgressBar> MyHPBar;
 
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* MyMPBar;
+	TObjectPtr<class UProgressBar> MyMPBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UQuickSlotWidget> QuickSlotWidget;
 
 	FTimerHandle HideEnemyHPAndNameWidgetTimerHandle = { };
 };

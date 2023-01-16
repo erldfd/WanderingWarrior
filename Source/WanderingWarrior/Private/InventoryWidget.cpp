@@ -33,8 +33,6 @@ void UInventoryWidget::NativeOnInitialized()
 		WeaponTabSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
 		WeaponTabSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UInventoryWidget::OnWeaponTabSlotClicked);
 		WeaponTabSlotImageArray[i]->SetSlotIndex(i);
-
-		
 	}
 	
 	MiscTabSlotImageArray.Init(nullptr, 12);
