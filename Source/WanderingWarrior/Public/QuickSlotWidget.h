@@ -21,6 +21,8 @@ public:
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
 	void SetSlotImageFromTexture(int SlotIndex, class UTexture2D* SlotTexture = nullptr);
 
+	void SetSlotItemCountText(int SlotItemCount, int SlotIndex);
+
 protected:
 
 	virtual void NativeOnInitialized() override;
@@ -33,6 +35,9 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlotWidgetImage>> QuickSlotImageArray;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class UTextBlock>> QuickSlotItemCountTextArray;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTexture2D> EmptySlotTexture;

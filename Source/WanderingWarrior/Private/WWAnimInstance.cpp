@@ -24,11 +24,6 @@ UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0)
 	if (CHARACTER_HIT_MONTAGE.Succeeded())
 	{
 		CharacterHitMongtage = CHARACTER_HIT_MONTAGE.Object;
-		UE_LOG(LogTemp, Warning, TEXT("CharacterHitMontage Added"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CharacterHitMontage not "));
 	}
 }
 
@@ -53,7 +48,7 @@ void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UWWAnimInstance::PlayAttackMontage()
 {
-	if (Montage_IsPlaying(AttackMontage) == false)
+	if (Montage_IsPlaying(AttackMontage) == false && bIsPlayingCharacterHitMontage == false)
 	{
 		Montage_Play(AttackMontage, 1);
 		bIsAttacking = true;

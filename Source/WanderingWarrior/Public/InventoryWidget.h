@@ -27,6 +27,8 @@ public:
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
 	void SetSlotImageFromTexture(enum class ETabType TabType, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
 
+	void SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType);
+
 public:
 
 	//param : SlotIndex
@@ -61,9 +63,13 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlotWidgetImage>> WeaponTabSlotImageArray;
 
+	UPROPERTY();
+	TArray<TObjectPtr<class UTextBlock>> WeaponTabItemCountTextArray;
+
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlotWidgetImage>> MiscTabSlotImageArray;
 
+	TArray<TObjectPtr<class UTextBlock>> MiscTabItemCountTextArray;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTexture2D> EmptySlotTexture;
 

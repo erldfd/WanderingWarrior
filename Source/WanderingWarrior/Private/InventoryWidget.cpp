@@ -8,13 +8,18 @@
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/TextBlock.h"
 #include "Styling/SlateBrush.h"
+
+#define WEAPON_TAB_SLOT_COUNT 12
+#define MISC_TAB_SLOT_COUNT 12
 
 void UInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	UE_LOG(LogTemp, Warning, TEXT("InvenntoryWidget NativeOnInitailized"));
-	WeaponTabSlotImageArray.Init(nullptr, 12);
+	WeaponTabSlotImageArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
+	WeaponTabItemCountTextArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
 
 	for (int i = 0; i < WeaponTabSlotImageArray.Num(); ++i)
 	{
@@ -33,10 +38,20 @@ void UInventoryWidget::NativeOnInitialized()
 		WeaponTabSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
 		WeaponTabSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UInventoryWidget::OnWeaponTabSlotClicked);
 		WeaponTabSlotImageArray[i]->SetSlotIndex(i);
+
+		WidgetNameString = FString("WeaponTabItemCount_");
+		WidgetNameString.Append(FString::FromInt(i));
+		WidgetName = FName(WidgetNameString);
+
+		UTextBlock* TextBlock = Cast<UTextBlock>(GetWidgetFromName(WidgetName));
+
+		WeaponTabItemCountTextArray[i] = TextBlock;
+		WeaponTabItemCountTextArray[i]->SetText(FText());
 	}
 	
-	MiscTabSlotImageArray.Init(nullptr, 12);
-	
+	MiscTabSlotImageArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
+	MiscTabItemCountTextArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
+
 	for (int i = 0; i < MiscTabSlotImageArray.Num(); ++i)
 	{
 		if (MiscTabSlotImageArray.IsValidIndex(i) == false)
@@ -53,9 +68,15 @@ void UInventoryWidget::NativeOnInitialized()
 		MiscTabSlotImageArray[i] = SlotImage;
 		MiscTabSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
 		MiscTabSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UInventoryWidget::OnMiscTabSlotClicked);
-
-		UE_LOG(LogTemp, Warning, TEXT("OnMiscTabSlotclicked is Bound? : %d, WidgetName : %s"), MiscTabSlotImageArray[i]->OnClickedDelegate.IsBound(), *MiscTabSlotImageArray[i]->GetName());
 		MiscTabSlotImageArray[i]->SetSlotIndex(i);
+
+		WidgetNameString = FString("MiscTabItemCount_");
+		WidgetNameString.Append(FString::FromInt(i));
+		WidgetName = FName(WidgetNameString);
+
+		UTextBlock* TextBlock = Cast<UTextBlock>(GetWidgetFromName(WidgetName));
+		MiscTabItemCountTextArray[i] = TextBlock;
+		MiscTabItemCountTextArray[i]->SetText(FText());
 	}
 
 	/*MiscTabSlotArray.Init(nullptr, 12);
@@ -157,6 +178,45 @@ void UInventoryWidget::SetSlotImageFromTextureInternal(TArray<UInventorySlotWidg
 	}
 
 	SlotImageArray[SlotIndex]->SetBrushFromTexture(SlotTexture);
+}
+
+void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType)
+{
+	FText ItemCountText;
+
+	if (SlotItemCount > 0)
+	{
+		ItemCountText = FText::FromString(FString::FromInt(SlotItemCount));
+	}
+	else
+	{
+		ItemCountText = FText();
+	}
+
+	switch (TabType)
+	{
+	case ETabType::WeaponTab:
+		if (SlotIndex >= WEAPON_TAB_SLOT_COUNT)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Out of Index - WeaponTab"));
+			break;
+		}
+
+		WeaponTabItemCountTextArray[SlotIndex]->SetText(ItemCountText);
+		break;
+	case ETabType::MiscTab:
+		if (SlotIndex >= MISC_TAB_SLOT_COUNT)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Out of Index - MiscTab"));
+			break;
+		}
+
+		MiscTabItemCountTextArray[SlotIndex]->SetText(ItemCountText);
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Not Available Tab"));
+		break;
+	}
 }
 
 void UInventoryWidget::OnWeaponTabSlotClicked()

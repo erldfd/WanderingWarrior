@@ -5,9 +5,14 @@
 
 #include "InventorySlotWidgetImage.h"
 
+#include "Components/TextBlock.h"
+
+#define QUICK_SLOT_COUNT 8
+
 void UQuickSlotWidget::NativeOnInitialized()
 {
-	QuickSlotImageArray.Init(nullptr, 8);
+	QuickSlotImageArray.Init(nullptr, QUICK_SLOT_COUNT);
+	QuickSlotItemCountTextArray.Init(nullptr, QUICK_SLOT_COUNT);
 
 	for (int i = 0; i < QuickSlotImageArray.Num(); ++i)
 	{
@@ -26,6 +31,15 @@ void UQuickSlotWidget::NativeOnInitialized()
 		QuickSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
 		//QuickSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UQuickSlotWidget::OnWeaponTabSlotClicked);
 		QuickSlotImageArray[i]->SetSlotIndex(i);
+
+		WidgetNameString = FString("QuickSlotItemCountText_");
+		WidgetNameString.Append(FString::FromInt(i));
+		WidgetName = FName(WidgetNameString);
+
+		UTextBlock* TextBlock = Cast<UTextBlock>(GetWidgetFromName(WidgetName));
+
+		QuickSlotItemCountTextArray[i] = TextBlock;
+		QuickSlotItemCountTextArray[i]->SetText(FText());
 	}
 }
 
@@ -57,4 +71,26 @@ void UQuickSlotWidget::SetSlotImageFromTextureInternal(TArray<UInventorySlotWidg
 	SlotImageArray[SlotIndex]->SetBrushFromTexture(SlotTexture);
 	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Hidden);
 	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Visible);//이미지 새로고침이 왜 안될까.. 그래서 임시방편으로 넣음
+}
+
+void UQuickSlotWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex)
+{
+	if (SlotIndex >= QUICK_SLOT_COUNT)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Out of Index - WeaponTab"));
+		return;
+	}
+
+	FText ItemCountText;
+
+	if (SlotItemCount > 0)
+	{
+		ItemCountText = FText::FromString(FString::FromInt(SlotItemCount));
+	}
+	else
+	{
+		ItemCountText = FText();
+	}
+
+	QuickSlotItemCountTextArray[SlotIndex]->SetText(ItemCountText);
 }

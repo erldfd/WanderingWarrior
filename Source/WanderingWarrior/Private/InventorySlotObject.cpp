@@ -7,7 +7,7 @@
 
 #include "Engine/Texture2D.h"
 
-UInventorySlotObject::UInventorySlotObject()
+UInventorySlotObject::UInventorySlotObject() : HoldedItemCount(0)
 {
 }
 

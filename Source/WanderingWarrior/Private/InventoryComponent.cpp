@@ -104,47 +104,47 @@ bool UInventoryComponent::ObtainItem(AAItem* NewItem)
 {
 	if (NewItem == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, NewItem == nullptr"));
 		return false;
 	}
 
 	check(InventoryWidget != nullptr);
 
+	UInventorySlotObject* Slot = nullptr;
+
+	ETabType TabType;
+
 	if (NewItem->IsA<AWeapon>())
 	{
-		UInventorySlotObject* Slot = WeaponTab->GetItemHoldableSlot(NewItem);
-		
-		if (Slot == nullptr)
-		{
-			return false;
-		}
-
-		Slot->SetSlotItem(NewItem);
-
-		int SlotIndex = Slot->GetSlotIndex();
-		InventoryWidget->SetSlotImageFromTexture(WeaponTab->GetTabType(), SlotIndex, NewItem->GetItemSlotTexture());
-		
-		Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
-		return true;
+		Slot = WeaponTab->GetItemHoldableSlot(NewItem);
+		TabType = ETabType::WeaponTab;
 	}
 	else if (NewItem->IsA<AMiscItem>())
 	{
-		UInventorySlotObject* Slot = MiscTab->GetItemHoldableSlot(NewItem);
-
-		if (Slot == nullptr)
-		{
-			return false;
-		}
-
-		Slot->SetSlotItem(NewItem);
-
-		int SlotIndex = Slot->GetSlotIndex();
-		InventoryWidget->SetSlotImageFromTexture(MiscTab->GetTabType(), SlotIndex, NewItem->GetItemSlotTexture());
-		
-		Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
-		return true;
+		Slot = MiscTab->GetItemHoldableSlot(NewItem);
+		TabType = ETabType::MiscTab;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, Not Available Item Type"));
+		return false;
 	}
 
-	return false;
+	if (Slot == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, Slot == nullptr"));
+		return false;
+	}
+
+	Slot->SetSlotItem(NewItem);
+
+	int SlotIndex = Slot->GetSlotIndex();
+	InventoryWidget->SetSlotImageFromTexture(TabType, SlotIndex, NewItem->GetItemSlotTexture());
+
+	Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
+	InventoryWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), SlotIndex, TabType);
+
+	return true;
 }
 
 bool UInventoryComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
@@ -155,6 +155,8 @@ bool UInventoryComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 	}
 
 	Slot->UseSlotItem();
+
+	InventoryWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), Slot->GetSlotIndex(), CurrentActivatedTabType);
 
 	if (Slot->GetHoldedItemCount() == 0)
 	{

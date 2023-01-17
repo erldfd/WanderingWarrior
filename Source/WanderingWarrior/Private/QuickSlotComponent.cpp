@@ -49,30 +49,29 @@ bool UQuickSlotComponent::ObtainItem(AAItem* NewItem)
 {
 	if (NewItem == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("QuiclSlotComponent, ObtainItem, NewItem == nullptr"));
 		return false;
 	}
 
 	check(QuickSlotWidget != nullptr);
 
-	if (NewItem != nullptr)
+	UInventorySlotObject* Slot = QuickSlotTab->GetItemHoldableSlot(NewItem);
+
+	if (Slot == nullptr)
 	{
-		UInventorySlotObject* Slot = QuickSlotTab->GetItemHoldableSlot(NewItem);
-
-		if (Slot == nullptr)
-		{
-			return false;
-		}
-
-		Slot->SetSlotItem(NewItem);
-
-		int SlotIndex = Slot->GetSlotIndex();
-		QuickSlotWidget->SetSlotImageFromTexture(SlotIndex, NewItem->GetItemSlotTexture());
-
-		Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
-		return true;
+		UE_LOG(LogTemp, Warning, TEXT("QuiclSlotComponent, ObtainItem, Slot == nullptr"));
+		return false;
 	}
 
-	return false;
+	Slot->SetSlotItem(NewItem);
+
+	int SlotIndex = Slot->GetSlotIndex();
+	QuickSlotWidget->SetSlotImageFromTexture(SlotIndex, NewItem->GetItemSlotTexture());
+
+	Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
+	QuickSlotWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), SlotIndex);
+
+	return true;
 }
 
 bool UQuickSlotComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
@@ -84,6 +83,8 @@ bool UQuickSlotComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 
 	Slot->UseSlotItem();
 	
+	QuickSlotWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), Slot->GetSlotIndex());
+
 	if (Slot->GetHoldedItemCount() == 0)
 	{
 		int SlotIndex = Slot->GetSlotIndex();

@@ -7,8 +7,6 @@ UInventorySlotWidgetImage::UInventorySlotWidgetImage(const FObjectInitializer& O
 {
 	OnMouseButtonDownEvent.Clear();
 	OnMouseButtonDownEvent.BindUFunction(this, FName("OnClicked"));
-	//OnMouseButtonDownEvent.IsBoundToObject
-	UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidgetImage OnMouseButtonDownEvent is bound? : %d, %s"), OnMouseButtonDownEvent.IsBound(), *GetName());
 }
 
 void UInventorySlotWidgetImage::OnClicked()

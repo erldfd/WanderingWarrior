@@ -25,7 +25,6 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("EnemyCharacter BeginPlay"));
 
 	UWWAnimInstance* PlayerAnimInstance = Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->GetPlayerAnimInstance();
 	ensure(PlayerAnimInstance != nullptr);

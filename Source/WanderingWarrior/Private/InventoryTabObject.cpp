@@ -21,7 +21,6 @@ UInventoryTabObject::UInventoryTabObject() : SlotCount(12)
 
 			InventorySlotArray[i] = CreateDefaultSubobject<UInventorySlotObject>(SlotName);
 			InventorySlotArray[i]->SetSlotIndex(i);
-			UE_LOG(LogTemp, Warning, TEXT("InvnetoryTabobject SetSlotIndexNumber : %d"), InventorySlotArray[i]->GetSlotIndex());
 		}
 	}
 }
