@@ -40,7 +40,7 @@ void UInventoryTabObject::SetSlotCount(int NewSlotCount)
 
 UInventorySlotObject* UInventoryTabObject::GetSlotFromIndex(int Index)
 {
-	if (ensure(InventorySlotArray.IsValidIndex(Index)) == false) return nullptr;
+	if (ensureMsgf(InventorySlotArray.IsValidIndex(Index), TEXT("InvalidIndex : %d"), Index) == false) return nullptr;
 
 	return InventorySlotArray[Index];
 }

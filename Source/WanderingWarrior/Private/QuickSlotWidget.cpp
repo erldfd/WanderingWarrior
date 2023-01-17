@@ -55,4 +55,6 @@ void UQuickSlotWidget::SetSlotImageFromTextureInternal(TArray<UInventorySlotWidg
 	}
 
 	SlotImageArray[SlotIndex]->SetBrushFromTexture(SlotTexture);
+	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Hidden);
+	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Visible);//이미지 새로고침이 왜 안될까.. 그래서 임시방편으로 넣음
 }

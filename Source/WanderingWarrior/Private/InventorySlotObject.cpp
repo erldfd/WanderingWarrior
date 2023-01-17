@@ -55,7 +55,7 @@ bool UInventorySlotObject::SetHoldedItemCount(int NewCount)
 
 bool UInventorySlotObject::UseSlotItem()
 {
-	if (HoldedItemCount <= 0)
+	if (HoldedItemCount <= 0 || SlotItem == nullptr)
 	{
 		return false;
 	}
