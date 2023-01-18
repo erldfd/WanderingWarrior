@@ -17,6 +17,7 @@ UQuickSlotComponent::UQuickSlotComponent()
 
 	QuickSlotTab = CreateDefaultSubobject<UInventoryTabObject>(TEXT("QuickSlotTab"));
 	QuickSlotTab->SetSlotCount(8);
+	QuickSlotTab->SetTabType(ETabType::QuickSlotTab);
 	// ...
 }
 

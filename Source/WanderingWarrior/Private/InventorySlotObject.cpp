@@ -7,7 +7,7 @@
 
 #include "Engine/Texture2D.h"
 
-UInventorySlotObject::UInventorySlotObject() : HoldedItemCount(0)
+UInventorySlotObject::UInventorySlotObject() : HeldItemCount(0)
 {
 }
 
@@ -38,7 +38,7 @@ void UInventorySlotObject::SetSlotIndex(int NewIndex)
 
 int UInventorySlotObject::GetHoldedItemCount()
 {
-	return HoldedItemCount;
+	return HeldItemCount;
 }
 
 bool UInventorySlotObject::SetHoldedItemCount(int NewCount)
@@ -48,24 +48,24 @@ bool UInventorySlotObject::SetHoldedItemCount(int NewCount)
 		return false;
 	}
 
-	HoldedItemCount = NewCount;
+	HeldItemCount = NewCount;
 
 	return true;
 }
 
 bool UInventorySlotObject::UseSlotItem()
 {
-	if (HoldedItemCount <= 0 || SlotItem == nullptr)
+	if (HeldItemCount <= 0 || SlotItem == nullptr)
 	{
 		return false;
 	}
 
-	SlotItem->Use();
-	HoldedItemCount--;
-	UE_LOG(LogTemp, Warning, TEXT("HOldedItemCount : %d"), HoldedItemCount);
-	if (HoldedItemCount == 0)
+ 	SlotItem->Use();
+	HeldItemCount--;
+	UE_LOG(LogTemp, Warning, TEXT("HOldedItemCount : %d"), HeldItemCount);
+	if (HeldItemCount == 0)
 	{
-		SlotItem == nullptr;
+		SlotItem = nullptr;
 	}
 
 	return true;

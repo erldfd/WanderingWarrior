@@ -39,5 +39,5 @@ private:
 	TObjectPtr<class AAItem> SlotItem;
 
 	int SlotIndex;
-	int HoldedItemCount;
+	int HeldItemCount;
 };

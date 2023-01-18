@@ -58,5 +58,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UCharacterStatComponent> CharacterStat;
 
+	UPROPERTY()
 	TObjectPtr<class APlayerCharacter> PlayerCharacter;
 };

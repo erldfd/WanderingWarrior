@@ -36,6 +36,7 @@ protected:
 
 private:
 
+	UPROPERTY()
 	TObjectPtr<class UInventoryTabObject> QuickSlotTab;
 
 	TObjectPtr<class UQuickSlotWidget> QuickSlotWidget;	

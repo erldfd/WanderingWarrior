@@ -6,7 +6,9 @@
 #include "InventorySlotObject.h"
 #include "AItem.h"
 
-UInventoryTabObject::UInventoryTabObject() : SlotCount(12)
+#define SLOT_COUNT 12
+
+UInventoryTabObject::UInventoryTabObject() : SlotCount(SLOT_COUNT)
 {
 	InventorySlotArray.Init(nullptr, SlotCount);
 
