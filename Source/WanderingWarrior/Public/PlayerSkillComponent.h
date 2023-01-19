@@ -38,4 +38,13 @@ private:
 	FTimerHandle CoolDownTimerHandle;
 
 	int MoveCount;
+
+	UPROPERTY()
+	TObjectPtr<UParticleSystem> PS_RockBurst0;
+
+	UPROPERTY()
+	TObjectPtr<USoundBase> SW_RockBurst0_0;
+
+	UPROPERTY()
+	TObjectPtr<USoundBase> SW_RockBurst0_1;
 };

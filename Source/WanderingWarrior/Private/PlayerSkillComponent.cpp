@@ -10,15 +10,33 @@
 #include "InGameWidget.h"
 
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values for this component's properties
 UPlayerSkillComponent::UPlayerSkillComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS_ROCKBURST0(TEXT("/Game/FX/PS_RockBurst0.PS_RockBurst0"));
+	if (PS_ROCKBURST0.Succeeded())
+	{
+		PS_RockBurst0 = PS_ROCKBURST0.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> SW_ROCKBURST0_0(TEXT("/Game/FX/SW_RockBurst0_0.SW_RockBurst0_0"));
+	if (SW_ROCKBURST0_0.Succeeded())
+	{
+		SW_RockBurst0_0 = SW_ROCKBURST0_0.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> SW_ROCKBURST0_1(TEXT("/Game/FX/SW_RockBurst0_1.SW_RockBurst0_1"));
+	if (SW_ROCKBURST0_1.Succeeded())
+	{
+		SW_RockBurst0_1 = SW_ROCKBURST0_1.Object;
+	}
 }
 
 
@@ -88,14 +106,30 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 		return;
 	}
 
+	const FRotator Rotation = GetOwner()->GetActorRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	// get forward vector
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector SkillLocation = Center + Direction * 150;
+	UGameplayStatics::SpawnEmitterAtLocation(World, PS_RockBurst0, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Rotation, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, GetOwner()->GetActorLocation());
+
+	World->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
+
+		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
+	}), 1, false, 0.3);
+
+	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::MoveForward), 0.01, true);
+
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
 	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,
-		Center,
+		FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88),
 		FQuat::Identity,
-		ECollisionChannel::ECC_EngineTraceChannel2,
-		FCollisionShape::MakeBox(FVector(Radius, Radius, 1)),
+		ECollisionChannel::ECC_GameTraceChannel7,
+		FCollisionShape::MakeSphere(Radius),
 		CollisionQueryParam
 	);
 
@@ -124,15 +158,16 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
-			DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Blue, false, 1, 0, 1);
+			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
+		DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Red, false, 1, 0, 1);
+	DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Red, false, 1, 0, 1);
 }
 
 void UPlayerSkillComponent::MoveForward()
