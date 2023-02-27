@@ -47,6 +47,8 @@ protected:
 private:
 
 	void OnStartNextCombo();
+	void OnDragDropInventorySlot(int DragStartSlotIndex, int DragEndSlotIndex, int DragStartSlotTabType, int DragEndSlotTabType);
+	void ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEndSlotIndex, enum class ETabType DragStartSlotTabType, enum class ETabType DragEndSlotTabType);
 
 private:
 

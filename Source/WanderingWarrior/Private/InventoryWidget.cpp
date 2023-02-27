@@ -5,6 +5,7 @@
 
 #include "InventorySlotWidgetImage.h"
 #include "InventoryTabObject.h"
+#include "InventorySlotWidget.h"
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
@@ -17,27 +18,31 @@
 void UInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
 	UE_LOG(LogTemp, Warning, TEXT("InvenntoryWidget NativeOnInitailized"));
-	WeaponTabSlotImageArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
+	//WeaponTabSlotImageArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
+	WeaponTabSlotWidgetArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
 	WeaponTabItemCountTextArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
 
-	for (int i = 0; i < WeaponTabSlotImageArray.Num(); ++i)
+	for (int i = 0; i < WeaponTabSlotWidgetArray.Num(); ++i)
 	{
-		if (WeaponTabSlotImageArray.IsValidIndex(i) == false)
+		if (WeaponTabSlotWidgetArray.IsValidIndex(i) == false)
 		{
 			break;
 		}
 
-		FString WidgetNameString("WeaponTabSlotImage_");
+		FString WidgetNameString("WeaponTabSlotWidget_");
 		WidgetNameString.Append(FString::FromInt(i));
 		FName WidgetName(WidgetNameString);
 
-		UInventorySlotWidgetImage* SlotImage = Cast<UInventorySlotWidgetImage>(GetWidgetFromName(WidgetName));
+		UInventorySlotWidget* SlotWidget = Cast<UInventorySlotWidget>(GetWidgetFromName(WidgetName));
 
-		WeaponTabSlotImageArray[i] = SlotImage;
-		WeaponTabSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
-		WeaponTabSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UInventoryWidget::OnWeaponTabSlotClicked);
-		WeaponTabSlotImageArray[i]->SetSlotIndex(i);
+		WeaponTabSlotWidgetArray[i] = SlotWidget;
+		WeaponTabSlotWidgetArray[i]->GetSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+		WeaponTabSlotWidgetArray[i]->GetDragSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+		WeaponTabSlotWidgetArray[i]->OnLeftMouseButtonUpDelegate.BindUObject(this, &UInventoryWidget::OnWeaponTabSlotClicked);
+		WeaponTabSlotWidgetArray[i]->SetSlotIndex(i);
+		WeaponTabSlotWidgetArray[i]->SetTabTypeBelongTo(ETabType::WeaponTab);
 
 		WidgetNameString = FString("WeaponTabItemCount_");
 		WidgetNameString.Append(FString::FromInt(i));
@@ -49,26 +54,28 @@ void UInventoryWidget::NativeOnInitialized()
 		WeaponTabItemCountTextArray[i]->SetText(FText());
 	}
 	
-	MiscTabSlotImageArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
+	MiscTabSlotWidgetArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
 	MiscTabItemCountTextArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
 
-	for (int i = 0; i < MiscTabSlotImageArray.Num(); ++i)
+	for (int i = 0; i < MiscTabSlotWidgetArray.Num(); ++i)
 	{
-		if (MiscTabSlotImageArray.IsValidIndex(i) == false)
+		if (MiscTabSlotWidgetArray.IsValidIndex(i) == false)
 		{
 			break;
 		}
 
-		FString WidgetNameString("MiscTabSlotImage_");
+		FString WidgetNameString("MiscTabSlotWidget_");
 		WidgetNameString.Append(FString::FromInt(i));
 		FName WidgetName(WidgetNameString);
 
-		UInventorySlotWidgetImage* SlotImage = Cast<UInventorySlotWidgetImage>(GetWidgetFromName(WidgetName));
+		UInventorySlotWidget* SlotWidget = Cast<UInventorySlotWidget>(GetWidgetFromName(WidgetName));
 
-		MiscTabSlotImageArray[i] = SlotImage;
-		MiscTabSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
-		MiscTabSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UInventoryWidget::OnMiscTabSlotClicked);
-		MiscTabSlotImageArray[i]->SetSlotIndex(i);
+		MiscTabSlotWidgetArray[i] = SlotWidget;
+		//MiscTabSlotWidgetArray[i]->GetSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+		//MiscTabSlotWidgetArray[i]->GetDragSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+		MiscTabSlotWidgetArray[i]->OnLeftMouseButtonUpDelegate.BindUObject(this, &UInventoryWidget::OnMiscTabSlotClicked);
+		MiscTabSlotWidgetArray[i]->SetSlotIndex(i);
+		MiscTabSlotWidgetArray[i]->SetTabTypeBelongTo(ETabType::MiscTab);
 
 		WidgetNameString = FString("MiscTabItemCount_");
 		WidgetNameString.Append(FString::FromInt(i));
@@ -121,63 +128,65 @@ void UInventoryWidget::NativeOnInitialized()
 	UE_LOG(LogTemp, Warning, TEXT("MiscTabButton Onclicked is Bound? : %d"), MiscTabButton->OnClicked.IsBound());
 }
 
-TArray<UInventorySlotWidgetImage*> UInventoryWidget::GetSlotImageArray(ETabType TabType)
+TArray<UInventorySlotWidget*> UInventoryWidget::GetSlotWidgetArray(ETabType TabType)
 {
 	switch (TabType)
 	{
 	case ETabType::WeaponTab:
 
-		return WeaponTabSlotImageArray;
+		return WeaponTabSlotWidgetArray;
 
 	case ETabType::MiscTab:
 
-		return MiscTabSlotImageArray;
+		return MiscTabSlotWidgetArray;
 
 	default:
 
 		UE_LOG(LogTemp, Warning, TEXT("GetSlotImageArray Failed.. Return WeaponTabslotImageArray"));
-		return WeaponTabSlotImageArray;
+		return WeaponTabSlotWidgetArray;
 	}
 }
 
-void UInventoryWidget::SetSlotImageFromTexture(ETabType TabType, int SlotIndex, UTexture2D* SlotTexture)
+void UInventoryWidget::SetSlotWidgetImageFromTexture(ETabType TabType, int SlotIndex, UTexture2D* SlotTexture)
 {
-	TArray<UInventorySlotWidgetImage*> SlotImageArray;
+	TArray<UInventorySlotWidget*> SlotWidgetArray;
 
 	switch (TabType)
 	{
 	case ETabType::WeaponTab:
-		SlotImageArray = WeaponTabSlotImageArray;
+		SlotWidgetArray = WeaponTabSlotWidgetArray;
 		break;
 	case ETabType::MiscTab:
-		SlotImageArray = MiscTabSlotImageArray;
+		SlotWidgetArray = MiscTabSlotWidgetArray;
 		break;
 	default:
-		UE_LOG(LogTemp, Warning, TEXT("SetSlotImageFromTexture Failed.. WeaponTabslotImageArray is modified"));
-		SlotImageArray = WeaponTabSlotImageArray;
+		UE_LOG(LogTemp, Warning, TEXT("SetSlotImageFromTexture Failed.. WeaponTabslotWidgetArray is modified"));
+		SlotWidgetArray = WeaponTabSlotWidgetArray;
 		break;
 	}
 
-	SetSlotImageFromTextureInternal(SlotImageArray, SlotIndex, SlotTexture);
+	SetSlotWidgetImageFromTextureInternal(SlotWidgetArray, SlotIndex, SlotTexture);
 }
 
-void UInventoryWidget::SetSlotImageFromTextureInternal(TArray<UInventorySlotWidgetImage*> SlotImageArray, int SlotIndex, UTexture2D* SlotTexture)
+void UInventoryWidget::SetSlotWidgetImageFromTextureInternal(TArray<UInventorySlotWidget*> SlotWidgetArray, int SlotIndex, UTexture2D* SlotTexture)
 {
-	if (SlotIndex < 0 || SlotIndex > SlotImageArray.Num() - 1)
+	if (SlotIndex < 0 || SlotIndex > SlotWidgetArray.Num() - 1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("SlotIndex - Out of Index"));
+		UE_LOG(LogTemp, Error, TEXT("InventoryWidget, SetSlotWidgetImageFromTextureInternal SlotIndex - Out of Index"));
 		return;
 	}
 
-	check(SlotImageArray.IsValidIndex(SlotIndex));
-	check(SlotImageArray[SlotIndex] != nullptr);
+	check(SlotWidgetArray.IsValidIndex(SlotIndex));
+	check(SlotWidgetArray[SlotIndex] != nullptr);
 
 	if (SlotTexture == nullptr)
 	{
 		SlotTexture = EmptySlotTexture;
 	}
 
-	SlotImageArray[SlotIndex]->SetBrushFromTexture(SlotTexture);
+	SlotWidgetArray[SlotIndex]->GetSlotImage()->SetBrushFromTexture(SlotTexture);
+	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetBrushFromTexture(SlotTexture);
+	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetBrushSize(FVector2D(170, 115));
 }
 
 void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType)
@@ -219,52 +228,44 @@ void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ET
 	}
 }
 
-void UInventoryWidget::OnWeaponTabSlotClicked()
+void UInventoryWidget::OnWeaponTabSlotClicked(int SlotIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget : OnWeaponTabSlotClicked"));
-	for (int i = 0; i < WeaponTabSlotImageArray.Num(); ++i)
+
+	if (WeaponTabSlotWidgetArray.IsValidIndex(SlotIndex) == false ||
+		WeaponTabSlotWidgetArray[SlotIndex] == nullptr)
 	{
-		if (WeaponTabSlotImageArray.IsValidIndex(i) == false ||
-			WeaponTabSlotImageArray[i] == nullptr ||
-			WeaponTabSlotImageArray[i]->GetIsClicked() == false)
-		{
-			continue;
-		}
-
-		WeaponTabSlotImageArray[i]->SetIsClicked(false);
-
-		if (OnSlotImageWidgetClickedDelegate.IsBound() == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnSlotImageWidgetClickedDelegate is not bound."));
-			return;
-		}
-
-		OnSlotImageWidgetClickedDelegate.Execute(WeaponTabSlotImageArray[i]->GetSlotIndex());
+		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnWeaponTabSlotClicked, It is invailed index"));
+		return;
 	}
+
+	if (OnSlotImageWidgetClickedDelegate.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnSlotImageWidgetClickedDelegate is not bound."));
+		return;
+	}
+
+	OnSlotImageWidgetClickedDelegate.Execute(SlotIndex);
 }
 
-void UInventoryWidget::OnMiscTabSlotClicked()
+void UInventoryWidget::OnMiscTabSlotClicked(int SlotIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget : OnMiscTabSlotClicked"));
-	for (int i = 0; i < MiscTabSlotImageArray.Num(); ++i)
+
+	if (MiscTabSlotWidgetArray.IsValidIndex(SlotIndex) == false ||
+		MiscTabSlotWidgetArray[SlotIndex] == nullptr)
 	{
-		if (MiscTabSlotImageArray.IsValidIndex(i) == false ||
-			MiscTabSlotImageArray[i] == nullptr ||
-			MiscTabSlotImageArray[i]->GetIsClicked() == false)
-		{
-			continue;
-		}
-
-		MiscTabSlotImageArray[i]->SetIsClicked(false);
-
-		if (OnSlotImageWidgetClickedDelegate.IsBound() == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnSlotImageWidgetClickedDelegate is not bound."));
-			return;
-		}
-
-		OnSlotImageWidgetClickedDelegate.Execute(MiscTabSlotImageArray[i]->GetSlotIndex());
+		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnMiscTabSlotClicked, It is invailed index"));
+		return;
 	}
+
+	if (OnSlotImageWidgetClickedDelegate.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnSlotImageWidgetClickedDelegate is not bound."));
+		return;
+	}
+
+	OnSlotImageWidgetClickedDelegate.Execute(SlotIndex);
 }
 
 void UInventoryWidget::ConvertToWeaponTab()

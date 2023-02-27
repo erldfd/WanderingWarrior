@@ -28,7 +28,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	class UInventoryTabObject* GetTab(ETabName Tab);
+	class UInventoryTabObject* GetTab(enum class ETabType Tab);
 
 	class UInventoryWidget* GetInventoryWidget();
 
@@ -40,6 +40,8 @@ public:
 	void OpenAndCloseInventory();
 
 	bool IsInventoryVisible();
+
+	void SetInventoryWidget(class UInventoryWidget* NewInventoryWidget);
 
 public:
 
@@ -53,6 +55,9 @@ private:
 
 	void OnSlotImageWidgetClicked(int SlotIndex);
 	void OnConvertTab(int TabIndex);
+	void OnDragDropSlot(int StartDragSlotIndex, int SlotIndex);
+
+	void ExchangeOrMoveSlotItem(int SlotIndex1, int SlotIndex2);
 
 private:
 

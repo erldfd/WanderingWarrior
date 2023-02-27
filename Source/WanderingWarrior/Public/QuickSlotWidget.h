@@ -19,9 +19,11 @@ class WANDERINGWARRIOR_API UQuickSlotWidget : public UUserWidget
 public:
 
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
-	void SetSlotImageFromTexture(int SlotIndex, class UTexture2D* SlotTexture = nullptr);
+	void SetSlotWidgetImageFromTexture(int SlotIndex, class UTexture2D* SlotTexture = nullptr);
 
 	void SetSlotItemCountText(int SlotItemCount, int SlotIndex);
+
+	TArray<class UInventorySlotWidget*> GetQuickSlotWidgetArray();
 
 protected:
 
@@ -29,12 +31,17 @@ protected:
 
 private:
 
-	void SetSlotImageFromTextureInternal(TArray<class UInventorySlotWidgetImage*> SlotImageArray, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
+	void SetSlotWidgetImageFromTextureInternal(TArray<class UInventorySlotWidget*> SlotImageArray, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
+
+	void OnQuickSlotClicked(int SlotIndex);
 
 private:
 
+	//UPROPERTY()
+	//TArray<TObjectPtr<class UInventorySlotWidgetImage>> QuickSlotImageArray;
+
 	UPROPERTY()
-	TArray<TObjectPtr<class UInventorySlotWidgetImage>> QuickSlotImageArray;
+	TArray<TObjectPtr<class UInventorySlotWidget>> QuickSlotWidgetArray;
 
 	UPROPERTY()
 	TArray<TObjectPtr<class UTextBlock>> QuickSlotItemCountTextArray;

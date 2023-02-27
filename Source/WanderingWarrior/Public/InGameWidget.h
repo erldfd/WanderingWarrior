@@ -23,6 +23,7 @@ public:
 	void SetMyHPBarPercent(float Percent);
 
 	class UQuickSlotWidget* GetQuickSlotWidget();
+	class UInventoryWidget* GetInventoryWidget();
 
 protected:
 
@@ -48,6 +49,9 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UQuickSlotWidget> QuickSlotWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UInventoryWidget> InventoryWidget;
 
 	FTimerHandle HideEnemyHPAndNameWidgetTimerHandle = { };
 };

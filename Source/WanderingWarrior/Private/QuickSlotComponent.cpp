@@ -7,6 +7,7 @@
 #include "InventoryTabObject.h"
 #include "InventorySlotObject.h"
 #include "AItem.h"
+#include "InventorySlotWidget.h"
 
 // Sets default values for this component's properties
 UQuickSlotComponent::UQuickSlotComponent()
@@ -67,10 +68,13 @@ bool UQuickSlotComponent::ObtainItem(AAItem* NewItem)
 	Slot->SetSlotItem(NewItem);
 
 	int SlotIndex = Slot->GetSlotIndex();
-	QuickSlotWidget->SetSlotImageFromTexture(SlotIndex, NewItem->GetItemSlotTexture());
+	QuickSlotWidget->SetSlotWidgetImageFromTexture(SlotIndex, NewItem->GetItemSlotTexture());
 
 	Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
 	QuickSlotWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), SlotIndex);
+
+	TArray<UInventorySlotWidget*> SlotWidgetArray = QuickSlotWidget->GetQuickSlotWidgetArray();
+	SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(false);
 
 	return true;
 }
@@ -91,7 +95,10 @@ bool UQuickSlotComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 		int SlotIndex = Slot->GetSlotIndex();
 
 		check(QuickSlotWidget != nullptr);
-		QuickSlotWidget->SetSlotImageFromTexture(Slot->GetSlotIndex());
+		QuickSlotWidget->SetSlotWidgetImageFromTexture(Slot->GetSlotIndex());
+
+		TArray<UInventorySlotWidget*> SlotWidgetArray = QuickSlotWidget->GetQuickSlotWidgetArray();
+		SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(true);
 	}
 
 	return true;

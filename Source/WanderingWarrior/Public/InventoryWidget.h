@@ -22,10 +22,10 @@ class WANDERINGWARRIOR_API UInventoryWidget : public UUserWidget
 	
 public:
 
-	TArray<class UInventorySlotWidgetImage*> GetSlotImageArray(enum class ETabType TabType);
+	TArray<class UInventorySlotWidget*> GetSlotWidgetArray(enum class ETabType TabType);
 
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
-	void SetSlotImageFromTexture(enum class ETabType TabType, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
+	void SetSlotWidgetImageFromTexture(enum class ETabType TabType, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
 
 	void SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType);
 
@@ -41,10 +41,10 @@ protected:
 
 private:
 
-	void SetSlotImageFromTextureInternal(TArray<UInventorySlotWidgetImage*> SlotImageArray, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
-
-	void OnWeaponTabSlotClicked();
-	void OnMiscTabSlotClicked();
+	void SetSlotWidgetImageFromTextureInternal(TArray<UInventorySlotWidget*> SlotImageArray, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
+	
+	void OnWeaponTabSlotClicked(int SlotIndex);
+	void OnMiscTabSlotClicked(int SlotIndex);
 
 	UFUNCTION()
 	void ConvertToWeaponTab();
@@ -60,16 +60,23 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* MiscTabButton;
 
+	//UPROPERTY()
+	//TArray<TObjectPtr<class UInventorySlotWidgetImage>> WeaponTabSlotImageArray;
 	UPROPERTY()
-	TArray<TObjectPtr<class UInventorySlotWidgetImage>> WeaponTabSlotImageArray;
+	TArray<TObjectPtr<class UInventorySlotWidget>> WeaponTabSlotWidgetArray;
 
-	UPROPERTY();
+	UPROPERTY()
 	TArray<TObjectPtr<class UTextBlock>> WeaponTabItemCountTextArray;
 
-	UPROPERTY()
-	TArray<TObjectPtr<class UInventorySlotWidgetImage>> MiscTabSlotImageArray;
+	//UPROPERTY()
+	//TArray<TObjectPtr<class UInventorySlotWidgetImage>> MiscTabSlotImageArray;
 
+	UPROPERTY()
+	TArray<TObjectPtr<class UInventorySlotWidget>> MiscTabSlotWidgetArray;
+
+	UPROPERTY()
 	TArray<TObjectPtr<class UTextBlock>> MiscTabItemCountTextArray;
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTexture2D> EmptySlotTexture;
 

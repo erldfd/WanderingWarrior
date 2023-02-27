@@ -6,8 +6,10 @@
 #include "InventoryTabObject.h"
 #include "InventorySlotObject.h"
 #include "InventoryWidget.h"
+#include "InventorySlotWidget.h"
 #include "Weapon.h"
 #include "MiscItem.h"
+#include "InGameWidget.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -43,7 +45,7 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
+	//InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
 	check(InventoryWidget != nullptr);
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UInventoryComponent::OnSlotImageWidgetClicked);
 	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound())
@@ -55,9 +57,34 @@ void UInventoryComponent::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, Not Bound"));
 	}
 
-	InventoryWidget->AddToViewport();
+	//InventoryWidget->AddToViewport();
 	InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	InventoryWidget->OnConvertTabDelegate.BindUObject(this, &UInventoryComponent::OnConvertTab);
+
+	/*TArray<UInventorySlotWidget*> WeaponTabWidgetArray = InventoryWidget->GetSlotWidgetArray(ETabType::WeaponTab);
+	TArray<UInventorySlotWidget*> MiscTabWidgetArray = InventoryWidget->GetSlotWidgetArray(ETabType::MiscTab);
+
+	for (int i = 0; i < WeaponTabWidgetArray.Num(); ++i)
+	{
+		if (WeaponTabWidgetArray.IsValidIndex(i) == false ||
+			WeaponTabWidgetArray[i] == nullptr)
+		{
+			continue;
+		}
+
+		WeaponTabWidgetArray[i]->OnDragDropDelegate.BindUObject(this, &UInventoryComponent::OnDragDropSlot);
+	}
+
+	for (int i = 0; i < MiscTabWidgetArray.Num(); ++i)
+	{
+		if (MiscTabWidgetArray.IsValidIndex(i) == false ||
+			MiscTabWidgetArray[i] == nullptr)
+		{
+			continue;
+		}
+
+		MiscTabWidgetArray[i]->OnDragDropDelegate.BindUObject(this, &UInventoryComponent::OnDragDropSlot);
+	}*/
 }
 
 
@@ -69,19 +96,19 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-UInventoryTabObject* UInventoryComponent::GetTab(ETabName Tab)
+UInventoryTabObject* UInventoryComponent::GetTab(ETabType Tab)
 {
 	UInventoryTabObject* TempTab = nullptr;
 
 	switch (Tab)
 	{
-	case ETabName::WeaponTab:
+	case ETabType::WeaponTab:
 
 		check(WeaponTab != nullptr);
 		TempTab = WeaponTab;
 		break;
 
-	case ETabName::MiscTab:
+	case ETabType::MiscTab:
 
 		check(MiscTab != nullptr);
 		TempTab = MiscTab;
@@ -139,10 +166,13 @@ bool UInventoryComponent::ObtainItem(AAItem* NewItem)
 	Slot->SetSlotItem(NewItem);
 
 	int SlotIndex = Slot->GetSlotIndex();
-	InventoryWidget->SetSlotImageFromTexture(TabType, SlotIndex, NewItem->GetItemSlotTexture());
+	InventoryWidget->SetSlotWidgetImageFromTexture(TabType, SlotIndex, NewItem->GetItemSlotTexture());
 
 	Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
 	InventoryWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), SlotIndex, TabType);
+
+	TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(TabType);
+	SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(false);
 
 	return true;
 }
@@ -163,7 +193,10 @@ bool UInventoryComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 		int SlotIndex = Slot->GetSlotIndex();
 
 		check(InventoryWidget != nullptr);
-		InventoryWidget->SetSlotImageFromTexture(CurrentActivatedTabType, Slot->GetSlotIndex());
+		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, Slot->GetSlotIndex());
+
+		TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(CurrentActivatedTabType);
+		SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(true);
 	}
 
 	return true;
@@ -205,6 +238,12 @@ bool UInventoryComponent::IsInventoryVisible()
 	return InventoryWidget->IsVisible();
 }
 
+void UInventoryComponent::SetInventoryWidget(UInventoryWidget* NewInventoryWidget)
+{
+	check(NewInventoryWidget != nullptr);
+	InventoryWidget = NewInventoryWidget;
+}
+
 void UInventoryComponent::OnSlotImageWidgetClicked(int SlotIndex)
 {
 	UseSlotItemFormSlotIndex(SlotIndex);
@@ -223,3 +262,49 @@ void UInventoryComponent::OnConvertTab(int TabIndex)
 		CurrentActivatedTabType = ETabType::MiscTab;
 	}
 }
+
+/*void UInventoryComponent::OnDragDropSlot(int StartDragSlotIndex, int SlotIndex)
+{
+	ExchangeOrMoveSlotItem(StartDragSlotIndex, SlotIndex);
+}
+
+void UInventoryComponent::ExchangeOrMoveSlotItem(int SlotIndex1, int SlotIndex2)
+{
+	UE_LOG(LogTemp, Warning, TEXT("SlotIndex1 : %d, SlotIndex2 : %d"), SlotIndex1, SlotIndex2);
+
+	UInventorySlotObject* Slot1 = CurrentActivatedTab->GetSlotFromIndex(SlotIndex1);
+	UInventorySlotObject* Slot2 = CurrentActivatedTab->GetSlotFromIndex(SlotIndex2);
+
+	UInventorySlotObject* TempSlot = Slot1;
+	AAItem* TempItem = Slot1->GetSlotItem();
+	int TempHoldedItemCount = Slot1->GetHoldedItemCount();
+
+	if (Slot2->GetSlotItem() == nullptr)
+	{
+		Slot2->SetSlotItem(TempSlot->GetSlotItem());
+		Slot2->SetHoldedItemCount(TempHoldedItemCount);
+		
+		Slot1->SetHoldedItemCount(0);
+		Slot1->SetSlotItem(nullptr);
+
+		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, SlotIndex1);
+
+		TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(CurrentActivatedTabType);
+		SlotWidgetArray[SlotIndex1]->SetIsEmptySlotImage(true);
+		SlotWidgetArray[SlotIndex2]->SetIsEmptySlotImage(false);
+	}
+	else
+	{
+		Slot1->SetSlotItem(Slot2->GetSlotItem());
+		Slot1->SetHoldedItemCount(Slot2->GetHoldedItemCount());
+		Slot2->SetSlotItem(TempSlot->GetSlotItem());
+		Slot2->SetHoldedItemCount(TempHoldedItemCount);
+
+		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, SlotIndex1, Slot1->GetSlotItem()->GetItemSlotTexture());
+	}
+
+	InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, SlotIndex2, Slot2->GetSlotItem()->GetItemSlotTexture());
+
+	InventoryWidget->SetSlotItemCountText(Slot1->GetHoldedItemCount(), SlotIndex1, CurrentActivatedTabType);
+	InventoryWidget->SetSlotItemCountText(Slot2->GetHoldedItemCount(), SlotIndex2, CurrentActivatedTabType);
+}*/

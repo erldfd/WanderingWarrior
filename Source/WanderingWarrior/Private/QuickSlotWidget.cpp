@@ -3,7 +3,9 @@
 
 #include "QuickSlotWidget.h"
 
+#include "InventorySlotWidget.h"
 #include "InventorySlotWidgetImage.h"
+#include "InventoryTabObject.h"
 
 #include "Components/TextBlock.h"
 
@@ -11,26 +13,28 @@
 
 void UQuickSlotWidget::NativeOnInitialized()
 {
-	QuickSlotImageArray.Init(nullptr, QUICK_SLOT_COUNT);
+	QuickSlotWidgetArray.Init(nullptr, QUICK_SLOT_COUNT);
 	QuickSlotItemCountTextArray.Init(nullptr, QUICK_SLOT_COUNT);
 
-	for (int i = 0; i < QuickSlotImageArray.Num(); ++i)
+	for (int i = 0; i < QuickSlotWidgetArray.Num(); ++i)
 	{
-		if (QuickSlotImageArray.IsValidIndex(i) == false)
+		if (QuickSlotWidgetArray.IsValidIndex(i) == false)
 		{
 			break;
 		}
 
-		FString WidgetNameString("QuickSlot_");
+		FString WidgetNameString("QuickSlotWidget_");
 		WidgetNameString.Append(FString::FromInt(i));
 		FName WidgetName(WidgetNameString);
 
-		UInventorySlotWidgetImage* SlotImage = Cast<UInventorySlotWidgetImage>(GetWidgetFromName(WidgetName));
+		UInventorySlotWidget* SlotWidget = Cast<UInventorySlotWidget>(GetWidgetFromName(WidgetName));
 
-		QuickSlotImageArray[i] = SlotImage;
-		QuickSlotImageArray[i]->SetBrushFromTexture(EmptySlotTexture);
-		//QuickSlotImageArray[i]->OnClickedDelegate.BindUObject(this, &UQuickSlotWidget::OnWeaponTabSlotClicked);
-		QuickSlotImageArray[i]->SetSlotIndex(i);
+		QuickSlotWidgetArray[i] = SlotWidget;
+		QuickSlotWidgetArray[i]->GetSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+		QuickSlotWidgetArray[i]->GetDragSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+		QuickSlotWidgetArray[i]->OnLeftMouseButtonUpDelegate.BindUObject(this, &UQuickSlotWidget::OnQuickSlotClicked);
+		QuickSlotWidgetArray[i]->SetSlotIndex(i);
+		QuickSlotWidgetArray[i]->SetTabTypeBelongTo(ETabType::QuickSlotTab);
 
 		WidgetNameString = FString("QuickSlotItemCountText_");
 		WidgetNameString.Append(FString::FromInt(i));
@@ -43,16 +47,16 @@ void UQuickSlotWidget::NativeOnInitialized()
 	}
 }
 
-void UQuickSlotWidget::SetSlotImageFromTexture(int SlotIndex, UTexture2D* SlotTexture)
+void UQuickSlotWidget::SetSlotWidgetImageFromTexture(int SlotIndex, UTexture2D* SlotTexture)
 {
-	TArray<UInventorySlotWidgetImage*> SlotImageArray;
+	TArray<UInventorySlotWidget*> SlotImageArray;
 
-	SlotImageArray = QuickSlotImageArray;
+	SlotImageArray = QuickSlotWidgetArray;
 
-	SetSlotImageFromTextureInternal(SlotImageArray, SlotIndex, SlotTexture);
+	SetSlotWidgetImageFromTextureInternal(SlotImageArray, SlotIndex, SlotTexture);
 }
 
-void UQuickSlotWidget::SetSlotImageFromTextureInternal(TArray<UInventorySlotWidgetImage*> SlotImageArray, int SlotIndex, UTexture2D* SlotTexture)
+void UQuickSlotWidget::SetSlotWidgetImageFromTextureInternal(TArray<UInventorySlotWidget*> SlotImageArray, int SlotIndex, UTexture2D* SlotTexture)
 {
 	if (SlotIndex < 0 || SlotIndex > SlotImageArray.Num() - 1)
 	{
@@ -68,9 +72,11 @@ void UQuickSlotWidget::SetSlotImageFromTextureInternal(TArray<UInventorySlotWidg
 		SlotTexture = EmptySlotTexture;
 	}
 
-	SlotImageArray[SlotIndex]->SetBrushFromTexture(SlotTexture);
-	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Hidden);
-	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Visible);//이미지 새로고침이 왜 안될까.. 그래서 임시방편으로 넣음
+	SlotImageArray[SlotIndex]->GetSlotImage()->SetBrushFromTexture(SlotTexture);
+	SlotImageArray[SlotIndex]->GetDragSlotImage()->SetBrushFromTexture(SlotTexture);
+	SlotImageArray[SlotIndex]->GetDragSlotImage()->SetBrushSize(FVector2D(170, 115));
+	//SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Hidden);
+	//SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Visible);//이미지 새로고침이 왜 안될까.. 그래서 임시방편으로 넣음
 }
 
 void UQuickSlotWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex)
@@ -93,4 +99,16 @@ void UQuickSlotWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex)
 	}
 
 	QuickSlotItemCountTextArray[SlotIndex]->SetText(ItemCountText);
+}
+
+TArray<class UInventorySlotWidget*> UQuickSlotWidget::GetQuickSlotWidgetArray()
+{
+	check(QuickSlotWidgetArray.IsEmpty() == false);
+	check(QuickSlotWidgetArray.IsValidIndex(0));
+	return QuickSlotWidgetArray;
+}
+
+void UQuickSlotWidget::OnQuickSlotClicked(int SlotIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("QuickSlot Clicked : %d"), SlotIndex);
 }

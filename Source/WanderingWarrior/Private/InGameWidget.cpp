@@ -38,6 +38,12 @@ UQuickSlotWidget* UInGameWidget::GetQuickSlotWidget()
 	return QuickSlotWidget;
 }
 
+UInventoryWidget* UInGameWidget::GetInventoryWidget()
+{
+	check(InventoryWidget != nullptr);
+	return InventoryWidget;
+}
+
 void UInGameWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
