@@ -69,4 +69,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UQuickSlotComponent> QuickSlotComponent;
+
+	UPROPERTY()
+	TObjectPtr<class UInventorySlotObject> TempSwapSlot;
 };

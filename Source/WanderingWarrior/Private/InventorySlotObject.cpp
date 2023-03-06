@@ -36,12 +36,12 @@ void UInventorySlotObject::SetSlotIndex(int NewIndex)
 	SlotIndex = NewIndex;
 }
 
-int UInventorySlotObject::GetHoldedItemCount()
+int UInventorySlotObject::GetHeldItemCount()
 {
 	return HeldItemCount;
 }
 
-bool UInventorySlotObject::SetHoldedItemCount(int NewCount)
+bool UInventorySlotObject::SetHeldItemCount(int NewCount)
 {
 	if (NewCount < 0 || NewCount > SlotItem->GetMaxItemCount())
 	{

@@ -55,10 +55,10 @@ private:
 private:
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* WeaponTabButton;
+	TObjectPtr<class UButton> WeaponTabButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* MiscTabButton;
+	TObjectPtr<class UButton> MiscTabButton;
 
 	//UPROPERTY()
 	//TArray<TObjectPtr<class UInventorySlotWidgetImage>> WeaponTabSlotImageArray;

@@ -28,8 +28,8 @@ public:
 	int GetSlotIndex();
 	void SetSlotIndex(int NewIndex);
 
-	int GetHoldedItemCount();
-	bool SetHoldedItemCount(int NewCount);
+	int GetHeldItemCount();
+	bool SetHeldItemCount(int NewCount);
 
 	bool UseSlotItem();
 

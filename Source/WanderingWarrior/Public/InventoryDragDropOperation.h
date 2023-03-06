@@ -25,6 +25,7 @@ public:
 
 	enum class ETabType GetTabTypeBelongTo();
 	void SetTabTypeBelongTo(enum class ETabType TabType);
+
 private:
 
 	int StartDragSlotIndex;

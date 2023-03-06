@@ -36,7 +36,7 @@ public:
 	//SlotIndex is Getted Slot Index, if Failed to Get Slot, SlotIndex is -1.
 	class UInventorySlotObject* GetEmptySlot();
 
-	class UInventorySlotObject* GetItemHoldableSlot(class AAItem* Item);
+	class UInventorySlotObject* GetHoldableItemSlot();
 
 	ETabType GetTabType();
 	void SetTabType(ETabType NewTabType);

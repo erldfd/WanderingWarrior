@@ -39,6 +39,11 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	check(PlayerInventory != nullptr);
 
 	PlayerInventory->SetInventoryWidget(InGameWidget->GetInventoryWidget());
+
+	SetShowMouseCursor(false);
+
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
 }
 
 UInGameWidget* AWWPlayerController::GetInGameWidget()
@@ -98,7 +103,7 @@ void AWWPlayerController::OpenAndCloseInventory()
 		SetShowMouseCursor(true);
 
 		FInputModeGameAndUI InputMode;
-		InputMode.SetWidgetToFocus(InGameWidget->GetQuickSlotWidget()->TakeWidget());
+		//InputMode.SetWidgetToFocus(InGameWidget->GetQuickSlotWidget()->TakeWidget());
 		//FInputModeUIOnly InputMode;
 		SetInputMode(InputMode);
 	}

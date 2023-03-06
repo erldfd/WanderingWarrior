@@ -61,7 +61,7 @@ UInventorySlotObject* UInventoryTabObject::GetEmptySlot()
 	return nullptr;
 }
 
-UInventorySlotObject* UInventoryTabObject::GetItemHoldableSlot(AAItem* Item)
+UInventorySlotObject* UInventoryTabObject::GetHoldableItemSlot()
 {
 	for (int i = 0; i < InventorySlotArray.Num(); ++i)
 	{
@@ -71,7 +71,7 @@ UInventorySlotObject* UInventoryTabObject::GetItemHoldableSlot(AAItem* Item)
 		}
 
 		if (InventorySlotArray[i]->IsEmpty() ||
-			InventorySlotArray[i]->GetSlotItem()->GetMaxItemCount() > InventorySlotArray[i]->GetHoldedItemCount())
+			InventorySlotArray[i]->GetSlotItem()->GetMaxItemCount() > InventorySlotArray[i]->GetHeldItemCount())
 		{
 			return InventorySlotArray[i];
 		}

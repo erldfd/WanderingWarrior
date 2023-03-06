@@ -74,9 +74,9 @@ void UQuickSlotWidget::SetSlotWidgetImageFromTextureInternal(TArray<UInventorySl
 
 	SlotImageArray[SlotIndex]->GetSlotImage()->SetBrushFromTexture(SlotTexture);
 	SlotImageArray[SlotIndex]->GetDragSlotImage()->SetBrushFromTexture(SlotTexture);
-	SlotImageArray[SlotIndex]->GetDragSlotImage()->SetBrushSize(FVector2D(170, 115));
-	//SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Hidden);
-	//SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Visible);//이미지 새로고침이 왜 안될까.. 그래서 임시방편으로 넣음
+	SlotImageArray[SlotIndex]->GetDragSlotImage()->SetDesiredSizeOverride(FVector2D(170, 115));
+	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Hidden);
+	SlotImageArray[SlotIndex]->SetVisibility(ESlateVisibility::Visible);//이미지 새로고침이 왜 안될까.. 그래서 임시방편으로 넣음
 }
 
 void UQuickSlotWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex)

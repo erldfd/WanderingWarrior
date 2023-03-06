@@ -143,12 +143,12 @@ bool UInventoryComponent::ObtainItem(AAItem* NewItem)
 
 	if (NewItem->IsA<AWeapon>())
 	{
-		Slot = WeaponTab->GetItemHoldableSlot(NewItem);
+		Slot = WeaponTab->GetHoldableItemSlot();
 		TabType = ETabType::WeaponTab;
 	}
 	else if (NewItem->IsA<AMiscItem>())
 	{
-		Slot = MiscTab->GetItemHoldableSlot(NewItem);
+		Slot = MiscTab->GetHoldableItemSlot();
 		TabType = ETabType::MiscTab;
 	}
 	else
@@ -168,8 +168,8 @@ bool UInventoryComponent::ObtainItem(AAItem* NewItem)
 	int SlotIndex = Slot->GetSlotIndex();
 	InventoryWidget->SetSlotWidgetImageFromTexture(TabType, SlotIndex, NewItem->GetItemSlotTexture());
 
-	Slot->SetHoldedItemCount(Slot->GetHoldedItemCount() + 1);
-	InventoryWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), SlotIndex, TabType);
+	Slot->SetHeldItemCount(Slot->GetHeldItemCount() + 1);
+	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), SlotIndex, TabType);
 
 	TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(TabType);
 	SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(false);
@@ -186,9 +186,9 @@ bool UInventoryComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 
 	Slot->UseSlotItem();
 
-	InventoryWidget->SetSlotItemCountText(Slot->GetHoldedItemCount(), Slot->GetSlotIndex(), CurrentActivatedTabType);
+	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), Slot->GetSlotIndex(), CurrentActivatedTabType);
 
-	if (Slot->GetHoldedItemCount() == 0)
+	if (Slot->GetHeldItemCount() == 0)
 	{
 		int SlotIndex = Slot->GetSlotIndex();
 
@@ -277,14 +277,14 @@ void UInventoryComponent::ExchangeOrMoveSlotItem(int SlotIndex1, int SlotIndex2)
 
 	UInventorySlotObject* TempSlot = Slot1;
 	AAItem* TempItem = Slot1->GetSlotItem();
-	int TempHoldedItemCount = Slot1->GetHoldedItemCount();
+	int TempHoldedItemCount = Slot1->GetHeldItemCount();
 
 	if (Slot2->GetSlotItem() == nullptr)
 	{
 		Slot2->SetSlotItem(TempSlot->GetSlotItem());
-		Slot2->SetHoldedItemCount(TempHoldedItemCount);
+		Slot2->SetHeldItemCount(TempHoldedItemCount);
 		
-		Slot1->SetHoldedItemCount(0);
+		Slot1->SetHeldItemCount(0);
 		Slot1->SetSlotItem(nullptr);
 
 		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, SlotIndex1);
@@ -296,15 +296,15 @@ void UInventoryComponent::ExchangeOrMoveSlotItem(int SlotIndex1, int SlotIndex2)
 	else
 	{
 		Slot1->SetSlotItem(Slot2->GetSlotItem());
-		Slot1->SetHoldedItemCount(Slot2->GetHoldedItemCount());
+		Slot1->SetHeldItemCount(Slot2->GetHeldItemCount());
 		Slot2->SetSlotItem(TempSlot->GetSlotItem());
-		Slot2->SetHoldedItemCount(TempHoldedItemCount);
+		Slot2->SetHeldItemCount(TempHoldedItemCount);
 
 		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, SlotIndex1, Slot1->GetSlotItem()->GetItemSlotTexture());
 	}
 
 	InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, SlotIndex2, Slot2->GetSlotItem()->GetItemSlotTexture());
 
-	InventoryWidget->SetSlotItemCountText(Slot1->GetHoldedItemCount(), SlotIndex1, CurrentActivatedTabType);
-	InventoryWidget->SetSlotItemCountText(Slot2->GetHoldedItemCount(), SlotIndex2, CurrentActivatedTabType);
+	InventoryWidget->SetSlotItemCountText(Slot1->GetHeldItemCount(), SlotIndex1, CurrentActivatedTabType);
+	InventoryWidget->SetSlotItemCountText(Slot2->GetHeldItemCount(), SlotIndex2, CurrentActivatedTabType);
 }*/

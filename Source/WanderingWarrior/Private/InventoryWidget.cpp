@@ -186,7 +186,7 @@ void UInventoryWidget::SetSlotWidgetImageFromTextureInternal(TArray<UInventorySl
 
 	SlotWidgetArray[SlotIndex]->GetSlotImage()->SetBrushFromTexture(SlotTexture);
 	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetBrushFromTexture(SlotTexture);
-	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetBrushSize(FVector2D(170, 115));
+	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetDesiredSizeOverride(FVector2D(170, 115));
 }
 
 void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType)

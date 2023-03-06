@@ -29,5 +29,5 @@ public:
 private:
 
 	UPROPERTY()
-	class UWWAnimInstance* PlayerAnimInstance;
+	TObjectPtr<class UWWAnimInstance> PlayerAnimInstance;
 };

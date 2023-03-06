@@ -65,6 +65,8 @@ APlayerCharacter::APlayerCharacter()
 
 	Tags.Init("", 1);
 	Tags[0] = TEXT("Player");
+
+	TempSwapSlot = NewObject<UInventorySlotObject>();
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -233,39 +235,38 @@ void APlayerCharacter::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEn
 	check(DragStartSlotWidgetArray.IsValidIndex(DragStartSlotIndex));
 	check(DragEndSlotWidgetArray.IsValidIndex(DragEndSlotIndex));
 
-	UInventorySlotObject* TempSlot = DragStartSlot;
-	AAItem* TempItem = DragStartSlot->GetSlotItem();
-	int TempHoldedItemCount = DragStartSlot->GetHoldedItemCount();
+	TempSwapSlot->SetSlotItem(DragStartSlot->GetSlotItem());
+	TempSwapSlot->SetHeldItemCount(DragStartSlot->GetHeldItemCount());
+	int TempHoldedItemCount = TempSwapSlot->GetHeldItemCount();
 
-	
 	if (DragEndSlot->GetSlotItem() == nullptr)
 	{
-		DragEndSlot->SetSlotItem(TempSlot->GetSlotItem());
-		DragEndSlot->SetHoldedItemCount(TempHoldedItemCount);
+		DragEndSlot->SetSlotItem(TempSwapSlot->GetSlotItem());
+		DragEndSlot->SetHeldItemCount(TempHoldedItemCount);
 
-		DragStartSlot->SetHoldedItemCount(0);
+		DragStartSlot->SetHeldItemCount(0);
 		DragStartSlot->SetSlotItem(nullptr);
 
 		if (DragStartSlotTabType == ETabType::WeaponTab || DragStartSlotTabType == ETabType::MiscTab)
 		{
 			InventoryWidget->SetSlotWidgetImageFromTexture(DragStartSlotTabType, DragStartSlotIndex);
-			InventoryWidget->SetSlotItemCountText(DragStartSlot->GetHoldedItemCount(), DragStartSlotIndex, DragStartSlotTabType);
+			InventoryWidget->SetSlotItemCountText(DragStartSlot->GetHeldItemCount(), DragStartSlotIndex, DragStartSlotTabType);
 		}
 		else
 		{
 			QuickSlotWidget->SetSlotWidgetImageFromTexture(DragStartSlotIndex);
-			QuickSlotWidget->SetSlotItemCountText(DragStartSlot->GetHoldedItemCount(), DragStartSlotIndex);
+			QuickSlotWidget->SetSlotItemCountText(DragStartSlot->GetHeldItemCount(), DragStartSlotIndex);
 		}
 
 		if (DragEndSlotTabType == ETabType::WeaponTab || DragEndSlotTabType == ETabType::MiscTab)
 		{
 			InventoryWidget->SetSlotWidgetImageFromTexture(DragEndSlotTabType, DragEndSlotIndex, DragEndSlot->GetSlotItem()->GetItemSlotTexture());
-			InventoryWidget->SetSlotItemCountText(DragEndSlot->GetHoldedItemCount(), DragEndSlotIndex, DragEndSlotTabType);
+			InventoryWidget->SetSlotItemCountText(DragEndSlot->GetHeldItemCount(), DragEndSlotIndex, DragEndSlotTabType);
 		}
 		else
 		{
 			QuickSlotWidget->SetSlotWidgetImageFromTexture(DragEndSlotIndex, DragEndSlot->GetSlotItem()->GetItemSlotTexture());
-			QuickSlotWidget->SetSlotItemCountText(DragEndSlot->GetHoldedItemCount(), DragEndSlotIndex);
+			QuickSlotWidget->SetSlotItemCountText(DragEndSlot->GetHeldItemCount(), DragEndSlotIndex);
 		}
 		
 		DragStartSlotWidgetArray[DragStartSlotIndex]->SetIsEmptySlotImage(true);
@@ -274,30 +275,30 @@ void APlayerCharacter::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEn
 	else
 	{
 		DragStartSlot->SetSlotItem(DragEndSlot->GetSlotItem());
-		DragStartSlot->SetHoldedItemCount(DragEndSlot->GetHoldedItemCount());
-		DragEndSlot->SetSlotItem(TempSlot->GetSlotItem());
-		DragEndSlot->SetHoldedItemCount(TempHoldedItemCount);
+		DragStartSlot->SetHeldItemCount(DragEndSlot->GetHeldItemCount());
+		DragEndSlot->SetSlotItem(TempSwapSlot->GetSlotItem());
+		DragEndSlot->SetHeldItemCount(TempHoldedItemCount);
 
 		if (DragStartSlotTabType == ETabType::WeaponTab || DragStartSlotTabType == ETabType::MiscTab)
 		{
 			InventoryWidget->SetSlotWidgetImageFromTexture(DragStartSlotTabType, DragStartSlotIndex, DragStartSlot->GetSlotItem()->GetItemSlotTexture());
-			InventoryWidget->SetSlotItemCountText(DragStartSlot->GetHoldedItemCount(), DragStartSlotIndex, DragStartSlotTabType);
+			InventoryWidget->SetSlotItemCountText(DragStartSlot->GetHeldItemCount(), DragStartSlotIndex, DragStartSlotTabType);
 		}
 		else
 		{
 			QuickSlotWidget->SetSlotWidgetImageFromTexture(DragStartSlotIndex, DragStartSlot->GetSlotItem()->GetItemSlotTexture());
-			QuickSlotWidget->SetSlotItemCountText(DragStartSlot->GetHoldedItemCount(), DragStartSlotIndex);
+			QuickSlotWidget->SetSlotItemCountText(DragStartSlot->GetHeldItemCount(), DragStartSlotIndex);
 		}
 
-		if (DragStartSlotTabType == ETabType::WeaponTab || DragStartSlotTabType == ETabType::MiscTab)
+		if (DragEndSlotTabType == ETabType::WeaponTab || DragEndSlotTabType == ETabType::MiscTab)
 		{
 			InventoryWidget->SetSlotWidgetImageFromTexture(DragEndSlotTabType, DragEndSlotIndex, DragEndSlot->GetSlotItem()->GetItemSlotTexture());
-			InventoryWidget->SetSlotItemCountText(DragEndSlot->GetHoldedItemCount(), DragEndSlotIndex, DragEndSlotTabType);
+			InventoryWidget->SetSlotItemCountText(DragEndSlot->GetHeldItemCount(), DragEndSlotIndex, DragEndSlotTabType);
 		}
 		else
 		{
 			QuickSlotWidget->SetSlotWidgetImageFromTexture(DragEndSlotIndex, DragEndSlot->GetSlotItem()->GetItemSlotTexture());
-			QuickSlotWidget->SetSlotItemCountText(DragEndSlot->GetHoldedItemCount(), DragEndSlotIndex);
+			QuickSlotWidget->SetSlotItemCountText(DragEndSlot->GetHeldItemCount(), DragEndSlotIndex);
 		}
 	}
 }

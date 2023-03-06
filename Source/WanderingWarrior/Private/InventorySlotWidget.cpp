@@ -8,6 +8,7 @@
 
 #include "Components/Image.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/PanelWidget.h"
 
 int UInventorySlotWidget::GetSlotIndex()
 {
@@ -59,6 +60,8 @@ void UInventorySlotWidget::NativeOnInitialized()
 	StartDragSlotIndex = -1;
 	bIsEmptySlotImage = true;
 	DragSlotImage->SetDesiredSizeOverride(FVector2D(170, 120));
+	//DragSlotImage->Visibility = ESlateVisibility::Visible;
+	//DragSlotImage->SetColorAndOpacity(FLinearColor(1, 1, 1, 0));
 }
 
 FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -70,6 +73,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 		if (bIsEmptySlotImage == false)
 		{
 			reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
+			//DragSlotImage->SetColorAndOpacity(FLinearColor(1, 1, 1, 1));
 		}
 		
 		if (OnLeftMouseButtonDownDelegate.IsBound() == false)
@@ -115,14 +119,24 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 	check(InventoryDragDropOperation != nullptr);
 	check(DragSlotImage != nullptr);
 	
+	UE_LOG(LogTemp, Warning, TEXT("Parent : %s"), *DragSlotImage->GetParent()->GetName());
+	/*UPanelWidget* Parent = Cast<UPanelWidget>(DragSlotImage->GetParent());
+	check(Parent != nullptr);
+
+	Parent->AddChild(DragSlotImage);
+
+	if (Parent->GetChildIndex(DragSlotImage) == INDEX_NONE)
+	{
+		Parent->AddChild(DragSlotImage);
+	}*/
+
+	DragSlotImage->SetVisibility(ESlateVisibility::Visible);
 	InventoryDragDropOperation->DefaultDragVisual = Cast<UWidget>(DragSlotImage);
 
-	UImage* Image = Cast<UImage>(InventoryDragDropOperation->DefaultDragVisual);
-	check(Image != nullptr);
+	//UImage* Image = Cast<UImage>(InventoryDragDropOperation->DefaultDragVisual);
+	//check(Image != nullptr);
 
-	//Image->SetDesiredSizeOverride(FVector2D(170, 115));
-	//Image->SetDesiredSizeOverride(FVector2D(100, 100));
-	Image->SetVisibility(ESlateVisibility::Visible);
+	//Image->SetVisibility(ESlateVisibility::Visible);
 
 	InventoryDragDropOperation->SetStartDragSlotIndex(SlotIndex);
 	InventoryDragDropOperation->Pivot = EDragPivot::MouseDown;

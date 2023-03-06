@@ -35,7 +35,7 @@ private:
 private:
 
 	UPROPERTY()
-	TArray<TSubclassOf<class AWeapon>> WeaponClassList;
+	TArray<TSubclassOf<class AWeapon>> WeaponClassArray;
 
 	TArray<struct FWeaponDataRow*> WeaponDataList;
 

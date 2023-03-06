@@ -25,7 +25,7 @@ ETabType UInventoryDragDropOperation::GetTabTypeBelongTo()
 	return TabTypeBelongTo;
 }
 
-void UInventoryDragDropOperation::SetTabTypeBelongTo(ETabType TabType)
+void UInventoryDragDropOperation::SetTabTypeBelongTo(enum ETabType TabType)
 {
 	TabTypeBelongTo = TabType;
 }

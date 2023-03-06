@@ -26,7 +26,7 @@ UWWGameInstance::UWWGameInstance()
 		ConstructorHelpers::FClassFinder<AWeapon> BP_Weapon(*WeaponDataList[i]->WeaponBlueprintPath);
 		if (BP_Weapon.Succeeded())
 		{
-			WeaponClassList.Emplace(BP_Weapon.Class);
+			WeaponClassArray.Emplace(BP_Weapon.Class);
 		}
 		else
 		{
@@ -63,10 +63,10 @@ void UWWGameInstance::Init()
 
 AWeapon* UWWGameInstance::GetWeapon(EWeaponName Name)
 {
-	int Index = FMath::Clamp((int)Name, 0, WeaponClassList.Num());
-	check(WeaponClassList.IsValidIndex(Index));
+	int Index = FMath::Clamp((int)Name, 0, WeaponClassArray.Num());
+	check(WeaponClassArray.IsValidIndex(Index));
 
-	auto NewWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClassList[Index]);
+	auto NewWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClassArray[Index]);
 
 	NewWeapon->SetAttackDamage(WeaponDataList[Index]->WeaponDamage);
 	NewWeapon->SetItemName(WeaponDataList[Index]->WeaponName);
