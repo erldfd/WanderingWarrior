@@ -6,10 +6,9 @@
 #include "InventorySlotObject.h"
 #include "AItem.h"
 #include "ItemData.h"
+#include "WWConstContainer.h"
 
-#define SLOT_COUNT 12
-
-UInventoryTabObject::UInventoryTabObject() : SlotCount(SLOT_COUNT)
+UInventoryTabObject::UInventoryTabObject() : SlotCount(SlotCount::WEAPON_TAB_SLOT_COUNT)
 {
 	InventorySlotArray.Init(nullptr, SlotCount);
 

@@ -25,7 +25,7 @@ void AMainMenuPlayerController::OnPossess(APawn* aPawn)
 	SetShowMouseCursor(true);
 
 	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
+	//InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
 	//FInputModeUIOnly InputMode;
 	SetInputMode(InputMode);
 }

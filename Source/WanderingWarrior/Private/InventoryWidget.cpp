@@ -6,23 +6,21 @@
 #include "InventorySlotWidgetImage.h"
 #include "InventoryTabObject.h"
 #include "InventorySlotWidget.h"
+#include "WWConstContainer.h"
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/TextBlock.h"
 #include "Styling/SlateBrush.h"
 
-#define WEAPON_TAB_SLOT_COUNT 12
-#define MISC_TAB_SLOT_COUNT 12
-
 void UInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
 	UE_LOG(LogTemp, Warning, TEXT("InvenntoryWidget NativeOnInitailized"));
-	//WeaponTabSlotImageArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
-	WeaponTabSlotWidgetArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
-	WeaponTabItemCountTextArray.Init(nullptr, WEAPON_TAB_SLOT_COUNT);
+
+	WeaponTabSlotWidgetArray.Init(nullptr, SlotCount::WEAPON_TAB_SLOT_COUNT);
+	WeaponTabItemCountTextArray.Init(nullptr, SlotCount::WEAPON_TAB_SLOT_COUNT);
 
 	for (int i = 0; i < WeaponTabSlotWidgetArray.Num(); ++i)
 	{
@@ -54,8 +52,8 @@ void UInventoryWidget::NativeOnInitialized()
 		WeaponTabItemCountTextArray[i]->SetText(FText());
 	}
 	
-	MiscTabSlotWidgetArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
-	MiscTabItemCountTextArray.Init(nullptr, MISC_TAB_SLOT_COUNT);
+	MiscTabSlotWidgetArray.Init(nullptr, SlotCount::MISC_TAB_SLOT_COUNT);
+	MiscTabItemCountTextArray.Init(nullptr, SlotCount::MISC_TAB_SLOT_COUNT);
 
 	for (int i = 0; i < MiscTabSlotWidgetArray.Num(); ++i)
 	{
@@ -205,7 +203,7 @@ void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ET
 	switch (TabType)
 	{
 	case ETabType::WeaponTab:
-		if (SlotIndex >= WEAPON_TAB_SLOT_COUNT)
+		if (SlotIndex >= SlotCount::WEAPON_TAB_SLOT_COUNT)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Out of Index - WeaponTab"));
 			break;
@@ -214,7 +212,7 @@ void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ET
 		WeaponTabItemCountTextArray[SlotIndex]->SetText(ItemCountText);
 		break;
 	case ETabType::MiscTab:
-		if (SlotIndex >= MISC_TAB_SLOT_COUNT)
+		if (SlotIndex >= SlotCount::MISC_TAB_SLOT_COUNT)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Out of Index - MiscTab"));
 			break;

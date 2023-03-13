@@ -6,15 +6,14 @@
 #include "InventorySlotWidget.h"
 #include "InventorySlotWidgetImage.h"
 #include "InventoryTabObject.h"
+#include "WWConstContainer.h"
 
 #include "Components/TextBlock.h"
 
-#define QUICK_SLOT_COUNT 8
-
 void UQuickSlotWidget::NativeOnInitialized()
 {
-	QuickSlotWidgetArray.Init(nullptr, QUICK_SLOT_COUNT);
-	QuickSlotItemCountTextArray.Init(nullptr, QUICK_SLOT_COUNT);
+	QuickSlotWidgetArray.Init(nullptr, SlotCount::QUICK_SLOT_COUNT);
+	QuickSlotItemCountTextArray.Init(nullptr, SlotCount::QUICK_SLOT_COUNT);
 
 	for (int i = 0; i < QuickSlotWidgetArray.Num(); ++i)
 	{
@@ -81,7 +80,7 @@ void UQuickSlotWidget::SetSlotWidgetImageFromTextureInternal(TArray<UInventorySl
 
 void UQuickSlotWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex)
 {
-	if (SlotIndex >= QUICK_SLOT_COUNT)
+	if (SlotIndex >= SlotCount::QUICK_SLOT_COUNT)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, SetSlotItemCountText, Out of Index - WeaponTab"));
 		return;

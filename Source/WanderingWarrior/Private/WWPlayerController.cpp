@@ -56,13 +56,6 @@ void AWWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
-	check(InGameWidget != nullptr);
-
-	InGameWidget->AddToViewport();
-
-	PlayerCharacter->GetQuickSlotComponent()->SetQuickSlotWidget(InGameWidget->GetQuickSlotWidget());*/
-
 	CharacterStat->OnHPChangedDelegate.AddUObject(this, &AWWPlayerController::OnHPChanged);
 }
 
