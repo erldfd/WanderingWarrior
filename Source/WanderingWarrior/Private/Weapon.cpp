@@ -13,7 +13,6 @@
 
 #include "Components/BoxComponent.h"
 
-
 // Sets default values
 AWeapon::AWeapon() : AttackDamage(1)
 {
@@ -83,17 +82,15 @@ void AWeapon::SetAttackDamage(float NewDamage)
 	AttackDamage = NewDamage;
 }
 
-void AWeapon::Use()
+void AWeapon::Use(const UWorld& World)
 {
-	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetWorld()->GetFirstPlayerController());
+	check(&World != nullptr);
+
+	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(World.GetFirstPlayerController());
 	check(PlayerController != nullptr);
 
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
 	check(PlayerCharacter != nullptr);
 
 	PlayerCharacter->EquipWeapon(this);
-
-	SetActorEnableCollision(true);
-	SetActorHiddenInGame(false);
-	SetActorTickEnabled(true);
 }

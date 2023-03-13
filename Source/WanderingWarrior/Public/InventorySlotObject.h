@@ -4,9 +4,14 @@
 
 #include "CoreMinimal.h"
 
+//#include "WWGameInstance.h"
+#include "ItemData.h"
+
 #include "UObject/NoExportTypes.h"
 
 #include "InventorySlotObject.generated.h"
+
+struct FItemDataRow;
 
 /**
  * 
@@ -20,18 +25,18 @@ public:
 
 	UInventorySlotObject();
 
-	class AAItem* GetSlotItem();
-	void SetSlotItem(class AAItem* NewItem);
+	const FItemDataRow& GetSlotItemData() const;
+	void SetSlotItemData(const FItemDataRow& NewItemData);
 
 	bool IsEmpty();
 
-	int GetSlotIndex();
+	const int& GetSlotIndex() const;
 	void SetSlotIndex(int NewIndex);
 
-	int GetHeldItemCount();
+	const int& GetHeldItemCount() const;
 	bool SetHeldItemCount(int NewCount);
 
-	bool UseSlotItem();
+	bool UseSlotItem(const UWorld& World);
 
 private:
 
@@ -40,4 +45,6 @@ private:
 
 	int SlotIndex;
 	int HeldItemCount;
+
+	FItemDataRow SlotItemData;
 };

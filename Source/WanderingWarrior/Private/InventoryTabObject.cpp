@@ -5,6 +5,7 @@
 
 #include "InventorySlotObject.h"
 #include "AItem.h"
+#include "ItemData.h"
 
 #define SLOT_COUNT 12
 
@@ -71,7 +72,7 @@ UInventorySlotObject* UInventoryTabObject::GetHoldableItemSlot()
 		}
 
 		if (InventorySlotArray[i]->IsEmpty() ||
-			InventorySlotArray[i]->GetSlotItem()->GetMaxItemCount() > InventorySlotArray[i]->GetHeldItemCount())
+			InventorySlotArray[i]->GetSlotItemData().MaxItemCount > InventorySlotArray[i]->GetHeldItemCount())
 		{
 			return InventorySlotArray[i];
 		}

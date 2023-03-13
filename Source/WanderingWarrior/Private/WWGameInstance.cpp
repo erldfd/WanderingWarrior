@@ -3,55 +3,53 @@
 
 #include "WWGameInstance.h"
 
-#include "WeaponData.h"
-#include "MiscItemData.h"
 #include "Weapon.h"
 #include "MiscItem.h"
+#include "ItemData.h"
 
 #include "GameFramework/Actor.h"
 
 UWWGameInstance::UWWGameInstance() 
 {
-	TSubclassOf<UWeaponData> WeaponData = UWeaponData::StaticClass();
-	WeaponDataList =  *WeaponData.GetDefaultObject()->GetWeaponDataRowList();
+	TSubclassOf<UItemData> ItemData = UItemData::StaticClass();
+	WeaponDataArray =  ItemData.GetDefaultObject()->GetItemDataRowArray(EItemType::Weapon);
 
-	ensure(WeaponDataList.Num() > 0);
+	ensure(WeaponDataArray.Num() > 0);
 
 	UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *GetName());
 
-	for (int i = 0; i < WeaponDataList.Num(); ++i)
+	for (int i = 0; i < WeaponDataArray.Num(); ++i)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *WeaponDataList[i]->WeaponBlueprintPath);
+		UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *WeaponDataArray[i]->BlueprintPath);
 
-		ConstructorHelpers::FClassFinder<AWeapon> BP_Weapon(*WeaponDataList[i]->WeaponBlueprintPath);
+		ConstructorHelpers::FClassFinder<AWeapon> BP_Weapon(*WeaponDataArray[i]->BlueprintPath);
 		if (BP_Weapon.Succeeded())
 		{
 			WeaponClassArray.Emplace(BP_Weapon.Class);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed : %s"), *WeaponDataList[i]->WeaponBlueprintPath)
+			UE_LOG(LogTemp, Warning, TEXT("Failed : %s"), *WeaponDataArray[i]->BlueprintPath)
 		}
 	}
 
-	TSubclassOf<UMiscItemData> MiscItemData = UMiscItemData::StaticClass();
-	MiscItemDataArray = *MiscItemData.GetDefaultObject()->GetMiscItemDataRowArray();
+	MiscItemDataArray = ItemData.GetDefaultObject()->GetItemDataRowArray(EItemType::Misc);
 	ensure(MiscItemDataArray.Num() > 0);
 
 	UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *GetName());
 
 	for (int i = 0; i < MiscItemDataArray.Num(); ++i)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *MiscItemDataArray[i]->ItemBlueprintPath);
+		UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *MiscItemDataArray[i]->BlueprintPath);
 
-		ConstructorHelpers::FClassFinder<AMiscItem> BP_Weapon(*MiscItemDataArray[i]->ItemBlueprintPath);
+		ConstructorHelpers::FClassFinder<AMiscItem> BP_Weapon(*MiscItemDataArray[i]->BlueprintPath);
 		if (BP_Weapon.Succeeded())
 		{
 			MiscItemClassArray.Emplace(BP_Weapon.Class);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed : %s"), *MiscItemDataArray[i]->ItemBlueprintPath)
+			UE_LOG(LogTemp, Warning, TEXT("Failed : %s"), *MiscItemDataArray[i]->BlueprintPath)
 		}
 	}
 }
@@ -61,40 +59,31 @@ void UWWGameInstance::Init()
 	Super::Init();
 }
 
-AWeapon* UWWGameInstance::GetWeapon(EWeaponName Name)
+AWeapon* UWWGameInstance::SpawnWeapon(EWeaponName Name)
 {
 	int Index = FMath::Clamp((int)Name, 0, WeaponClassArray.Num());
 	check(WeaponClassArray.IsValidIndex(Index));
 
 	auto NewWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClassArray[Index]);
+	NewWeapon->SetAttackDamage(WeaponDataArray[Index]->Damage);
+	NewWeapon->SetItemName(WeaponDataArray[Index]->Name);
+	NewWeapon->SetItemSlotTexture(WeaponDataArray[Index]->SlotTexture);
 
-	NewWeapon->SetAttackDamage(WeaponDataList[Index]->WeaponDamage);
-	NewWeapon->SetItemName(WeaponDataList[Index]->WeaponName);
-	NewWeapon->SetItemSlotTexture(WeaponDataList[Index]->SlotTexture);
-
-	NewWeapon->SetActorEnableCollision(false);
-	NewWeapon->SetActorHiddenInGame(true);
-	NewWeapon->SetActorTickEnabled(false);
-	
 	return NewWeapon;
 }
 
-AMiscItem* UWWGameInstance::GetMiscItem(EMiscItemName Name)
+FItemDataRow* UWWGameInstance::GetWeaponData(EWeaponName Name) const
 {
-	int Index = FMath::Clamp((int)Name, 0, MiscItemClassArray.Num());
-	check(MiscItemClassArray.IsValidIndex(Index));
+	int Index = FMath::Clamp((int)Name, 0, WeaponDataArray.Num());
+	check(WeaponDataArray.IsValidIndex(Index));
 
-	auto NewItem = GetWorld()->SpawnActor<AMiscItem>(MiscItemClassArray[Index]);
-
-	NewItem->SetItemName(MiscItemDataArray[Index]->ItemName);
-	NewItem->SetItemSlotTexture(MiscItemDataArray[Index]->SlotTexture);
-
-	NewItem->SetActorEnableCollision(false);
-	NewItem->SetActorHiddenInGame(true);
-	NewItem->SetActorTickEnabled(false);
-
-	return NewItem;
+	return WeaponDataArray[Index];
 }
 
+FItemDataRow* UWWGameInstance::GetMiscItemData(EMiscItemName Name) const
+{
+	int Index = FMath::Clamp((int)Name, 0, MiscItemDataArray.Num());
+	check(MiscItemDataArray.IsValidIndex(Index));
 
-
+	return MiscItemDataArray[Index];
+}

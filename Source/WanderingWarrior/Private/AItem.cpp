@@ -3,8 +3,10 @@
 
 #include "AItem.h"
 
-#include "Kismet/GameplayStatics.h"
+#include "WWGameInstance.h"
 
+//#include "Engine/DataTable.h"
+#include "Engine/Texture2D.h"
 // Sets default values
 AAItem::AAItem()
 {
@@ -44,7 +46,7 @@ void AAItem::SetItemSlotTexture(UTexture2D* NewTexture)
 	ItemSlotTexture = NewTexture;
 }
 
-void AAItem::Use()
+void AAItem::Use(const UWorld& World)
 {
 	UE_LOG(LogTemp, Fatal, TEXT("This is for Pure Virual Function.. dont Implement it"));
 }

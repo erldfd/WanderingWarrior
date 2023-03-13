@@ -27,7 +27,7 @@ public:
 
 	AMiscItem();
 
-	virtual void Use() override;
+	virtual void Use(const UWorld& World) override;
 
 protected:
 

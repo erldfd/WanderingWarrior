@@ -9,6 +9,8 @@
 #include "AItem.h"
 #include "InventorySlotWidget.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values for this component's properties
 UQuickSlotComponent::UQuickSlotComponent()
 {
@@ -27,7 +29,14 @@ UQuickSlotComponent::UQuickSlotComponent()
 void UQuickSlotComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	/*UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	check(GameInstance != nullptr);
 
+	for (int i = 0; i < 8; ++i)
+	{
+		QuickSlotTab->GetSlotFromIndex(i)->SetGameInstance(GameInstance);
+	}*/
 	// ...
 	
 }
@@ -65,7 +74,7 @@ bool UQuickSlotComponent::ObtainItem(AAItem* NewItem)
 		return false;
 	}
 
-	Slot->SetSlotItem(NewItem);
+	//Slot->SetSlotItem(NewItem);
 
 	int SlotIndex = Slot->GetSlotIndex();
 	QuickSlotWidget->SetSlotWidgetImageFromTexture(SlotIndex, NewItem->GetItemSlotTexture());
@@ -81,12 +90,12 @@ bool UQuickSlotComponent::ObtainItem(AAItem* NewItem)
 
 bool UQuickSlotComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 {
-	if (Slot == nullptr || Slot->GetSlotItem() == nullptr)
+	if (Slot == nullptr || Slot->GetHeldItemCount() == 0)
 	{
 		return false;
 	}
 
-	Slot->UseSlotItem();
+	/*Slot->UseSlotItem();*/
 	
 	QuickSlotWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), Slot->GetSlotIndex());
 

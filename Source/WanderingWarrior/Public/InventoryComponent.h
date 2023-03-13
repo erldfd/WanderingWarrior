@@ -8,6 +8,9 @@
 
 #include "InventoryComponent.generated.h"
 
+enum class EWeaponName;
+enum class EMiscItemName;
+
 //param : is inventory opened?
 DECLARE_DELEGATE_OneParam(FOnOpenAndCloseInventoryDelegate, bool);
 enum class ETabName
@@ -31,8 +34,10 @@ public:
 	class UInventoryTabObject* GetTab(enum class ETabType Tab);
 
 	class UInventoryWidget* GetInventoryWidget();
+	void SetInventoryWidget(class UInventoryWidget* NewInventoryWidget);
 
-	bool ObtainItem(class AAItem* NewItem);
+	bool ObtainItem(EWeaponName WeaponName);
+	bool ObtainItem(EMiscItemName MiscItemName);
 
 	bool UseSlotItemFromSlot(class UInventorySlotObject* Slot);
 	bool UseSlotItemFormSlotIndex(int Index);
@@ -40,8 +45,6 @@ public:
 	void OpenAndCloseInventory();
 
 	bool IsInventoryVisible();
-
-	void SetInventoryWidget(class UInventoryWidget* NewInventoryWidget);
 
 public:
 

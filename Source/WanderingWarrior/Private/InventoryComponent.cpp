@@ -10,6 +10,10 @@
 #include "Weapon.h"
 #include "MiscItem.h"
 #include "InGameWidget.h"
+#include "ItemData.h"
+#include "WWGameInstance.h"
+
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -45,7 +49,6 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//InventoryWidget = CreateWidget<UInventoryWidget>(GetWorld(), InventoryWidgetClass);
 	check(InventoryWidget != nullptr);
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UInventoryComponent::OnSlotImageWidgetClicked);
 	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound())
@@ -57,34 +60,8 @@ void UInventoryComponent::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, Not Bound"));
 	}
 
-	//InventoryWidget->AddToViewport();
 	InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	InventoryWidget->OnConvertTabDelegate.BindUObject(this, &UInventoryComponent::OnConvertTab);
-
-	/*TArray<UInventorySlotWidget*> WeaponTabWidgetArray = InventoryWidget->GetSlotWidgetArray(ETabType::WeaponTab);
-	TArray<UInventorySlotWidget*> MiscTabWidgetArray = InventoryWidget->GetSlotWidgetArray(ETabType::MiscTab);
-
-	for (int i = 0; i < WeaponTabWidgetArray.Num(); ++i)
-	{
-		if (WeaponTabWidgetArray.IsValidIndex(i) == false ||
-			WeaponTabWidgetArray[i] == nullptr)
-		{
-			continue;
-		}
-
-		WeaponTabWidgetArray[i]->OnDragDropDelegate.BindUObject(this, &UInventoryComponent::OnDragDropSlot);
-	}
-
-	for (int i = 0; i < MiscTabWidgetArray.Num(); ++i)
-	{
-		if (MiscTabWidgetArray.IsValidIndex(i) == false ||
-			MiscTabWidgetArray[i] == nullptr)
-		{
-			continue;
-		}
-
-		MiscTabWidgetArray[i]->OnDragDropDelegate.BindUObject(this, &UInventoryComponent::OnDragDropSlot);
-	}*/
 }
 
 
@@ -127,35 +104,30 @@ UInventoryWidget* UInventoryComponent::GetInventoryWidget()
 	return InventoryWidget;
 }
 
-bool UInventoryComponent::ObtainItem(AAItem* NewItem)
+void UInventoryComponent::SetInventoryWidget(UInventoryWidget* NewInventoryWidget)
 {
-	if (NewItem == nullptr)
+	check(NewInventoryWidget != nullptr);
+	InventoryWidget = NewInventoryWidget;
+}
+
+bool UInventoryComponent::ObtainItem(EWeaponName WeaponName)
+{
+	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	check(GameInstance != nullptr);
+
+	FItemDataRow* ItemData = GameInstance->GetWeaponData(WeaponName);
+
+	if (ItemData == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, NewItem == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, ItemData == nullptr"));
 		return false;
 	}
-
+	
 	check(InventoryWidget != nullptr);
 
-	UInventorySlotObject* Slot = nullptr;
+	UInventorySlotObject* Slot = WeaponTab->GetHoldableItemSlot();
 
-	ETabType TabType;
-
-	if (NewItem->IsA<AWeapon>())
-	{
-		Slot = WeaponTab->GetHoldableItemSlot();
-		TabType = ETabType::WeaponTab;
-	}
-	else if (NewItem->IsA<AMiscItem>())
-	{
-		Slot = MiscTab->GetHoldableItemSlot();
-		TabType = ETabType::MiscTab;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, Not Available Item Type"));
-		return false;
-	}
+	ETabType TabType = ETabType::WeaponTab;
 
 	if (Slot == nullptr)
 	{
@@ -163,10 +135,49 @@ bool UInventoryComponent::ObtainItem(AAItem* NewItem)
 		return false;
 	}
 
-	Slot->SetSlotItem(NewItem);
+	Slot->SetSlotItemData(*ItemData);
 
 	int SlotIndex = Slot->GetSlotIndex();
-	InventoryWidget->SetSlotWidgetImageFromTexture(TabType, SlotIndex, NewItem->GetItemSlotTexture());
+	InventoryWidget->SetSlotWidgetImageFromTexture(TabType, SlotIndex, ItemData->SlotTexture);
+
+	Slot->SetHeldItemCount(Slot->GetHeldItemCount() + 1);
+	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), SlotIndex, TabType);
+
+	TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(TabType);
+	SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(false);
+
+	return true;
+}
+
+bool UInventoryComponent::ObtainItem(EMiscItemName MiscItemName)
+{
+	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	check(GameInstance != nullptr);
+
+	FItemDataRow* ItemData = GameInstance->GetMiscItemData(MiscItemName);
+
+	if (ItemData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, ItemData == nullptr"));
+		return false;
+	}
+
+	check(InventoryWidget != nullptr);
+
+	UInventorySlotObject* Slot = MiscTab->GetHoldableItemSlot();
+
+	ETabType TabType = ETabType::MiscTab;
+
+	if (Slot == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComponent, ObtainItem, Slot == nullptr"));
+		return false;
+	}
+
+	Slot->SetSlotItemData(*ItemData);
+
+	int SlotIndex = Slot->GetSlotIndex();
+	InventoryWidget->SetSlotWidgetImageFromTexture(TabType, SlotIndex, ItemData->SlotTexture);
 
 	Slot->SetHeldItemCount(Slot->GetHeldItemCount() + 1);
 	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), SlotIndex, TabType);
@@ -179,12 +190,15 @@ bool UInventoryComponent::ObtainItem(AAItem* NewItem)
 
 bool UInventoryComponent::UseSlotItemFromSlot(UInventorySlotObject* Slot)
 {
-	if (Slot == nullptr || Slot->GetSlotItem() == nullptr)
+	if (Slot == nullptr || Slot->GetHeldItemCount() == 0)
 	{
 		return false;
 	}
 
-	Slot->UseSlotItem();
+	UWorld* World = GetWorld();
+	check(World != nullptr);
+
+	Slot->UseSlotItem(*World);
 
 	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), Slot->GetSlotIndex(), CurrentActivatedTabType);
 
@@ -236,12 +250,6 @@ bool UInventoryComponent::IsInventoryVisible()
 {
 	check(InventoryWidget != nullptr);
 	return InventoryWidget->IsVisible();
-}
-
-void UInventoryComponent::SetInventoryWidget(UInventoryWidget* NewInventoryWidget)
-{
-	check(NewInventoryWidget != nullptr);
-	InventoryWidget = NewInventoryWidget;
 }
 
 void UInventoryComponent::OnSlotImageWidgetClicked(int SlotIndex)

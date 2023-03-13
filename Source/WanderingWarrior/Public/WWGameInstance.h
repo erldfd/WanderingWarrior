@@ -24,23 +24,25 @@ public:
 
 	virtual void Init() override;
 
-	class AWeapon* GetWeapon(enum class EWeaponName Name);
+	class AWeapon* SpawnWeapon(enum class EWeaponName Name);
+	class AMiscItem* SpawnMiscItem(enum class EMiscItemName Name);
 
-	class AMiscItem* GetMiscItem(enum class EMiscItemName Name);
+	struct FItemDataRow* GetWeaponData(enum class EWeaponName Name) const;
+	struct FItemDataRow* GetMiscItemData(enum class EMiscItemName Name) const;
 
 private:
 
-	void OnAssetLoadCompleted();
+	const TArray<struct FItemDataRow*>& GetDataArray(enum class EItemType ItemType) const;
 
 private:
 
 	UPROPERTY()
 	TArray<TSubclassOf<class AWeapon>> WeaponClassArray;
 
-	TArray<struct FWeaponDataRow*> WeaponDataList;
+	TArray<struct FItemDataRow*> WeaponDataArray;
 
 	UPROPERTY()
 	TArray<TSubclassOf<class AMiscItem>> MiscItemClassArray;
 
-	TArray<struct FMiscItemDataRow*> MiscItemDataArray;
+	TArray<struct FItemDataRow*> MiscItemDataArray;
 };

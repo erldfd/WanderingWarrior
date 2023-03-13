@@ -4,11 +4,7 @@
 
 #include "WanderingWarrior.h"
 
-#include "WWGameInstance.h"
-
 #include "GameFramework/Actor.h"
-#include "Engine/DataTable.h"
-#include "Engine/Texture2D.h"
 
 #include "AItem.generated.h"
 
@@ -32,10 +28,10 @@ public:
 	FName GetItemName();
 	void SetItemName(FName NewItemName);
 
-	UTexture2D* GetItemSlotTexture();
-	void SetItemSlotTexture(UTexture2D* NewTexture);
+	class UTexture2D* GetItemSlotTexture();
+	void SetItemSlotTexture(class UTexture2D* NewTexture);
 
-	virtual void Use();
+	virtual void Use(const UWorld& World);
 
 	int GetMaxItemCount();
 	// Max Count = 1000
@@ -53,8 +49,5 @@ protected:
 	int MaxItemCount = 1;
 
 	UPROPERTY()
-	TObjectPtr<UWWGameInstance> GameInstance;
-
-	UPROPERTY()
-	TObjectPtr<UTexture2D> ItemSlotTexture;
+	TObjectPtr<class UTexture2D> ItemSlotTexture;
 };

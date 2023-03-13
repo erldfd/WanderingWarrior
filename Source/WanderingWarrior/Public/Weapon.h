@@ -26,7 +26,7 @@ public:
 
 	void SetAttackDamage(float NewDamage);
 
-	virtual void Use() override;
+	virtual void Use(const UWorld& World) override;
 
 protected:
 	// Called when the game starts or when spawned

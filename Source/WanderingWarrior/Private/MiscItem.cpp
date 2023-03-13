@@ -13,9 +13,9 @@ AMiscItem::AMiscItem()
 	RootComponent = ItemStaticMeshComponent;
 }
 
-void AMiscItem::Use()
+void AMiscItem::Use(const UWorld& World)
 {
-	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetWorld()->GetFirstPlayerController());
+	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(World.GetFirstPlayerController());
 	check(PlayerController != nullptr);
 
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());

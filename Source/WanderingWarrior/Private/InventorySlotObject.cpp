@@ -3,30 +3,34 @@
 
 #include "InventorySlotObject.h"
 
-#include "AItem.h"
+#include "Weapon.h"
+#include "MiscItem.h"
+#include "WWGameInstance.h"
+//#include "ItemData.h"
 
 #include "Engine/Texture2D.h"
+#include "Kismet/GameplayStatics.h"
 
 UInventorySlotObject::UInventorySlotObject() : HeldItemCount(0)
 {
 }
 
-AAItem* UInventorySlotObject::GetSlotItem()
+const FItemDataRow& UInventorySlotObject::GetSlotItemData() const
 {
-	return SlotItem;
+	return SlotItemData;
 }
 
-void UInventorySlotObject::SetSlotItem(AAItem* NewItem)
+void UInventorySlotObject::SetSlotItemData(const FItemDataRow& NewItemData)
 {
-	SlotItem = NewItem;
+	SlotItemData = NewItemData;
 }
 
 bool UInventorySlotObject::IsEmpty()
 {
-	return (SlotItem == nullptr);
+	return (HeldItemCount == 0);
 }
 
-int UInventorySlotObject::GetSlotIndex()
+const int& UInventorySlotObject::GetSlotIndex() const
 {
 	return SlotIndex;
 }
@@ -36,14 +40,14 @@ void UInventorySlotObject::SetSlotIndex(int NewIndex)
 	SlotIndex = NewIndex;
 }
 
-int UInventorySlotObject::GetHeldItemCount()
+const int& UInventorySlotObject::GetHeldItemCount() const
 {
 	return HeldItemCount;
 }
 
 bool UInventorySlotObject::SetHeldItemCount(int NewCount)
 {
-	if (NewCount < 0 || NewCount > SlotItem->GetMaxItemCount())
+	if (NewCount < 0 || NewCount > SlotItemData.MaxItemCount)
 	{
 		return false;
 	}
@@ -53,16 +57,42 @@ bool UInventorySlotObject::SetHeldItemCount(int NewCount)
 	return true;
 }
 
-bool UInventorySlotObject::UseSlotItem()
+bool UInventorySlotObject::UseSlotItem(const UWorld& World)
 {
-	if (HeldItemCount <= 0 || SlotItem == nullptr)
+	if (HeldItemCount <= 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("InventorySlotObject, UseSlotItem, HeldItemCount <= 0"));
 		return false;
 	}
 
- 	SlotItem->Use();
+	check(&World != nullptr);
+
+	FName TagName = SlotItemData.ItemTypeTag.GetTagName();
+
+	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(&World));
+
+	if (TagName == "Weapon")
+	{
+		AWeapon* Weapon = GameInstance->SpawnWeapon((EWeaponName)SlotItemData.ID);
+		Weapon->Use(World);
+		
+		//SlotItem->Use();
+	}
+	else if (TagName == "Misc")
+	{
+		AMiscItem* Misc = NewObject<AMiscItem>();
+		Misc->Use(World);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WWCharacter, UseItem, Not Available Item."));
+		return false;
+	}
+
 	HeldItemCount--;
-	UE_LOG(LogTemp, Warning, TEXT("HOldedItemCount : %d"), HeldItemCount);
+
+	UE_LOG(LogTemp, Warning, TEXT("InventorySlotObject, UseSlotItem, HeldItemCount : %d"), HeldItemCount);
+
 	if (HeldItemCount == 0)
 	{
 		SlotItem = nullptr;
