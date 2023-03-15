@@ -10,6 +10,7 @@
 
 enum class EWeaponName;
 enum class EMiscItemName;
+enum class ETabType;
 
 //param : is inventory opened?
 DECLARE_DELEGATE_OneParam(FOnOpenAndCloseInventoryDelegate, bool);
@@ -31,7 +32,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	class UInventoryTabObject* GetTab(enum class ETabType Tab);
+	class UInventoryTabObject* GetTab(ETabType Tab);
 
 	class UInventoryWidget* GetInventoryWidget();
 	void SetInventoryWidget(class UInventoryWidget* NewInventoryWidget);

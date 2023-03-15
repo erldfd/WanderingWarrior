@@ -3,7 +3,6 @@
 
 #include "InventoryWidget.h"
 
-#include "InventorySlotWidgetImage.h"
 #include "InventoryTabObject.h"
 #include "InventorySlotWidget.h"
 #include "WWConstContainer.h"
@@ -12,6 +11,7 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/TextBlock.h"
 #include "Styling/SlateBrush.h"
+#include "Components/Image.h"
 
 void UInventoryWidget::NativeOnInitialized()
 {

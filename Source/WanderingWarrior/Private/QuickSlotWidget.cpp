@@ -4,11 +4,11 @@
 #include "QuickSlotWidget.h"
 
 #include "InventorySlotWidget.h"
-#include "InventorySlotWidgetImage.h"
 #include "InventoryTabObject.h"
 #include "WWConstContainer.h"
 
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 
 void UQuickSlotWidget::NativeOnInitialized()
 {
