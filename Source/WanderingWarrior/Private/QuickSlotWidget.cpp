@@ -6,6 +6,7 @@
 #include "InventorySlotWidget.h"
 #include "InventoryTabObject.h"
 #include "WWConstContainer.h"
+#include "WWEnumClassContainer.h"
 
 #include "Components/TextBlock.h"
 #include "Components/Image.h"

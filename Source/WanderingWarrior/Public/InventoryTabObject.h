@@ -8,12 +8,8 @@
 
 #include "InventoryTabObject.generated.h"
 
-enum class ETabType
-{
-	WeaponTab,
-	MiscTab,
-	QuickSlotTab
-};
+enum class ETabType;
+
 /**
  * 
  */
@@ -29,9 +25,9 @@ public:
 	//virtual void PostInitProperties() override;
 
 	int GetSlotCount();
-	void SetSlotCount(int NewSlotCount);
+	void InitSlots(int NewSlotCount);
 
-	class UInventorySlotObject* GetSlotFromIndex(int Index);
+	class UInventorySlotObject*& GetSlotFromIndex(int Index);
 
 	//SlotIndex is Getted Slot Index, if Failed to Get Slot, SlotIndex is -1.
 	class UInventorySlotObject* GetEmptySlot();

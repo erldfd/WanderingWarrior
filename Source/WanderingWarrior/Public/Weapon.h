@@ -6,12 +6,6 @@
 
 #include "Weapon.generated.h"
 
-enum class EWeaponName
-{
-	BlackSword,
-	WhiteSword
-};
-
 UCLASS()
 class WANDERINGWARRIOR_API AWeapon : public AAItem
 {

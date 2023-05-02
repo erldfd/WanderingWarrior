@@ -8,9 +8,9 @@
 #include "ItemData.h"
 #include "WWConstContainer.h"
 
-UInventoryTabObject::UInventoryTabObject() : SlotCount(SlotCount::WEAPON_TAB_SLOT_COUNT)
+UInventoryTabObject::UInventoryTabObject() : SlotCount(0)
 {
-	InventorySlotArray.Init(nullptr, SlotCount);
+	/*InventorySlotArray.Init(nullptr, SlotCount);
 
 	FString SlotNameString("Slot");
 
@@ -24,7 +24,7 @@ UInventoryTabObject::UInventoryTabObject() : SlotCount(SlotCount::WEAPON_TAB_SLO
 			InventorySlotArray[i] = CreateDefaultSubobject<UInventorySlotObject>(SlotName);
 			InventorySlotArray[i]->SetSlotIndex(i);
 		}
-	}
+	}*/
 }
 
 int UInventoryTabObject::GetSlotCount()
@@ -32,16 +32,33 @@ int UInventoryTabObject::GetSlotCount()
 	return SlotCount;
 }
 
-void UInventoryTabObject::SetSlotCount(int NewSlotCount)
+void UInventoryTabObject::InitSlots(int NewSlotCount)
 {
 	// 임시 함수... 퀵슬롯의 슬롯이 8개이기 때문에 ㅎ므....... 어쩌지......
 
 	SlotCount = NewSlotCount;
+
+	InventorySlotArray.Init(nullptr, SlotCount);
+
+	FString SlotNameString("Slot");
+
+	for (int i = 0; i < SlotCount; ++i)
+	{
+		if (InventorySlotArray.IsValidIndex(i))
+		{
+			SlotNameString.Append(FString::FromInt(i));
+			FName SlotName(*SlotNameString);
+
+			InventorySlotArray[i] = NewObject<UInventorySlotObject>();
+			InventorySlotArray[i]->SetSlotIndex(i);
+		}
+	}
 }
 
-UInventorySlotObject* UInventoryTabObject::GetSlotFromIndex(int Index)
+UInventorySlotObject*& UInventoryTabObject::GetSlotFromIndex(int Index)
 {
-	if (ensureMsgf(InventorySlotArray.IsValidIndex(Index), TEXT("InvalidIndex : %d"), Index) == false) return nullptr;
+	//UInventorySlotObject* Temp = nullptr;
+	//if (ensureMsgf(InventorySlotArray.IsValidIndex(Index), TEXT("InventoryTabObject, GetSlotFromindex, InvalidIndex : %d"), Index) == false) return Temp;
 
 	return InventorySlotArray[Index];
 }

@@ -11,12 +11,14 @@
 #include "ItemData.generated.h"
 
 // it same to ItemTypeTag literally
+
 UENUM()
-enum class EItemType
+enum class EItemDataType
 {
 	Weapon,
 	Misc
 };
+
 
 USTRUCT(BlueprintType)
 struct FItemDataRow : public FTableRowBase
@@ -64,7 +66,7 @@ public:
 
 	UItemData();
 
-	const TArray<FItemDataRow*>& GetItemDataRowArray(EItemType ItemType) const;
+	const TArray<FItemDataRow*>& GetItemDataRowArray(EItemDataType ItemType) const;
 
 private:
 

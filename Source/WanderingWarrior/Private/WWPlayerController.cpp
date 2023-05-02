@@ -8,8 +8,10 @@
 #include "PlayerCharacter.h"
 #include "InventoryComponent.h"
 #include "PlayerSkillComponent.h"
-#include "QuickSlotComponent.h"
-#include "QuickSlotWidget.h"
+//#include "QuickSlotComponent.h"
+//#include "QuickSlotWidget.h"
+#include "CharacterQuickSlot.h"
+#include "CharacterInventory.h"
 
 AWWPlayerController::AWWPlayerController()
 {
@@ -33,12 +35,12 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 
 	InGameWidget->AddToViewport();
 
-	PlayerCharacter->GetQuickSlotComponent()->SetQuickSlotWidget(InGameWidget->GetQuickSlotWidget());
+	PlayerCharacter->GetQuickSlot()->SetInventoryWidget(InGameWidget->GetQuickSlotWidget());
 
-	auto PlayerInventory = PlayerCharacter->GetInventoryComponent();
-	check(PlayerInventory != nullptr);
+	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
+	/*check(PlayerInventory != nullptr);*/
 
-	PlayerInventory->SetInventoryWidget(InGameWidget->GetInventoryWidget());
+	PlayerInventory.SetInventoryWidget(InGameWidget->GetInventoryWidget());
 
 	SetShowMouseCursor(false);
 
@@ -86,12 +88,12 @@ void AWWPlayerController::OnHPChanged()
 
 void AWWPlayerController::OpenAndCloseInventory()
 {
-	auto PlayerInventory = PlayerCharacter->GetInventoryComponent();
-	check(PlayerInventory != nullptr);
+	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
+	//check(PlayerInventory != nullptr);
 
-	PlayerInventory->OpenAndCloseInventory();
+	PlayerInventory.OpenAndCloseInventory();
 	
-	if (PlayerInventory->IsInventoryVisible())
+	if (PlayerInventory.IsInventoryVisible())
 	{
 		SetShowMouseCursor(true);
 
@@ -117,40 +119,40 @@ void AWWPlayerController::OnMouseRightButtonClicked()
 
 void AWWPlayerController::UseQuickSlot0()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(0);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(0);
 }
 
 void AWWPlayerController::UseQuickSlot1()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(1);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(1);
 }
 
 void AWWPlayerController::UseQuickSlot2()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(2);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(2);
 }
 
 void AWWPlayerController::UseQuickSlot3()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(3);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(3);
 }
 
 void AWWPlayerController::UseQuickSlot4()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(4);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(4);
 }
 
 void AWWPlayerController::UseQuickSlot5()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(5);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(5);
 }
 
 void AWWPlayerController::UseQuickSlot6()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(6);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(6);
 }
 
 void AWWPlayerController::UseQuickSlot7()
 {
-	PlayerCharacter->GetQuickSlotComponent()->UseSlotItemFormSlotIndex(7);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(7);
 }

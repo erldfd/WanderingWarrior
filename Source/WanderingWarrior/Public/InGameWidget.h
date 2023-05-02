@@ -22,7 +22,7 @@ public:
 	void SetEnemyHPBarPercent(float Percent);
 	void SetMyHPBarPercent(float Percent);
 
-	class UQuickSlotWidget* GetQuickSlotWidget();
+	class UInventoryWidget* GetQuickSlotWidget();
 	class UInventoryWidget* GetInventoryWidget();
 
 protected:
@@ -48,7 +48,7 @@ private:
 	TObjectPtr<class UProgressBar> MyMPBar;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UQuickSlotWidget> QuickSlotWidget;
+	TObjectPtr<class UInventoryWidget> QuickSlotWidget;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UInventoryWidget> InventoryWidget;

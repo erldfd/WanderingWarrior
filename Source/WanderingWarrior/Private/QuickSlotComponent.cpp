@@ -8,6 +8,7 @@
 #include "InventorySlotObject.h"
 #include "AItem.h"
 #include "InventorySlotWidget.h"
+#include "WWEnumClassContainer.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -19,7 +20,7 @@ UQuickSlotComponent::UQuickSlotComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	QuickSlotTab = CreateDefaultSubobject<UInventoryTabObject>(TEXT("QuickSlotTab"));
-	QuickSlotTab->SetSlotCount(8);
+	QuickSlotTab->InitSlots(8);
 	QuickSlotTab->SetTabType(ETabType::QuickSlotTab);
 	// ...
 }

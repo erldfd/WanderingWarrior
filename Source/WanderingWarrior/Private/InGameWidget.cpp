@@ -4,7 +4,10 @@
 #include "InGameWidget.h"
 
 #include "CharacterStatComponent.h"
-#include "QuickSlotWidget.h"
+//#include "QuickSlotWidget.h"
+#include "InventoryWidget.h"
+#include "WWConstContainer.h"
+#include "WWEnumClassContainer.h"
 
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
@@ -32,7 +35,7 @@ void UInGameWidget::SetMyHPBarPercent(float Percent)
 	MyHPBar->SetPercent(Percent);
 }
 
-UQuickSlotWidget* UInGameWidget::GetQuickSlotWidget()
+UInventoryWidget* UInGameWidget::GetQuickSlotWidget()
 {
 	check(QuickSlotWidget != nullptr);
 	return QuickSlotWidget;
@@ -50,6 +53,27 @@ void UInGameWidget::NativeOnInitialized()
 
 	ensure(MyHPBar != nullptr);
 	MyHPBar->SetPercent(1);
+
+	FInventoryWidgetSettings Settings;
+	Settings.TabCount = TabCount::INVENTORY_TAB_COUNT;
+	Settings.SlotCountByTab = SlotCount::WEAPON_TAB_SLOT_COUNT;
+	Settings.InventoryType = EInventory::CharacterInventory;
+	Settings.TabTypeArray.Init(ETabType::WeaponTab, TabCount::INVENTORY_TAB_COUNT);
+	
+	Settings.TabTypeArray[1] = ETabType::MiscTab;
+
+	ensure(InventoryWidget != nullptr);
+	InventoryWidget->SetInventoryType(EInventory::CharacterInventory);
+	InventoryWidget->InitInventoryWidget(Settings);
+
+	Settings.TabCount = TabCount::QUICKSLOT_TAB_COUNT;
+	Settings.SlotCountByTab = SlotCount::QUICK_SLOT_COUNT;
+	Settings.InventoryType = EInventory::CharacterInventory;
+	Settings.TabTypeArray.Init(ETabType::QuickSlotTab, TabCount::QUICKSLOT_TAB_COUNT);
+
+	ensure(QuickSlotWidget != nullptr);
+	QuickSlotWidget->SetInventoryType(EInventory::CharacterQuickSlot);
+	QuickSlotWidget->InitInventoryWidget(Settings);
 
 	HideEnemyHPAndNameWidget();
 }

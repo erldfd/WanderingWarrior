@@ -159,18 +159,35 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 
 	Image->SetVisibility(ESlateVisibility::Hidden);
 
-	if (OnDragDropDelegate.IsBound() == false)
+	/*if (OnDragDropDelegate.IsBound() == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidget, NativeOnDrop, OnDragDropDelegate is not bound"));
 		return false;
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Start TabType : %d, EndTabType : %d"), Operation->GetTabTypeBelongTo(), InventoryDragDropOperation->GetTabTypeBelongTo());
-	OnDragDropDelegate.Execute(StartDragSlotIndex, SlotIndex, (int)Operation->GetTabTypeBelongTo(), (int)InventoryDragDropOperation->GetTabTypeBelongTo());
+	OnDragDropDelegate.Execute(StartDragSlotIndex, SlotIndex, (int)Operation->GetTabTypeBelongTo(), (int)InventoryDragDropOperation->GetTabTypeBelongTo());*/
+
+	if (OnDragDropInventoryItemDelegate.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidget, NativeOnDrop, OnDragDropInventoryItemDelegate is not bound"));
+		return false;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Start TabType : %d, EndTabType : %d"), Operation->GetTabTypeBelongTo(), InventoryDragDropOperation->GetTabTypeBelongTo());
+
+	//param : DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType
+	OnDragDropInventoryItemDelegate.Execute(StartDragSlotIndex, SlotIndex, (int)Operation->GetInventoryBelongTo(), (int)InventoryDragDropOperation->GetInventoryBelongTo(), (int)Operation->GetTabTypeBelongTo(), (int)InventoryDragDropOperation->GetTabTypeBelongTo());
+
 	return true;
 }
 
 void UInventorySlotWidget::SetTabTypeBelongTo(ETabType NewTabType)
 {
 	InventoryDragDropOperation->SetTabTypeBelongTo(NewTabType);
+}
+
+void UInventorySlotWidget::SetInventoryBelongTo(EInventory NewInventory)
+{
+	InventoryDragDropOperation->SetInventoryBelongTo(NewInventory);
 }

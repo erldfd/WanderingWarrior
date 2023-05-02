@@ -9,13 +9,13 @@ UItemData::UItemData()
 	MiscItemDataRowArray = GetItemDataFromPathInConstructor("/Game/Data/MiscDataTable");
 }
 
-const TArray<FItemDataRow*>& UItemData::GetItemDataRowArray(EItemType ItemType) const
+const TArray<FItemDataRow*>& UItemData::GetItemDataRowArray(EItemDataType ItemType) const
 {
 	switch (ItemType)
 	{
-	case EItemType::Weapon:
+	case EItemDataType::Weapon:
 		return WeaponItemDataRowArray;
-	case EItemType::Misc:
+	case EItemDataType::Misc:
 		return MiscItemDataRowArray;
 		break;
 	default:

@@ -6,6 +6,7 @@
 #include "CharacterStatComponent.h"
 #include "WWPlayerController.h"
 #include "PlayerCharacter.h"
+#include "WWEnumClassContainer.h"
 
 AMiscItem::AMiscItem()
 {

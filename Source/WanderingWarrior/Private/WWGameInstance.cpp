@@ -6,13 +6,15 @@
 #include "Weapon.h"
 #include "MiscItem.h"
 #include "ItemData.h"
+#include "WWEnumClassContainer.h"
+#include "InventoryManager.h"
 
 #include "GameFramework/Actor.h"
 
 UWWGameInstance::UWWGameInstance() 
 {
 	TSubclassOf<UItemData> ItemData = UItemData::StaticClass();
-	WeaponDataArray =  ItemData.GetDefaultObject()->GetItemDataRowArray(EItemType::Weapon);
+	WeaponDataArray =  ItemData.GetDefaultObject()->GetItemDataRowArray(EItemDataType::Weapon);
 
 	ensure(WeaponDataArray.Num() > 0);
 
@@ -33,7 +35,7 @@ UWWGameInstance::UWWGameInstance()
 		}
 	}
 
-	MiscItemDataArray = ItemData.GetDefaultObject()->GetItemDataRowArray(EItemType::Misc);
+	MiscItemDataArray = ItemData.GetDefaultObject()->GetItemDataRowArray(EItemDataType::Misc);
 	ensure(MiscItemDataArray.Num() > 0);
 
 	UE_LOG(LogTemp, Warning, TEXT("WWGameInstance.cpp %s"), *GetName());
@@ -57,6 +59,13 @@ UWWGameInstance::UWWGameInstance()
 void UWWGameInstance::Init()
 {
 	Super::Init();
+
+	InventoryManager = NewObject<UInventoryManager>();
+
+	UWorld* World = GetWorld();
+	check(World != nullptr);
+
+	InventoryManager->InitManager(*World);
 }
 
 AWeapon* UWWGameInstance::SpawnWeapon(EWeaponName Name)
@@ -86,4 +95,10 @@ FItemDataRow* UWWGameInstance::GetMiscItemData(EMiscItemName Name) const
 	check(MiscItemDataArray.IsValidIndex(Index));
 
 	return MiscItemDataArray[Index];
+}
+
+class UInventoryManager* UWWGameInstance::GetInventoryManager()
+{
+	check(InventoryManager != nullptr);
+	return InventoryManager;
 }

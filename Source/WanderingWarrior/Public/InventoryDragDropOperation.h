@@ -8,6 +8,8 @@
 
 #include "InventoryDragDropOperation.generated.h"
 
+enum class ETabType;
+enum class EInventory;
 /**
  * 
  */
@@ -23,11 +25,14 @@ public:
 	int GetStartDragSlotIndex();
 	void SetStartDragSlotIndex(int NewIndex);
 
-	enum class ETabType GetTabTypeBelongTo();
-	void SetTabTypeBelongTo(enum class ETabType TabType);
+	ETabType GetTabTypeBelongTo();
+	void SetTabTypeBelongTo(ETabType TabType);
+	EInventory GetInventoryBelongTo();
+	void SetInventoryBelongTo(EInventory NewInventory);
 
 private:
 
 	int StartDragSlotIndex;
-	enum class ETabType TabTypeBelongTo;
+	ETabType TabTypeBelongTo;
+	EInventory InventoryBelongTo;
 };

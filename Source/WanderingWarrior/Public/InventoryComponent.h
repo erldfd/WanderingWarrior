@@ -13,12 +13,7 @@ enum class EMiscItemName;
 enum class ETabType;
 
 //param : is inventory opened?
-DECLARE_DELEGATE_OneParam(FOnOpenAndCloseInventoryDelegate, bool);
-enum class ETabName
-{
-	WeaponTab,
-	MiscTab
-};
+//DECLARE_DELEGATE_OneParam(FOnOpenAndCloseInventoryDelegate, bool);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WANDERINGWARRIOR_API UInventoryComponent : public UActorComponent
@@ -32,7 +27,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	class UInventoryTabObject* GetTab(ETabType Tab);
+	/*class UInventoryTabObject* GetTab(ETabType Tab);
 
 	class UInventoryWidget* GetInventoryWidget();
 	void SetInventoryWidget(class UInventoryWidget* NewInventoryWidget);
@@ -41,15 +36,24 @@ public:
 	bool ObtainItem(EMiscItemName MiscItemName);
 
 	bool UseSlotItemFromSlot(class UInventorySlotObject* Slot);
-	bool UseSlotItemFormSlotIndex(int Index);
+	bool UseSlotItemFormSlotIndex(int Index);*/
 
-	void OpenAndCloseInventory();
+	/*void OpenAndCloseInventory();*/
 
-	bool IsInventoryVisible();
+	/*bool IsInventoryVisible();*/
+
+	class UInventoryTabObject* GetCurrentActivatedTab();
+	void SetCurrentActivatedTab(UInventoryTabObject* Tab);
+	
+	ETabType GetCurrentActivatedTabType();
+	void SetCurrentActivatedTabType(ETabType NewTabType);
+
+	TArray<class UInventoryTabObject*>& GetTabArray();
+	void InitTabArray(int TabCount);
 
 public:
 
-	FOnOpenAndCloseInventoryDelegate OnOpenAndCloseInventoryDelegate;
+	/*FOnOpenAndCloseInventoryDelegate OnOpenAndCloseInventoryDelegate;*/
 
 protected:
 	// Called when the game starts
@@ -65,20 +69,28 @@ private:
 
 private:
 
-	enum class ETabType CurrentActivatedTabType;
+	ETabType CurrentActivatedTabType;
 
-	UPROPERTY()
-	TObjectPtr<class UInventoryTabObject> WeaponTab;
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<class UInventoryTabObject>> TabArray;
 
-	UPROPERTY()
-	TObjectPtr<class UInventoryTabObject> MiscTab;
+
+
+
+	// lagacyssssssssssssssssssssssssssss
+
+	//UPROPERTY()
+	//TObjectPtr<class UInventoryTabObject> WeaponTab;
+
+	//UPROPERTY()
+	//TObjectPtr<class UInventoryTabObject> MiscTab;
 
 	UPROPERTY()
 	TObjectPtr<class UInventoryTabObject> CurrentActivatedTab;
 		
-	UPROPERTY()
-	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
+	//UPROPERTY()
+	//TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
 
-	UPROPERTY()
-	TObjectPtr<class UInventoryWidget> InventoryWidget;
+	//UPROPERTY()
+	//TObjectPtr<class UInventoryWidget> InventoryWidget;
 };

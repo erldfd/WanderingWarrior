@@ -29,11 +29,11 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	class UInventoryComponent* GetInventoryComponent();
-
 	class UPlayerSkillComponent* GetPlayerSkillComponenet();
 
-	class UQuickSlotComponent* GetQuickSlotComponent();
+	class UCharacterQuickSlot* GetQuickSlot();
+
+	class UCharacterInventory& GetInventory() const;
 
 	virtual void Attack(float Value) override;
 
@@ -61,15 +61,21 @@ private:
 	UPROPERTY()
 	TSubclassOf<class AWeapon> WeaponClass;
 
-	UPROPERTY()
-	TObjectPtr<class UInventoryComponent> InventoryComponent;
+	/*UPROPERTY()
+	TObjectPtr<class UInventoryComponent> InventoryComponent;*/
 
 	UPROPERTY()
 	TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
 
-	UPROPERTY()
-	TObjectPtr<class UQuickSlotComponent> QuickSlotComponent;
+	/*UPROPERTY()
+	TObjectPtr<class UQuickSlotComponent> QuickSlotComponent;*/
 
 	UPROPERTY()
 	TObjectPtr<class UInventorySlotObject> TempSwapSlot;
+
+	UPROPERTY()
+	TObjectPtr<class UCharacterInventory> Inventory;
+
+	UPROPERTY()
+	TObjectPtr<class UCharacterQuickSlot> QuickSlot;
 };

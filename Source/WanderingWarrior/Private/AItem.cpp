@@ -46,11 +46,6 @@ void AAItem::SetItemSlotTexture(UTexture2D* NewTexture)
 	ItemSlotTexture = NewTexture;
 }
 
-void AAItem::Use(const UWorld& World)
-{
-	UE_LOG(LogTemp, Fatal, TEXT("This is for Pure Virual Function.. dont Implement it"));
-}
-
 int AAItem::GetMaxItemCount()
 {
 	return MaxItemCount;
@@ -59,4 +54,9 @@ int AAItem::GetMaxItemCount()
 void AAItem::SetMaxItemCount(int Count)
 {
 	MaxItemCount = FMath::Clamp(Count, 0, 1000);//임의로 최대 1000...
+}
+
+void AAItem::SetItemType(EItemType NewItemType)
+{
+	ItemType = NewItemType;
 }

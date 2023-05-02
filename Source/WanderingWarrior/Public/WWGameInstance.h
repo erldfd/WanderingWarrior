@@ -10,6 +10,8 @@
 
 #include "WWGameInstance.generated.h"
 
+enum class EWeaponName;
+enum class EMiscItemName;
 /**
  * 
  */
@@ -24,15 +26,17 @@ public:
 
 	virtual void Init() override;
 
-	class AWeapon* SpawnWeapon(enum class EWeaponName Name);
-	class AMiscItem* SpawnMiscItem(enum class EMiscItemName Name);
+	class AWeapon* SpawnWeapon(EWeaponName Name);
+	class AMiscItem* SpawnMiscItem(EMiscItemName Name);
 
-	struct FItemDataRow* GetWeaponData(enum class EWeaponName Name) const;
-	struct FItemDataRow* GetMiscItemData(enum class EMiscItemName Name) const;
+	struct FItemDataRow* GetWeaponData(EWeaponName Name) const;
+	struct FItemDataRow* GetMiscItemData(EMiscItemName Name) const;
+
+	class UInventoryManager* GetInventoryManager();
 
 private:
 
-	const TArray<struct FItemDataRow*>& GetDataArray(enum class EItemType ItemType) const;
+	//const TArray<struct FItemDataRow*>& GetDataArray(ItemData::EItemType ItemType) const;
 
 private:
 
@@ -45,4 +49,7 @@ private:
 	TArray<TSubclassOf<class AMiscItem>> MiscItemClassArray;
 
 	TArray<struct FItemDataRow*> MiscItemDataArray;
+
+	UPROPERTY()
+	TObjectPtr<class UInventoryManager> InventoryManager;
 };

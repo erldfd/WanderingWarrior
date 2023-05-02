@@ -8,12 +8,18 @@
 
 #include "InventorySlotWidget.generated.h"
 
+enum class ETabType;
+enum class EInventory;
+
 //param : SlotIndex
 DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonDownDelegate, int);
 //param : SlotIndex
 DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonUpDelegate, int);
 //param : DragStartSlotIndex, DragEndSlotIndex, DragStartSlotTabType, DragEndSlotTabType
 DECLARE_DELEGATE_FourParams(FOnDragDropDelegate, int, int, int, int);
+
+//param : DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType
+DECLARE_DELEGATE_SixParams(FOnDragDropInventoryItemDelegate, int, int, int, int, int, int);
 /**
  * 
  */
@@ -36,13 +42,15 @@ public:
 	bool GetIsEmptySlotImage();
 	void SetIsEmptySlotImage(bool bIsEmpty);
 
-	void SetTabTypeBelongTo(enum class ETabType NewTabType);
+	void SetTabTypeBelongTo(ETabType NewTabType);
+	void SetInventoryBelongTo(EInventory NewInventory);
 
 public:
 
 	FOnLeftMouseButtonDownDelegate OnLeftMouseButtonDownDelegate;
 	FOnLeftMouseButtonUpDelegate OnLeftMouseButtonUpDelegate;
 	FOnDragDropDelegate OnDragDropDelegate;
+	FOnDragDropInventoryItemDelegate OnDragDropInventoryItemDelegate;
 
 protected:
 

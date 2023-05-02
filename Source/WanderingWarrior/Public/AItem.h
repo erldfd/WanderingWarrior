@@ -8,6 +8,8 @@
 
 #include "AItem.generated.h"
 
+enum class EItemType;
+
 UCLASS(abstract)
 class WANDERINGWARRIOR_API AAItem : public AActor
 {
@@ -31,11 +33,13 @@ public:
 	class UTexture2D* GetItemSlotTexture();
 	void SetItemSlotTexture(class UTexture2D* NewTexture);
 
-	virtual void Use(const UWorld& World);
+	virtual void Use(const UWorld& World) PURE_VIRTUAL(AAItem::Use, );
 
 	int GetMaxItemCount();
 	// Max Count = 1000
 	void SetMaxItemCount(int Count);
+
+	void SetItemType(EItemType NewItemType);
 
 protected:
 
@@ -50,4 +54,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UTexture2D> ItemSlotTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	EItemType ItemType;
 };

@@ -8,12 +8,6 @@
 
 #include "MiscItem.generated.h"
 
-enum class EMiscItemName
-{
-	HPPotion,
-	MPPotion
-};
-
 /**
  * 
  */
@@ -34,5 +28,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	TObjectPtr<UStaticMeshComponent> ItemStaticMeshComponent;
 
-	EMiscItemName MiscItemName;
+	enum class EMiscItemName MiscItemName;
 };
