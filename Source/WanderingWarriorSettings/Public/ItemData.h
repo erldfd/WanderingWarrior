@@ -19,7 +19,6 @@ enum class EItemDataType
 	Misc
 };
 
-
 USTRUCT(BlueprintType)
 struct FItemDataRow : public FTableRowBase
 {
@@ -70,7 +69,7 @@ public:
 
 private:
 
-	TArray<FItemDataRow*> GetItemDataFromPathInConstructor(const FString& DataPath)const;
+	TArray<FItemDataRow*> GetItemDataFromPathInConstructor(const FString& DataPath) const;
 
 private:
 

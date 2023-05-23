@@ -8,6 +8,8 @@ public class WanderingWarrior : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		PublicIncludePaths.AddRange(new string[] { "WanderingWarrior" });
+
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "AIModule", "GameplayTasks", "NavigationSystem", "SlateCore" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "WanderingWarriorSettings" });
