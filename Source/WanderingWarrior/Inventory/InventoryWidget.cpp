@@ -22,7 +22,7 @@ void UInventoryWidget::NativeOnInitialized()
 	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget NativeOnInitailized"));
 }
 
-TArray<UInventorySlotWidget*> UInventoryWidget::GetSlotWidgetArray(ETabType TabType)
+TArray<UInventorySlotWidget*>& UInventoryWidget::GetSlotWidgetArray(ETabType TabType)
 {
 	return TabButtonArray[FMath::Clamp(int(TabType), 0, TabButtonArray.Num()-1)]->GetSlotWidgetArray();
 }
@@ -88,7 +88,7 @@ void UInventoryWidget::InitNullTabButtonArray(int ArrayCount)
 	TabButtonArray.Init(nullptr, ArrayCount);
 }
 
-TArray<UInventoryTabButton*> UInventoryWidget::GetTabButtonArray()
+TArray<UInventoryTabButton*>& UInventoryWidget::GetTabButtonArray()
 {
 	return TabButtonArray;
 }

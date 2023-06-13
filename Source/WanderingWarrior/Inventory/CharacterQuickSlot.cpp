@@ -119,6 +119,13 @@ bool UCharacterQuickSlot::ObtainItem(const FItemDataRow& NewItemData, UInventory
 	return true;
 }
 
+void UCharacterQuickSlot::RemoveAllItem(int32 SlotIndex)
+{
+	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
+
+	Slot->ClearSlotItem();
+}
+
 bool UCharacterQuickSlot::UseSlotItemFormSlotIndex(int Index)
 {
 	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);

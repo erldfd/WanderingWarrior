@@ -10,8 +10,8 @@
 
 #include "WWGameInstance.generated.h"
 
-enum class EWeaponName;
-enum class EMiscItemName;
+enum class EWeaponName : uint8;
+enum class EMiscItemName : uint8;
 /**
  * 
  */
@@ -27,7 +27,7 @@ public:
 	virtual void Init() override;
 
 	class AWeapon* SpawnWeapon(EWeaponName Name);
-	class AMiscItem* SpawnMiscItem(EMiscItemName Name);
+	//class AMiscItem* SpawnMiscItem(EMiscItemName Name);
 
 	struct FItemDataRow* GetWeaponData(EWeaponName Name) const;
 	struct FItemDataRow* GetMiscItemData(EMiscItemName Name) const;
@@ -40,10 +40,12 @@ public:
 
 	class UInteractionManager* GetInteractionManager();
 
+	class UStoreManager* GetStoreManager();
+
 private:
 
 	UFUNCTION()
-	void OnStartConversation(int32 StartIndex);
+	void OnStartConversation(ANPCCharacter* InteractionActor);
 
 private:
 
@@ -68,4 +70,7 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UInteractionManager> InteractionManager;
+
+	UPROPERTY()
+	TObjectPtr<class UStoreManager> StoreManager;
 };

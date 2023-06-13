@@ -8,7 +8,7 @@
 
 #include "InventoryTabObject.generated.h"
 
-enum class ETabType;
+enum class ETabType : uint8;
 
 /**
  * 

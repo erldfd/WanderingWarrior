@@ -8,9 +8,9 @@
 
 #include "InventoryComponent.generated.h"
 
-enum class EWeaponName;
-enum class EMiscItemName;
-enum class ETabType;
+enum class EWeaponName : uint8;
+enum class EMiscItemName : uint8;
+enum class ETabType : uint8;
 
 //param : is inventory opened?
 //DECLARE_DELEGATE_OneParam(FOnOpenAndCloseInventoryDelegate, bool);

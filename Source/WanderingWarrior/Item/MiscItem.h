@@ -8,6 +8,7 @@
 
 #include "MiscItem.generated.h"
 
+enum class EMiscItemName : uint8;
 /**
  * 
  */
@@ -28,5 +29,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	TObjectPtr<UStaticMeshComponent> ItemStaticMeshComponent;
 
-	enum class EMiscItemName MiscItemName;
+	EMiscItemName MiscItemName;
 };

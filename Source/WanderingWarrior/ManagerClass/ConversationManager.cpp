@@ -3,9 +3,10 @@
 
 #include "ConversationManager.h"
 
-#include "WanderingWarrior/ConversationWidget.h"
 #include "ConversationScriptData.h"
+#include "WanderingWarrior/ConversationWidget.h"
 #include "WanderingWarrior/Controller/WWPlayerController.h"
+#include "WanderingWarrior/Character/NPCCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -32,6 +33,23 @@ void UConversationManager::SetNPCConversation(int32 ConversationIndex)
 	SetNPCConversationInternal(CurrentConversationIndex);
 }
 
+void UConversationManager::SetBehavior(EBehavior Behavior)
+{
+	switch (Behavior)
+	{
+	case EBehavior::OpenStore:
+
+		break;
+	case EBehavior::JustClose:
+		FinishConversation();
+		break;
+	case EBehavior::NoBehavior:
+		break;
+	default:
+		break;
+	}
+}
+
 void UConversationManager::SetNPCConversationInternal(int32 ConversationIndex)
 {
 	check(ConversationWidget);
@@ -54,6 +72,11 @@ void UConversationManager::SetConversationScriptDataArray(const TArray<FConversa
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UConversationManager, SetConversationScriptDataArray, %d"), ConversationScriptDataArray[i]->Index);
 	}
+}
+
+void UConversationManager::SetConversationNPC(ANPCCharacter* NPC)
+{
+	ConversationNPC = NPC;
 }
 
 void UConversationManager::OpenConversationWidget()
@@ -109,7 +132,7 @@ void UConversationManager::OnNPCConversationPageClicked()
 		}
 		else
 		{
-			FinishConversation();
+			SetBehavior(EBehavior::JustClose);
 			//TODO :: 상점 열기 등 행동
 			UE_LOG(LogTemp, Warning, TEXT("UConversationManager::OnNPCConversationPageClicked, ELSE"));
 		}
@@ -122,11 +145,13 @@ void UConversationManager::OnNPCConversationPageClicked()
 
 void UConversationManager::OnAnswerButtonClickedSignature(int32 ButtonIndex)
 {
+	bool bHasBehavior = (ConversationScriptDataArray[CurrentConversationIndex]->BehaviorArray.Num() > 0);
 	CurrentConversationIndex = ConversationScriptDataArray[CurrentConversationIndex]->PlayerAnswerIndexArray[ButtonIndex];
 	
 	if (CurrentConversationIndex == 0)
 	{
-		FinishConversation();
+		SetBehavior(EBehavior::JustClose);
+		return;
 	}
 
 	OpenNPCConversationWidget();

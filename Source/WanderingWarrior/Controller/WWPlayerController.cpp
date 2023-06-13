@@ -5,15 +5,20 @@
 
 #include "WanderingWarrior/InGameWidget.h"
 #include "WanderingWarrior/Components/CharacterStatComponent.h"
-#include "WanderingWarrior/Character/PlayerCharacter.h"
-#include "WanderingWarrior/Inventory/InventoryComponent.h"
 #include "WanderingWarrior/Components/PlayerSkillComponent.h"
+
+#include "WanderingWarrior/Character/PlayerCharacter.h"
+
+#include "WanderingWarrior/Inventory/InventoryComponent.h"
 #include "WanderingWarrior/Inventory/CharacterQuickSlot.h"
 #include "WanderingWarrior/Inventory/CharacterInventory.h"
+
 #include "WanderingWarrior/WWGameInstance.h"
-#include "WanderingWarrior/ManagerClass/ConversationManager.h"
 #include "WanderingWarrior/ConversationWidget.h"
+
+#include "WanderingWarrior/ManagerClass/ConversationManager.h"
 #include "WanderingWarrior/ManagerClass/InteractionManager.h"
+#include "WanderingWarrior/ManagerClass/StoreManager.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
@@ -45,10 +50,12 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
 
 	PlayerInventory.SetInventoryWidget(InGameWidget->GetInventoryWidget());
+	PlayerInventory.SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
 	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
 	GameInstance->GetConversationManager()->SetConversationWidget(InGameWidget->GetConversationWidget());
 	GameInstance->GetConversationManager()->BindConversationWidgetSignature();
+	GameInstance->GetStoreManager()->SetStoreWidget(InGameWidget->GetMarchantInventoryWidget());
 
 	SetShowMouseCursor(false);
 
@@ -133,7 +140,6 @@ void AWWPlayerController::OnHPChanged()
 void AWWPlayerController::OpenAndCloseInventory()
 {
 	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
-	//check(PlayerInventory != nullptr);
 
 	PlayerInventory.OpenAndCloseInventory();
 	
@@ -269,9 +275,9 @@ void AWWPlayerController::OnKeyEButtonPressed()
 			// 임시 UI 코드
 			return;
 		}
-
-		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.5);
 	}
+
+	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.5);
 }
 
 void AWWPlayerController::OnMarchantConversation(const TArray<FOverlapResult>& OverlapResults)

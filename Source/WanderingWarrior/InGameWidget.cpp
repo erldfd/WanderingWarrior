@@ -8,6 +8,8 @@
 #include "WWConstContainer.h"
 #include "WWEnumClassContainer.h"
 #include "ConversationWidget.h"
+#include "Inventory/InventoryItemInfoWidget.h"
+#include "Inventory/InventoryTabButton.h"
 
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
@@ -59,6 +61,12 @@ UConversationWidget* UInGameWidget::GetConversationWidget()
 	return ConversationWidget;
 }
 
+UInventoryItemInfoWidget* UInGameWidget::GetInventoryItemInfoWidget()
+{
+	check(InventoryItemInfoWidget);
+	return InventoryItemInfoWidget;
+}
+
 void UInGameWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -97,6 +105,13 @@ void UInGameWidget::NativeOnInitialized()
 	MarchantInventoryWidget->InitInventoryWidget(Settings);
 
 	HideEnemyHPAndNameWidget();
+
+	FWidgetTransform Transform;
+	Transform.Translation = FVector2D(100, 100);
+	check(InventoryItemInfoWidget);
+	InventoryItemInfoWidget->SetRenderTransform(Transform);
+
+	//InventoryWidget->GetTabButtonArray()[0]->GetSlotWidgetArray();
 }
 
 void UInGameWidget::HideEnemyHPAndNameWidget()

@@ -8,7 +8,7 @@
 
 #include "InventoryTabButton.generated.h"
 
-enum class ETabType;
+enum class ETabType : uint8;
 
 //param : TabType to int
 DECLARE_DELEGATE_OneParam(FOnTabButtonClickedDelegate, int);

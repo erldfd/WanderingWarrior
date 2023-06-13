@@ -8,7 +8,7 @@
 
 ANPCCharacter::ANPCCharacter()
 {
-	Inventory = CreateDefaultSubobject<UMarchantInventory>(TEXT("NewInventory"));
+	Inventory = CreateDefaultSubobject<UMarchantInventory>(TEXT("NPCInventory"));
 }
 
 void ANPCCharacter::BeginPlay()
@@ -39,4 +39,9 @@ void ANPCCharacter::SetConversationIndex(const int32& InIndex)
 const FString& ANPCCharacter::GetNPCName() const
 {
 	return NPCName;
+}
+
+UMarchantInventory* ANPCCharacter::GetInventory()
+{
+	return Inventory;
 }

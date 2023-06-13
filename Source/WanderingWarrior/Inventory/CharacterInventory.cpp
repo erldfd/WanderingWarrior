@@ -12,8 +12,10 @@
 #include "InventorySlotWidget.h"
 #include "InventoryComponent.h"
 #include "InventoryTabButton.h"
+#include "Inventory/InventoryItemInfoWidget.h"
 #include "WanderingWarrior/WWConstContainer.h"
 #include "WanderingWarrior/ManagerClass/InventoryManager.h"
+#include "Controller/WWPlayerController.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -45,10 +47,10 @@ void UCharacterInventory::OnComponentCreated()
 	Super::OnComponentCreated();
 
 	UWorld* World = GetWorld();
-	check(World != nullptr);
+	check(World);
 
 	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(World));
-	if (ensure(GameInstance != nullptr) == false) return;
+	if (ensure(GameInstance) == false) return;
 
 	GameInstance->GetInventoryManager()->AddToInventoryArray(InventoryType, this);
 }
@@ -57,7 +59,7 @@ void UCharacterInventory::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Warning, TEXT("CharacterInventory, BeginPlay"));
-	check(InventoryWidget != nullptr);
+	check(InventoryWidget);
 
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UCharacterInventory::OnSlotImageWidgetClicked);
 	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound())
@@ -73,19 +75,32 @@ void UCharacterInventory::BeginPlay()
 	InventoryWidget->OnConvertTabDelegate.BindUObject(this, &UCharacterInventory::OnConvertTab);
 
 	UWorld* World = GetWorld();
-	check(World != nullptr);
+	check(World);
 
 	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(World));
-	check(GameInstance != nullptr);
+	check(GameInstance);
 
 	GameInstance->GetInventoryManager()->BindFunctionToDragDropDelegate(EInventory::CharacterInventory, ETabType::WeaponTab);
 	GameInstance->GetInventoryManager()->BindFunctionToDragDropDelegate(EInventory::CharacterInventory, ETabType::MiscTab);
+
+	auto& TabButtonArray = InventoryWidget->GetTabButtonArray();
+
+	for (auto& TabButton : TabButtonArray)
+	{
+		auto& TabSlotWidgetArray = TabButton->GetSlotWidgetArray();
+
+		for (auto& TabSlotWidget : TabSlotWidgetArray)
+		{
+			TabSlotWidget->OnMouseEnterSignature.AddUObject(this, &UCharacterInventory::OnMouseEnterToSlotWidget);
+			TabSlotWidget->OnMouseLeaveSignature.AddUObject(this, &UCharacterInventory::OnMouseLeaveToSlotWidget);
+		}
+	}
 }
 
 bool UCharacterInventory::ObtainItem(EWeaponName WeaponName)
 {
 	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	check(GameInstance != nullptr);
+	check(GameInstance);
 
 	FItemDataRow* ItemData = GameInstance->GetWeaponData(WeaponName);
 
@@ -101,7 +116,7 @@ bool UCharacterInventory::ObtainItem(EWeaponName WeaponName)
 bool UCharacterInventory::ObtainItem(EMiscItemName MiscItemName)
 {
 	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	check(GameInstance != nullptr);
+	check(GameInstance);
 
 	FItemDataRow* ItemData = GameInstance->GetMiscItemData(MiscItemName);
 
@@ -117,7 +132,7 @@ bool UCharacterInventory::ObtainItem(EMiscItemName MiscItemName)
 
 bool UCharacterInventory::ObtainItem(const FItemDataRow& NewItemData, UInventoryTabObject* Tab)
 {
-	check(InventoryWidget != nullptr);
+	check(InventoryWidget);
 
 	UInventorySlotObject* Slot = Tab->GetHoldableItemSlot();
 
@@ -137,13 +152,20 @@ bool UCharacterInventory::ObtainItem(const FItemDataRow& NewItemData, UInventory
 	Slot->SetHeldItemCount(Slot->GetHeldItemCount() + 1);
 	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), SlotIndex, TabType);
 
-	TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(TabType);
+	TArray<UInventorySlotWidget*>& SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(TabType);
 	SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(false);
 
 	return true;
 }
 
-bool UCharacterInventory::UseSlotItemFormSlotIndex(int Index)
+void UCharacterInventory::RemoveAllItem(int32 SlotIndex)
+{
+	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
+
+	Slot->ClearSlotItem();
+}
+
+bool UCharacterInventory::UseSlotItemFormSlotIndex(int32 Index)
 {
 	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
 
@@ -158,7 +180,7 @@ bool UCharacterInventory::UseSlotItemFromSlot(UInventorySlotObject*& Slot)
 	}
 
 	UWorld* World = GetWorld();
-	check(World != nullptr);
+	check(World);
 
 	Slot->UseSlotItem(*World);
 
@@ -170,10 +192,10 @@ bool UCharacterInventory::UseSlotItemFromSlot(UInventorySlotObject*& Slot)
 	{
 		int SlotIndex = Slot->GetSlotIndex();
 
-		check(InventoryWidget != nullptr);
+		check(InventoryWidget);
 		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, Slot->GetSlotIndex());
 
-		TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(CurrentActivatedTabType);
+		TArray<UInventorySlotWidget*>& SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(CurrentActivatedTabType);
 		SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(true);
 	}
 
@@ -182,7 +204,7 @@ bool UCharacterInventory::UseSlotItemFromSlot(UInventorySlotObject*& Slot)
 
 void UCharacterInventory::OpenAndCloseInventory()
 {
-	check(InventoryWidget != nullptr);
+	check(InventoryWidget);
 	bool bIsVisible = InventoryWidget->IsVisible();
 
 	if (bIsVisible)
@@ -205,21 +227,21 @@ void UCharacterInventory::OpenAndCloseInventory()
 
 bool UCharacterInventory::IsInventoryVisible()
 {
-	check(InventoryWidget != nullptr);
+	check(InventoryWidget);
 	return InventoryWidget->IsVisible();
 }
 
-void UCharacterInventory::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEndSlotIndex, ETabType DragSlotTabType)
+void UCharacterInventory::ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CharacterInventory, ExchangeOrMoveSlotItem, DragStartSlotIndex : %d, DragEndSlotIndex : %d"), DragStartSlotIndex, DragEndSlotIndex);
 
 	UInventorySlotObject* DragStartSlot = InventoryComponent->GetTabArray()[(int)DragSlotTabType]->GetSlotFromIndex(DragStartSlotIndex);
 	UInventorySlotObject* DragEndSlot = InventoryComponent->GetTabArray()[(int)DragSlotTabType]->GetSlotFromIndex(DragEndSlotIndex);
 
-	TArray<UInventorySlotWidget*> SlotWidgetArray = Super::InventoryWidget->GetSlotWidgetArray(DragSlotTabType);
+	TArray<UInventorySlotWidget*>& SlotWidgetArray = Super::InventoryWidget->GetSlotWidgetArray(DragSlotTabType);
 
-	check(DragStartSlot != nullptr);
-	check(DragEndSlot != nullptr);
+	check(DragStartSlot);
+	check(DragEndSlot);
 	check(SlotWidgetArray.IsValidIndex(DragStartSlotIndex));
 
 	if (DragEndSlot->GetHeldItemCount() == 0)
@@ -259,12 +281,71 @@ void UCharacterInventory::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int Dra
 	}
 }
 
-void UCharacterInventory::OnSlotImageWidgetClicked(int SlotIndex)
+void UCharacterInventory::SetItemInfoWidget(UInventoryItemInfoWidget& InItemInfoWidget)
+{
+	InventoryItemInfoWidget = &InItemInfoWidget;
+}
+
+void UCharacterInventory::OnSlotImageWidgetClicked(int32 SlotIndex)
 {
 	UseSlotItemFormSlotIndex(SlotIndex);
 }
 
-void UCharacterInventory::OnConvertTab(int TabIndex)
+void UCharacterInventory::OnConvertTab(int32 TabIndex)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UCharacterInventory::OnConvertTab, TabIndex : %d"), FMath::Clamp(TabIndex, 0, InventoryComponent->GetTabArray().Num()));
 	InventoryComponent->SetCurrentActivatedTab(InventoryComponent->GetTabArray()[FMath::Clamp(TabIndex, 0, InventoryComponent->GetTabArray().Num())]);
+	InventoryComponent->SetCurrentActivatedTabType(ETabType(FMath::Clamp(TabIndex, 0, InventoryComponent->GetTabArray().Num())));
+}
+
+void UCharacterInventory::OnMouseEnterToSlotWidget(int32 SlotIndex)
+{
+	bIsMouseEnterToSlotWidget = true;
+	UE_LOG(LogTemp, Warning, TEXT("UCharacterInventory::OnMouseEnterToSlotWidget, CurrentTab : %d"), (int32)InventoryComponent->GetCurrentActivatedTabType());
+	UInventorySlotObject* Slot = InventoryComponent->GetTabArray()[(int32)InventoryComponent->GetCurrentActivatedTabType()]->GetSlotFromIndex(SlotIndex);
+	if (Slot->GetHeldItemCount() == 0)
+	{
+		return;
+	}
+	
+	ShowItemInfoWidget(Slot->GetSlotItemData());
+}
+
+void UCharacterInventory::OnMouseLeaveToSlotWidget(int32 SlotIndex)
+{
+	bIsMouseEnterToSlotWidget = false;
+	InventoryItemInfoWidget->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UCharacterInventory::ShowItemInfoWidget(const FItemDataRow& ItemData)
+{
+	
+	UE_LOG(LogTemp, Warning, TEXT("UCharacterInventory::ShowItemInfoWidget"));
+
+	if (bIsMouseEnterToSlotWidget == false)
+	{
+		return;
+	}
+
+	float DelayTime = 1.5;
+	GetWorld()->GetTimerManager().SetTimer(ItemInfoWidgetTimeHandler, FTimerDelegate::CreateLambda([&]()->void {
+
+		FVector2D MousePosition;
+
+		AWWPlayerController* PlayerController = Cast<AWWPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+		check(PlayerController);
+		PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
+
+		check(InventoryItemInfoWidget);
+		InventoryItemInfoWidget->SetItemNameText(ItemData.Name);
+		InventoryItemInfoWidget->SetBuyPriceText(FText::FromString(FString::FromInt(ItemData.BuyPrice)));
+		InventoryItemInfoWidget->SetSellPriceText(FText::FromString(FString::FromInt(ItemData.SellPrice)));
+		InventoryItemInfoWidget->SetAttackDamageText(FText::FromString(FString::FromInt(ItemData.Damage)));
+		InventoryItemInfoWidget->SetVisibility(ESlateVisibility::Visible);
+
+		FWidgetTransform WidgetTransform;
+		WidgetTransform.Translation = MousePosition;
+		InventoryItemInfoWidget->SetRenderTransform(WidgetTransform);
+
+	}), 0.1, false, DelayTime);
 }

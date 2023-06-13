@@ -28,6 +28,8 @@ public:
 
 	class UConversationWidget* GetConversationWidget();
 
+	class UInventoryItemInfoWidget* GetInventoryItemInfoWidget();
+
 protected:
 
 	virtual void NativeOnInitialized() override;
@@ -63,4 +65,7 @@ private:
 	TObjectPtr<class UConversationWidget> ConversationWidget;
 
 	FTimerHandle HideEnemyHPAndNameWidgetTimerHandle = { };
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UInventoryItemInfoWidget> InventoryItemInfoWidget;
 };

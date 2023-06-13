@@ -2,7 +2,7 @@
 #pragma once
 
 UENUM()
-enum class ETabType
+enum class ETabType : uint8
 {
 	WeaponTab,
 	MiscTab,
@@ -11,28 +11,28 @@ enum class ETabType
 };
 
 UENUM()
-enum class EItemType
+enum class EItemType : uint8
 {
 	Weapon,
 	Misc
 };
 
 UENUM()
-enum class EWeaponName
+enum class EWeaponName : uint8
 {
 	BlackSword,
 	WhiteSword
 };
 
 UENUM()
-enum class EMiscItemName
+enum class EMiscItemName : uint8
 {
 	HPPotion,
 	MPPotion
 };
 
 UENUM()
-enum class EInventory
+enum class EInventory : uint8
 {
 	CharacterInventory,
 	CharacterQuickSlot,
@@ -41,7 +41,7 @@ enum class EInventory
 };
 
 UENUM()
-enum class ECreditOwner
+enum class ECreditOwner : uint8
 {
 	Player,
 	Marchant1

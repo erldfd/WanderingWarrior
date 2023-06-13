@@ -10,11 +10,11 @@
 #include "ConversationScriptData.generated.h"
 
 UENUM(BlueprintType)
-enum class EBehaviorIndex : uint8
+enum class EBehavior : uint8
 {
-	OpenStore,
+	NoBehavior,
+	OpenStore UMETA(DisplayName = "OpenStore"),
 	JustClose,
-	Test,
 };
 
 USTRUCT(BlueprintType)
@@ -37,7 +37,7 @@ public:
 	TArray<int32> PlayerAnswerIndexArray;
 
 	UPROPERTY(EditAnywhere, Category = "Data")
-	TArray<EBehaviorIndex> BehaviorArray;
+	TArray<EBehavior> BehaviorArray;
 };
 /**
  * 

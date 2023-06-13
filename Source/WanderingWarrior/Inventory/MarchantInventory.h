@@ -24,6 +24,8 @@ public:
 	virtual bool ObtainItem(EMiscItemName MiscItemName) override;
 	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabObject* Tab) override;
 
+	virtual void RemoveAllItem(int32 SlotIndex) override;
+
 	virtual bool UseSlotItemFormSlotIndex(int Index) override;
 	virtual bool UseSlotItemFromSlot(class UInventorySlotObject*& Slot) override;
 

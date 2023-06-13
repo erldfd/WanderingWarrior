@@ -8,8 +8,8 @@
 
 #include "InventoryWidget.generated.h"
 
-enum class ETabType;
-enum class EInventory;
+enum class ETabType : uint8;
+enum class EInventory : uint8;
 
 //param : SlotIndex
 DECLARE_DELEGATE_OneParam(FOnSlotImageWigetClickedDelegate, int);
@@ -40,7 +40,7 @@ class WANDERINGWARRIOR_API UInventoryWidget : public UUserWidget
 	
 public:
 
-	TArray<class UInventorySlotWidget*> GetSlotWidgetArray(ETabType TabType);
+	TArray<class UInventorySlotWidget*>& GetSlotWidgetArray(ETabType TabType);
 
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
 	void SetSlotWidgetImageFromTexture(ETabType TabType, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
@@ -50,7 +50,7 @@ public:
 
 	void InitNullTabButtonArray(int ArrayCount);
 
-	TArray<class UInventoryTabButton*> GetTabButtonArray();
+	TArray<class UInventoryTabButton*>& GetTabButtonArray();
 
 	void InitInventoryWidget(const FInventoryWidgetSettings& Settings);
 

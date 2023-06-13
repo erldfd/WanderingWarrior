@@ -8,8 +8,8 @@
 
 #include "InteractionManager.generated.h"
 
-// int32 : Conversation Index
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartConversationSignature, int32);
+// AActor : InteractionNPC
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStartConversationSignature, class ANPCCharacter*);
 /**
  * 
  */

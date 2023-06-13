@@ -41,14 +41,6 @@ void UInventoryTabButton::SetTabType(ETabType NewTabType)
 void UInventoryTabButton::OnTabSlotClicked(int SlotIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, OnWeaponTabSlotClicked"));
-
-	/*if (OnSlotImageWidgetClickedDelegate.IsBound() == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, OnSlotImageWidgetClickedDelegate is not bound."));
-		return;
-	}
-
-	OnSlotImageWidgetClickedDelegate.Execute(SlotIndex);*/
 }
 
 void UInventoryTabButton::OnTabButtonClicked()

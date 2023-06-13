@@ -8,18 +8,23 @@
 
 #include "InventorySlotWidget.generated.h"
 
-enum class ETabType;
-enum class EInventory;
+enum class ETabType : uint8;
+enum class EInventory : uint8;
 
 //param : SlotIndex
-DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonDownDelegate, int);
+DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonDownDelegate, int32);
 //param : SlotIndex
-DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonUpDelegate, int);
+DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonUpDelegate, int32);
 //param : DragStartSlotIndex, DragEndSlotIndex, DragStartSlotTabType, DragEndSlotTabType
-DECLARE_DELEGATE_FourParams(FOnDragDropDelegate, int, int, int, int);
+DECLARE_DELEGATE_FourParams(FOnDragDropDelegate, int32, int32, int32, int32);
 
 //param : DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType
-DECLARE_DELEGATE_SixParams(FOnDragDropInventoryItemDelegate, int, int, int, int, int, int);
+DECLARE_DELEGATE_SixParams(FOnDragDropInventoryItemDelegate, int32, int32, int32, int32, int32, int32);
+
+// param : SlotIndex
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMouseEnterSignature, int32);
+// param : SlotIndex
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMouseLeaveSignature, int32);
 /**
  * 
  */
@@ -31,7 +36,7 @@ class WANDERINGWARRIOR_API UInventorySlotWidget : public UUserWidget
 public:
 
 	int GetSlotIndex();
-	void SetSlotIndex(int NewIndex);
+	void SetSlotIndex(int32 NewIndex);
 
 	class UImage* GetSlotImage();
 	void SetSlotImage(UImage* NewSlotImage);
@@ -39,11 +44,13 @@ public:
 	class UImage* GetDragSlotImage();
 	void SetDragSlotImage(UImage* NewSlotImage);
 
-	bool GetIsEmptySlotImage();
-	void SetIsEmptySlotImage(bool bIsEmpty);
+	uint8 GetIsEmptySlotImage();
+	void SetIsEmptySlotImage(uint8 bIsEmpty);
 
 	void SetTabTypeBelongTo(ETabType NewTabType);
 	void SetInventoryBelongTo(EInventory NewInventory);
+
+	uint8 GetbIsMouseEntered();
 
 public:
 
@@ -51,6 +58,8 @@ public:
 	FOnLeftMouseButtonUpDelegate OnLeftMouseButtonUpDelegate;
 	FOnDragDropDelegate OnDragDropDelegate;
 	FOnDragDropInventoryItemDelegate OnDragDropInventoryItemDelegate;
+	FOnMouseEnterSignature OnMouseEnterSignature;
+	FOnMouseLeaveSignature OnMouseLeaveSignature;
 
 protected:
 
@@ -72,8 +81,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UInventoryDragDropOperation> InventoryDragDropOperation;
 
-	int SlotIndex;
-	int StartDragSlotIndex;
+	int32 SlotIndex;
+	int32 StartDragSlotIndex;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> SlotImage;
@@ -81,5 +90,9 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> DragSlotImage;
 
-	bool bIsEmptySlotImage;
+	uint8 bIsEmptySlotImage : 1;
+
+	FTimerHandle WaitForItemInfoTimeHandler;
+
+	uint8 bIsMouseEntered : 1;
 };

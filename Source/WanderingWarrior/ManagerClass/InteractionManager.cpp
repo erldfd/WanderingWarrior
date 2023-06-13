@@ -37,7 +37,7 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 
 			GameInstance->GetConversationManager()->SetNPCNameText(FText::FromString(Marchant->GetNPCName()));
 
-			OnStartConversationSignature.Broadcast(Marchant->GetConversationIndex());
+			OnStartConversationSignature.Broadcast(Marchant);
 
 			return;
 		}

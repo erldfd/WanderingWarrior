@@ -8,7 +8,7 @@
 
 #include "AItem.generated.h"
 
-enum class EItemType;
+enum class EItemType : uint8;
 
 UCLASS(abstract)
 class WANDERINGWARRIOR_API AAItem : public AActor
@@ -27,8 +27,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	FName GetItemName();
-	void SetItemName(FName NewItemName);
+	const FText& GetItemName();
+	void SetItemName(const FText& NewItemName);
 
 	class UTexture2D* GetItemSlotTexture();
 	void SetItemSlotTexture(class UTexture2D* NewTexture);
@@ -41,20 +41,29 @@ public:
 
 	void SetItemType(EItemType NewItemType);
 
+	int32 GetBuyPrice();
+	int32 GetSellPrice();
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	FName ItemName;
+	FText ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	int FieldItemCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	int MaxItemCount = 1;
+	int MaxItemCount;
 
 	UPROPERTY()
 	TObjectPtr<class UTexture2D> ItemSlotTexture;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	EItemType ItemType;
+
+	UPROPERTY(EditAnywhere, Category = Item)
+	int32 BuyPrice;
+
+	UPROPERTY(EditAnywhere, Category = Item)
+	int32 SellPrice;
 };

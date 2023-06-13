@@ -13,6 +13,8 @@
 #include "ManagerClass/ConversationManager.h"
 #include "ConversationScriptData.h"
 #include "ManagerClass/InteractionManager.h"
+#include "ManagerClass/StoreManager.h"
+#include "Character/NPCCharacter.h"
 
 #include "GameFramework/Actor.h"
 
@@ -68,13 +70,14 @@ void UWWGameInstance::Init()
 	ConversationManager->SetConversationScriptDataArray(ConversationData.GetDefaultObject()->GetConversationScriptDataRowArray());
 
 	InventoryManager = NewObject<UInventoryManager>(this);
-
 	InventoryManager->InitManager();
 
 	CreditMamager = NewObject<UCreditManager>(this);
-	InteractionManager = NewObject<UInteractionManager>(this);
 
+	InteractionManager = NewObject<UInteractionManager>(this);
 	InteractionManager->OnStartConversationSignature.AddUObject(this, &UWWGameInstance::OnStartConversation);
+
+	StoreManager = NewObject<UStoreManager>(this);
 }
 
 AWeapon* UWWGameInstance::SpawnWeapon(EWeaponName Name)
@@ -130,8 +133,17 @@ UInteractionManager* UWWGameInstance::GetInteractionManager()
 	return InteractionManager;
 }
 
-void UWWGameInstance::OnStartConversation(int32 StartIndex)
+UStoreManager* UWWGameInstance::GetStoreManager()
 {
+	check(StoreManager);
+	return StoreManager;
+}
+
+void UWWGameInstance::OnStartConversation(ANPCCharacter* InteractionActor)
+{
+	int32 StartIndex = InteractionActor->GetConversationIndex();
+
+	ConversationManager->SetConversationNPC(InteractionActor);
 	ConversationManager->OpenConversationWidget();
 	ConversationManager->SetNPCConversation(StartIndex);
 	ConversationManager->OpenNPCConversationWidget();

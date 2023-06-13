@@ -28,6 +28,7 @@ public:
 	const FItemDataRow& GetSlotItemData() const;
 	void SetSlotItemData(const FItemDataRow& NewItemData);
 
+	void ClearSlotItem();
 	bool IsEmpty();
 
 	const int& GetSlotIndex() const;

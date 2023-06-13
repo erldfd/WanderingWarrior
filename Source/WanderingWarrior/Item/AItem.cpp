@@ -8,7 +8,7 @@
 //#include "Engine/DataTable.h"
 #include "Engine/Texture2D.h"
 // Sets default values
-AAItem::AAItem()
+AAItem::AAItem() : MaxItemCount(1)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -26,12 +26,12 @@ void AAItem::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-FName AAItem::GetItemName()
+const FText& AAItem::GetItemName()
 {
 	return ItemName;
 }
 
-void AAItem::SetItemName(FName NewItemName)
+void AAItem::SetItemName(const FText& NewItemName)
 {
 	ItemName = NewItemName;
 }
@@ -59,4 +59,14 @@ void AAItem::SetMaxItemCount(int Count)
 void AAItem::SetItemType(EItemType NewItemType)
 {
 	ItemType = NewItemType;
+}
+
+int32 AAItem::GetBuyPrice()
+{
+	return BuyPrice;
+}
+
+int32 AAItem::GetSellPrice()
+{
+	return SellPrice;
 }

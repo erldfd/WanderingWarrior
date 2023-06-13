@@ -8,8 +8,8 @@
 
 #include "InventoryDragDropOperation.generated.h"
 
-enum class ETabType;
-enum class EInventory;
+enum class ETabType : uint8;
+enum class EInventory : uint8;
 /**
  * 
  */

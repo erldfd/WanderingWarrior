@@ -8,7 +8,7 @@
 
 #include "CreditManager.generated.h"
 
-enum class ECreditOwner;
+enum class ECreditOwner : uint8;
 
 /**
  * 

@@ -27,7 +27,7 @@ struct FItemDataRow : public FTableRowBase
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	FName Name;
+	FText Name;
 
 	// it same to EItemType literally
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
@@ -52,6 +52,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int MaxItemCount;
+
+	UPROPERTY(EditAnywhere, Category = "Data")
+	int32 BuyPrice;
+
+	UPROPERTY(EditAnywhere, Category = "Data")
+	int32 SellPrice;
 };
 /**
  * 

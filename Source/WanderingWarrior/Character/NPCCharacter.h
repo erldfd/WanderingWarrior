@@ -25,6 +25,8 @@ public:
 
 	const FString& GetNPCName() const;
 
+	class UMarchantInventory* GetInventory();
+
 protected:
 
 	virtual void BeginPlay() override;

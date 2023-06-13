@@ -4,10 +4,10 @@
 #include "InventoryManager.h"
 
 #include "WanderingWarrior/WWEnumClassContainer.h"
+#include "WanderingWarrior/WWConstContainer.h"
 #include "WanderingWarrior/Inventory/AInventory.h"
 #include "WanderingWarrior/Inventory/InventoryWidget.h"
 #include "WanderingWarrior/Inventory/InventorySlotWidget.h"
-#include "WanderingWarrior/WWConstContainer.h"
 #include "WanderingWarrior/Inventory/CharacterInventory.h"
 #include "WanderingWarrior/Inventory/InventorySlotObject.h"
 #include "WanderingWarrior/Inventory/InventoryComponent.h"

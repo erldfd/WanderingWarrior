@@ -9,6 +9,7 @@
 
 #include "ConversationManager.generated.h"
 
+enum class EBehavior : uint8;
 /**
  * 
  */
@@ -31,6 +32,8 @@ public:
 
 	void SetConversationScriptDataArray(const TArray<struct FConversationScriptDataRow*>& InConversationScriptDataArray);
 
+	void SetConversationNPC(class ANPCCharacter* NPC);
+
 	void OpenConversationWidget();
 
 	void CloseConversationWidget();
@@ -43,6 +46,7 @@ public:
 
 private:
 
+	void SetBehavior(EBehavior Behavior);
 	void SetNPCConversationInternal(int32 ConversationIndex);
 
 	UFUNCTION()
@@ -64,4 +68,7 @@ private:
 	int32 NPCScriptIndex;
 
 	int32 CurrentConversationIndex;
+
+	UPROPERTY()
+	TObjectPtr<class ANPCCharacter> ConversationNPC;
 };

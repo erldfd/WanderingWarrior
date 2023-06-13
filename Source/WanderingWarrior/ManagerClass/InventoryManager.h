@@ -8,8 +8,8 @@
 
 #include "InventoryManager.generated.h"
 
-enum class EInventory;
-enum class ETabType;
+enum class EInventory : uint8;
+enum class ETabType : uint8;
 
 /**
  * 

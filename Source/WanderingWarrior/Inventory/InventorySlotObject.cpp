@@ -25,6 +25,12 @@ void UInventorySlotObject::SetSlotItemData(const FItemDataRow& NewItemData)
 	SlotItemData = NewItemData;
 }
 
+void UInventorySlotObject::ClearSlotItem()
+{
+	SlotItem = nullptr;
+	HeldItemCount = 0;
+}
+
 bool UInventorySlotObject::IsEmpty()
 {
 	return (HeldItemCount == 0);
