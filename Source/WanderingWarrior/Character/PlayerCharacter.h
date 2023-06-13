@@ -58,7 +58,7 @@ private:
 	TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
 
 	UPROPERTY()
-	TObjectPtr<class UInventorySlotObject> TempSwapSlot;
+	TObjectPtr<class UInventorySlotData> TempSwapSlot;
 
 	UPROPERTY()
 	TObjectPtr<class UCharacterInventory> Inventory;

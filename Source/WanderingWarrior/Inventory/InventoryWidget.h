@@ -50,7 +50,7 @@ public:
 
 	void InitNullTabButtonArray(int ArrayCount);
 
-	TArray<class UInventoryTabButton*>& GetTabButtonArray();
+	TArray<class UInventoryTabButtonWidget*>& GetTabButtonArray();
 
 	void InitInventoryWidget(const FInventoryWidgetSettings& Settings);
 
@@ -83,7 +83,7 @@ private:
 private:
 
 	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<class UInventoryTabButton>> TabButtonArray;
+	TArray<TObjectPtr<class UInventoryTabButtonWidget>> TabButtonArray;
 
 	/*UPROPERTY(EditAnywhere)
 	TArray<> SlotWidgetArrays;*/

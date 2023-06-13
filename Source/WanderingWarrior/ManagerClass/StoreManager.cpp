@@ -7,8 +7,8 @@
 
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/MarchantInventory.h"
-#include "Inventory/InventoryTabObject.h"
-#include "Inventory/InventorySlotObject.h"
+#include "Inventory/InventoryTabData.h"
+#include "Inventory/InventorySlotData.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/InventoryWidget.h"
 #include "Inventory/InventorySlotWidget.h"

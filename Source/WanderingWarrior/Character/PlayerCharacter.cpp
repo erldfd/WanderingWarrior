@@ -12,8 +12,8 @@
 #include "WanderingWarrior/Components/PlayerSkillComponent.h"
 #include "WanderingWarrior/Inventory/InventorySlotWidget.h"
 #include "WanderingWarrior/Inventory/InventoryWidget.h"
-#include "WanderingWarrior/Inventory/InventoryTabObject.h"
-#include "WanderingWarrior/Inventory/InventorySlotObject.h"
+#include "WanderingWarrior/Inventory/InventoryTabData.h"
+#include "WanderingWarrior/Inventory/InventorySlotData.h"
 #include "WanderingWarrior/WWEnumClassContainer.h"
 #include "WanderingWarrior/Inventory/CharacterInventory.h"
 #include "WanderingWarrior/Inventory/CharacterQuickSlot.h"
@@ -58,7 +58,7 @@ APlayerCharacter::APlayerCharacter()
 
 	Tags.Init("Player", 1);
 
-	TempSwapSlot = NewObject<UInventorySlotObject>();
+	TempSwapSlot = NewObject<UInventorySlotData>();
 
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(TEXT("NewInventory"));
 	QuickSlot = CreateDefaultSubobject<UCharacterQuickSlot>(TEXT("NewQuickSlot"));

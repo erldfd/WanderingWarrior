@@ -39,7 +39,7 @@ private:
 		int DragStartInventory, int DragEndInventory, 
 		int DragStartSlotTabType, int DragEndSlotTabType);
 
-	void ExchangeOrMoveInventoryItemInternal(class UInventorySlotObject* DragStartSlot, class UInventorySlotObject* DragEndSlot, 
+	void ExchangeOrMoveInventoryItemInternal(class UInventorySlotData* DragStartSlot, class UInventorySlotData* DragEndSlot,
 		EInventory DragStartInventory, EInventory DragEndInventory,
 		ETabType DragStartSlotTabType, ETabType DragEndSlotTabType);
 
@@ -48,5 +48,5 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<class UAInventory>> InventoryArray;
 
-	TObjectPtr<class UInventorySlotObject> TempSwapSlot;
+	TObjectPtr<class UInventorySlotData> TempSwapSlot;
 };

@@ -1,49 +1,49 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "InventoryTabButton.h"
+#include "InventoryTabButtonWidget.h"
 
-UInventoryTabButton::UInventoryTabButton()
+UInventoryTabButtonWidget::UInventoryTabButtonWidget()
 {
-	OnClicked.AddDynamic(this, &UInventoryTabButton::OnTabButtonClicked);
-	UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, UInventoryTabButton, OnClicked is bound? : %d"), OnClicked.IsBound());
+	OnClicked.AddDynamic(this, &UInventoryTabButtonWidget::OnTabButtonClicked);
+	UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, UInventoryTabButtonWidget, OnClicked is bound? : %d"), OnClicked.IsBound());
 }
 
-void UInventoryTabButton::InitSlotWidgetArray(int SlotWidgetCount)
+void UInventoryTabButtonWidget::InitSlotWidgetArray(int SlotWidgetCount)
 {
 	check(SlotWidgetCount > 0);
 	SlotWidgetArray.Init(nullptr, SlotWidgetCount);
 }
 
-void UInventoryTabButton::InitSlotItemCountTextArray(int SlotItemCountArrayCount)
+void UInventoryTabButtonWidget::InitSlotItemCountTextArray(int SlotItemCountArrayCount)
 {
 	check(SlotItemCountArrayCount > 0);
 	SlotItemCountTextArray.Init(nullptr, SlotItemCountArrayCount);
 }
 
-TArray<class UInventorySlotWidget*>& UInventoryTabButton::GetSlotWidgetArray()
+TArray<class UInventorySlotWidget*>& UInventoryTabButtonWidget::GetSlotWidgetArray()
 {
 	check(SlotWidgetArray.IsValidIndex(0));
 	return SlotWidgetArray;
 }
 
-TArray<class UTextBlock*>& UInventoryTabButton::GetSlotItemCountTextArray()
+TArray<class UTextBlock*>& UInventoryTabButtonWidget::GetSlotItemCountTextArray()
 {
 	check(SlotItemCountTextArray.IsValidIndex(0));
 	return SlotItemCountTextArray;
 }
 
-void UInventoryTabButton::SetTabType(ETabType NewTabType)
+void UInventoryTabButtonWidget::SetTabType(ETabType NewTabType)
 {
 	TabType = NewTabType;
 }
 
-void UInventoryTabButton::OnTabSlotClicked(int SlotIndex)
+void UInventoryTabButtonWidget::OnTabSlotClicked(int SlotIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, OnWeaponTabSlotClicked"));
 }
 
-void UInventoryTabButton::OnTabButtonClicked()
+void UInventoryTabButtonWidget::OnTabButtonClicked()
 {
 	if (OnTabButtonClickedDelegate.IsBound())
 	{

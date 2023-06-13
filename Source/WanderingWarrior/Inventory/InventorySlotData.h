@@ -9,7 +9,7 @@
 
 #include "UObject/NoExportTypes.h"
 
-#include "InventorySlotObject.generated.h"
+#include "InventorySlotData.generated.h"
 
 struct FItemDataRow;
 
@@ -17,13 +17,13 @@ struct FItemDataRow;
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API UInventorySlotObject : public UObject
+class WANDERINGWARRIOR_API UInventorySlotData : public UObject
 {
 	GENERATED_BODY()
 
 public:
 
-	UInventorySlotObject();
+	UInventorySlotData();
 
 	const FItemDataRow& GetSlotItemData() const;
 	void SetSlotItemData(const FItemDataRow& NewItemData);

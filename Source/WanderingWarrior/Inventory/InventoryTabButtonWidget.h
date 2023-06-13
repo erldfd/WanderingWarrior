@@ -6,7 +6,7 @@
 
 #include "Components/Button.h"
 
-#include "InventoryTabButton.generated.h"
+#include "InventoryTabButtonWidget.generated.h"
 
 enum class ETabType : uint8;
 
@@ -17,13 +17,13 @@ DECLARE_DELEGATE_OneParam(FOnTabButtonClickedDelegate, int);
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API UInventoryTabButton : public UButton
+class WANDERINGWARRIOR_API UInventoryTabButtonWidget : public UButton
 {
 	GENERATED_BODY()
 	
 public:
 
-	UInventoryTabButton();
+	UInventoryTabButtonWidget();
 
 	//init to nullptr
 	void InitSlotWidgetArray(int SlotWidgetCount);

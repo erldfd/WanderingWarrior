@@ -6,12 +6,12 @@
 #include "ItemData.h"
 #include "WanderingWarrior/WWEnumClassContainer.h"
 #include "WanderingWarrior/WWGameInstance.h"
-#include "InventoryTabObject.h"
-#include "InventorySlotObject.h"
+#include "InventoryTabData.h"
+#include "InventorySlotData.h"
 #include "InventoryWidget.h"
 #include "InventorySlotWidget.h"
 #include "InventoryComponent.h"
-#include "InventoryTabButton.h"
+#include "InventoryTabButtonWidget.h"
 #include "WanderingWarrior/WWConstContainer.h"
 #include "WanderingWarrior/ManagerClass/InventoryManager.h"
 
@@ -20,13 +20,13 @@
 UCharacterQuickSlot::UCharacterQuickSlot()
 {
 	InventoryType = EInventory::CharacterQuickSlot;
-	TempSwapSlot = NewObject<UInventorySlotObject>();
+	TempSwapSlot = NewObject<UInventorySlotData>();
 
 	InventoryComponent->InitTabArray(TabCount::QUICKSLOT_TAB_COUNT);
 
-	TArray<UInventoryTabObject*>& TabArray = InventoryComponent->GetTabArray();
+	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
 
-	TabArray[0] = CreateDefaultSubobject<UInventoryTabObject>(TEXT("QuickSlotTab"));
+	TabArray[0] = CreateDefaultSubobject<UInventoryTabData>(TEXT("QuickSlotTab"));
 	check(TabArray[0] != nullptr);
 	TabArray[0]->InitSlots(SlotCount::QUICK_SLOT_COUNT);
 	TabArray[0]->SetTabType(ETabType::QuickSlotTab);
@@ -91,11 +91,11 @@ bool UCharacterQuickSlot::ObtainItem(EMiscItemName MiscItemName)
 	return ObtainItem(*ItemData, InventoryComponent->GetTabArray()[0]);
 }
 
-bool UCharacterQuickSlot::ObtainItem(const FItemDataRow& NewItemData, UInventoryTabObject* Tab)
+bool UCharacterQuickSlot::ObtainItem(const FItemDataRow& NewItemData, UInventoryTabData* Tab)
 {
 	check(InventoryWidget != nullptr);
 
-	UInventorySlotObject* Slot = Tab->GetHoldableItemSlot();
+	UInventorySlotData* Slot = Tab->GetHoldableItemSlot();
 
 	ETabType TabType = Tab->GetTabType();
 
@@ -121,19 +121,19 @@ bool UCharacterQuickSlot::ObtainItem(const FItemDataRow& NewItemData, UInventory
 
 void UCharacterQuickSlot::RemoveAllItem(int32 SlotIndex)
 {
-	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
+	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
 
 	Slot->ClearSlotItem();
 }
 
 bool UCharacterQuickSlot::UseSlotItemFormSlotIndex(int Index)
 {
-	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
+	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
 
 	return UseSlotItemFromSlot(Slot);
 }
 
-bool UCharacterQuickSlot::UseSlotItemFromSlot(UInventorySlotObject*& Slot)
+bool UCharacterQuickSlot::UseSlotItemFromSlot(UInventorySlotData*& Slot)
 {
 	if (Slot == nullptr || Slot->GetHeldItemCount() == 0)
 	{
@@ -167,8 +167,8 @@ void UCharacterQuickSlot::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int Dra
 {
 	UE_LOG(LogTemp, Warning, TEXT("CharacterQuickSlot, ExchangeOrMoveSlotItem, DragStartSlotIndex : %d, DragEndSlotIndex : %d"), DragStartSlotIndex, DragEndSlotIndex);
 
-	UInventorySlotObject* DragStartSlot = InventoryComponent->GetTabArray()[(int)DragSlotTabType]->GetSlotFromIndex(DragStartSlotIndex);
-	UInventorySlotObject* DragEndSlot = InventoryComponent->GetTabArray()[(int)DragSlotTabType]->GetSlotFromIndex(DragEndSlotIndex);
+	UInventorySlotData* DragStartSlot = InventoryComponent->GetTabArray()[(int)DragSlotTabType]->GetSlotFromIndex(DragStartSlotIndex);
+	UInventorySlotData* DragEndSlot = InventoryComponent->GetTabArray()[(int)DragSlotTabType]->GetSlotFromIndex(DragEndSlotIndex);
 
 	TArray<UInventorySlotWidget*> SlotWidgetArray = Super::InventoryWidget->GetSlotWidgetArray(DragSlotTabType);
 

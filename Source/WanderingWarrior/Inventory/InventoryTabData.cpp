@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "InventoryTabObject.h"
+#include "InventoryTabData.h"
 
-#include "InventorySlotObject.h"
+#include "InventorySlotData.h"
 #include "WanderingWarrior/Item/AItem.h"
 #include "ItemData.h"
 #include "WanderingWarrior/WWConstContainer.h"
 
-UInventoryTabObject::UInventoryTabObject() : SlotCount(0)
+UInventoryTabData::UInventoryTabData() : SlotCount(0)
 {
 	/*InventorySlotArray.Init(nullptr, SlotCount);
 
@@ -27,12 +27,12 @@ UInventoryTabObject::UInventoryTabObject() : SlotCount(0)
 	}*/
 }
 
-int UInventoryTabObject::GetSlotCount()
+int UInventoryTabData::GetSlotCount()
 {
 	return SlotCount;
 }
 
-void UInventoryTabObject::InitSlots(int NewSlotCount)
+void UInventoryTabData::InitSlots(int NewSlotCount)
 {
 	// 임시 함수... 퀵슬롯의 슬롯이 8개이기 때문에 ㅎ므....... 어쩌지......
 
@@ -49,13 +49,13 @@ void UInventoryTabObject::InitSlots(int NewSlotCount)
 			SlotNameString.Append(FString::FromInt(i));
 			FName SlotName(*SlotNameString);
 
-			InventorySlotArray[i] = NewObject<UInventorySlotObject>();
+			InventorySlotArray[i] = NewObject<UInventorySlotData>();
 			InventorySlotArray[i]->SetSlotIndex(i);
 		}
 	}
 }
 
-UInventorySlotObject*& UInventoryTabObject::GetSlotFromIndex(int Index)
+UInventorySlotData*& UInventoryTabData::GetSlotFromIndex(int Index)
 {
 	//UInventorySlotObject* Temp = nullptr;
 	//if (ensureMsgf(InventorySlotArray.IsValidIndex(Index), TEXT("InventoryTabObject, GetSlotFromindex, InvalidIndex : %d"), Index) == false) return Temp;
@@ -63,7 +63,7 @@ UInventorySlotObject*& UInventoryTabObject::GetSlotFromIndex(int Index)
 	return InventorySlotArray[Index];
 }
 
-UInventorySlotObject* UInventoryTabObject::GetEmptySlot()
+UInventorySlotData* UInventoryTabData::GetEmptySlot()
 {
 	for (int i = 0; i < InventorySlotArray.Num(); ++i)
 	{
@@ -78,7 +78,7 @@ UInventorySlotObject* UInventoryTabObject::GetEmptySlot()
 	return nullptr;
 }
 
-UInventorySlotObject* UInventoryTabObject::GetHoldableItemSlot()
+UInventorySlotData* UInventoryTabData::GetHoldableItemSlot()
 {
 	for (int i = 0; i < InventorySlotArray.Num(); ++i)
 	{
@@ -97,12 +97,12 @@ UInventorySlotObject* UInventoryTabObject::GetHoldableItemSlot()
 	return nullptr;
 }
 
-ETabType UInventoryTabObject::GetTabType()
+ETabType UInventoryTabData::GetTabType()
 {
 	return TabType;
 }
 
-void UInventoryTabObject::SetTabType(ETabType NewTabType)
+void UInventoryTabData::SetTabType(ETabType NewTabType)
 {
 	TabType = NewTabType;
 	UE_LOG(LogTemp, Warning, TEXT("TabType : %d"), TabType);

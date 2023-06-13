@@ -24,12 +24,12 @@ public:
 
 	virtual bool ObtainItem(EWeaponName WeaponName) override;
 	virtual bool ObtainItem(EMiscItemName MiscItemName) override;
-	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabObject* Tab) override;
+	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabData* Tab) override;
 
 	virtual void RemoveAllItem(int32 SlotIndex) override;
 
 	virtual bool UseSlotItemFormSlotIndex(int32 Index) override;
-	virtual bool UseSlotItemFromSlot(class UInventorySlotObject*& Slot) override;
+	virtual bool UseSlotItemFromSlot(class UInventorySlotData*& Slot) override;
 
 	void OpenAndCloseInventory();
 
@@ -64,7 +64,7 @@ private:
 private:
 
 	UPROPERTY()
-	TObjectPtr<class UInventorySlotObject> TempSwapSlot;
+	TObjectPtr<class UInventorySlotData> TempSwapSlot;
 
 	uint8 bIsMouseEnterToSlotWidget : 1;
 

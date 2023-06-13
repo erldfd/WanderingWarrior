@@ -10,11 +10,11 @@
 
 struct BuyAndSellArgs
 {
-	class UInventorySlotObject& BuyerSlot;
+	class UInventorySlotData& BuyerSlot;
 	class UInventorySlotWidget& BuyerSlotWidget;
 	int32& BuyerCredits;
 
-	class UInventorySlotObject& SellerSlot;
+	class UInventorySlotData& SellerSlot;
 	class UInventorySlotWidget& SellerSlotWidget;
 	int32& SellerCredits;
 };

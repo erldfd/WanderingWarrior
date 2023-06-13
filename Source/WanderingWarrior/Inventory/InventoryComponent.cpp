@@ -3,8 +3,8 @@
 
 #include "InventoryComponent.h"
 
-#include "InventoryTabObject.h"
-#include "InventorySlotObject.h"
+#include "InventoryTabData.h"
+#include "InventorySlotData.h"
 #include "InventoryWidget.h"
 #include "InventorySlotWidget.h"
 #include "WanderingWarrior/Item/Weapon.h"
@@ -37,12 +37,12 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-class UInventoryTabObject* UInventoryComponent::GetCurrentActivatedTab()
+class UInventoryTabData* UInventoryComponent::GetCurrentActivatedTab()
 {
 	return CurrentActivatedTab;
 }
 
-void UInventoryComponent::SetCurrentActivatedTab(UInventoryTabObject* Tab)
+void UInventoryComponent::SetCurrentActivatedTab(UInventoryTabData* Tab)
 {
 	CurrentActivatedTab = Tab;
 }
@@ -57,7 +57,7 @@ void UInventoryComponent::SetCurrentActivatedTabType(ETabType NewTabType)
 	CurrentActivatedTabType = NewTabType;
 }
 
-TArray<class UInventoryTabObject*>& UInventoryComponent::GetTabArray()
+TArray<class UInventoryTabData*>& UInventoryComponent::GetTabArray()
 {
 	return TabArray;
 }

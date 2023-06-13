@@ -9,9 +9,9 @@
 #include "WanderingWarrior/Inventory/InventoryWidget.h"
 #include "WanderingWarrior/Inventory/InventorySlotWidget.h"
 #include "WanderingWarrior/Inventory/CharacterInventory.h"
-#include "WanderingWarrior/Inventory/InventorySlotObject.h"
+#include "WanderingWarrior/Inventory/InventorySlotData.h"
 #include "WanderingWarrior/Inventory/InventoryComponent.h"
-#include "WanderingWarrior/Inventory/InventoryTabObject.h"
+#include "WanderingWarrior/Inventory/InventoryTabData.h"
 
 #include "Components/Image.h"
 
@@ -25,7 +25,7 @@ UInventoryManager::UInventoryManager()
 
 void UInventoryManager::InitManager()
 {
-	TempSwapSlot = NewObject<UInventorySlotObject>();
+	TempSwapSlot = NewObject<UInventorySlotData>();
 }
 
 void UInventoryManager::BindFunctionToDragDropDelegate(EInventory InventoryType, ETabType InventoryTabType)
@@ -66,9 +66,9 @@ void UInventoryManager::ExchangeOrMoveInventoryItem(int DragStartSlotIndex, int 
 		return;
 	}
 
-	UInventorySlotObject* DragStartSlot =
+	UInventorySlotData* DragStartSlot =
 		InventoryArray[DragStartInventory]->GetInventoryComponent()->GetTabArray()[DragStartSlotTabType]->GetSlotFromIndex(DragStartSlotIndex);
-	UInventorySlotObject* DragEndSlot =
+	UInventorySlotData* DragEndSlot =
 		InventoryArray[DragEndInventory]->GetInventoryComponent()->GetTabArray()[DragEndSlotTabType]->GetSlotFromIndex(DragEndSlotIndex);
 	check(DragStartSlot != nullptr);
 	check(DragEndSlot != nullptr);
@@ -85,7 +85,7 @@ void UInventoryManager::ExchangeOrMoveInventoryItem(int DragStartSlotIndex, int 
 	}
 }
 
-void UInventoryManager::ExchangeOrMoveInventoryItemInternal(class UInventorySlotObject* DragStartSlot, class UInventorySlotObject* DragEndSlot,
+void UInventoryManager::ExchangeOrMoveInventoryItemInternal(class UInventorySlotData* DragStartSlot, class UInventorySlotData* DragEndSlot,
 	EInventory DragStartInventory, EInventory DragEndInventory,
 	ETabType DragStartSlotTabType, ETabType DragEndSlotTabType)
 {

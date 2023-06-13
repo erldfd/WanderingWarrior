@@ -3,11 +3,11 @@
 
 #include "InventoryWidget.h"
 
-#include "InventoryTabObject.h"
+#include "InventoryTabData.h"
 #include "InventorySlotWidget.h"
 #include "WanderingWarrior/WWConstContainer.h"
 #include "WanderingWarrior/WWEnumClassContainer.h"
-#include "InventoryTabButton.h"
+#include "InventoryTabButtonWidget.h"
 
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
@@ -88,7 +88,7 @@ void UInventoryWidget::InitNullTabButtonArray(int ArrayCount)
 	TabButtonArray.Init(nullptr, ArrayCount);
 }
 
-TArray<UInventoryTabButton*>& UInventoryWidget::GetTabButtonArray()
+TArray<UInventoryTabButtonWidget*>& UInventoryWidget::GetTabButtonArray()
 {
 	return TabButtonArray;
 }
@@ -106,7 +106,10 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 		FString WidgetNameString("TabButton_");
 		WidgetNameString.Append(FString::FromInt(i));
 		FName WidgetName(WidgetNameString);
-		TabButtonArray[i] = Cast<UInventoryTabButton>(GetWidgetFromName(WidgetName));
+
+		TabButtonArray[i] = Cast<UInventoryTabButtonWidget>(GetWidgetFromName(WidgetName));
+		check(TabButtonArray[i]);
+
 		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, InitInventoryWidget, TabButtonArray%d is null? : %d, WidgetName : %s"), i, TabButtonArray[i] == nullptr, *WidgetName.ToString());
 		TabButtonArray[i]->InitSlotWidgetArray(SlotCount);
 		TabButtonArray[i]->InitSlotItemCountTextArray(SlotCount);
@@ -129,6 +132,7 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 			WidgetName = FName(WidgetNameString);
 
 			UInventorySlotWidget* SlotWidget = Cast<UInventorySlotWidget>(GetWidgetFromName(WidgetName));
+			check(SlotWidget);
 
 			TabSlotWidgetArray[j] = SlotWidget;
 			TabSlotWidgetArray[j]->GetSlotImage()->SetBrushFromTexture(EmptySlotTexture);
@@ -145,6 +149,7 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 			WidgetName = FName(WidgetNameString);
 
 			UTextBlock* TextBlock = Cast<UTextBlock>(GetWidgetFromName(WidgetName));
+			check(TextBlock);
 
 			TabItemCountTextArray[j] = TextBlock;
 			TabItemCountTextArray[j]->SetText(FText());

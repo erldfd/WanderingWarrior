@@ -3,7 +3,7 @@
 
 #include "InventoryDragDropOperation.h"
 
-#include "InventoryTabObject.h"
+#include "InventoryTabData.h"
 
 UInventoryDragDropOperation::UInventoryDragDropOperation() : StartDragSlotIndex(-1)
 {

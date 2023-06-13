@@ -32,13 +32,13 @@ public:
 
 	virtual bool ObtainItem(EWeaponName WeaponName) PURE_VIRTUAL(UAInventory::ObtainItem, return false;);
 	virtual bool ObtainItem(EMiscItemName MiscItemName) PURE_VIRTUAL(UAInventory::ObtainItem, return false;);
-	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabObject* Tab) PURE_VIRTUAL(UAInventory::ObtainItem, return false;);
+	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabData* Tab) PURE_VIRTUAL(UAInventory::ObtainItem, return false;);
 
 	// Remove All Item In Current Slot
 	virtual void RemoveAllItem(int32 SlotIndex) PURE_VIRTUAL(UAInventory::RemoveItem, );
 
 	virtual bool UseSlotItemFormSlotIndex(int32 Index) PURE_VIRTUAL(UAInventory::UseSlotItemFormSlotIndex, return false;);
-	virtual bool UseSlotItemFromSlot(class UInventorySlotObject*& Slot) PURE_VIRTUAL(UAInventory::UseSlotItemFormSlotIndex, return false;);
+	virtual bool UseSlotItemFromSlot(class UInventorySlotData*& Slot) PURE_VIRTUAL(UAInventory::UseSlotItemFormSlotIndex, return false;);
 
 	virtual void ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType) PURE_VIRTUAL(UAInventory::ExchangeOrMoveSlotItem, );
 

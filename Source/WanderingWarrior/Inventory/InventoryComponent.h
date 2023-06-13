@@ -42,13 +42,13 @@ public:
 
 	/*bool IsInventoryVisible();*/
 
-	class UInventoryTabObject* GetCurrentActivatedTab();
-	void SetCurrentActivatedTab(UInventoryTabObject* Tab);
+	class UInventoryTabData* GetCurrentActivatedTab();
+	void SetCurrentActivatedTab(UInventoryTabData* Tab);
 	
 	ETabType GetCurrentActivatedTabType();
 	void SetCurrentActivatedTabType(ETabType NewTabType);
 
-	TArray<class UInventoryTabObject*>& GetTabArray();
+	TArray<class UInventoryTabData*>& GetTabArray();
 	void InitTabArray(int TabCount);
 
 public:
@@ -72,7 +72,7 @@ private:
 	ETabType CurrentActivatedTabType;
 
 	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<class UInventoryTabObject>> TabArray;
+	TArray<TObjectPtr<class UInventoryTabData>> TabArray;
 
 
 
@@ -86,7 +86,7 @@ private:
 	//TObjectPtr<class UInventoryTabObject> MiscTab;
 
 	UPROPERTY()
-	TObjectPtr<class UInventoryTabObject> CurrentActivatedTab;
+	TObjectPtr<class UInventoryTabData> CurrentActivatedTab;
 		
 	//UPROPERTY()
 	//TSubclassOf<class UInventoryWidget> InventoryWidgetClass;

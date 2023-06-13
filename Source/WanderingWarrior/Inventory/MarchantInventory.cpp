@@ -6,9 +6,9 @@
 #include "WanderingWarrior/WWEnumClassContainer.h"
 #include "InventoryComponent.h"
 #include "WanderingWarrior/WWConstContainer.h"
-#include "InventoryTabObject.h"
+#include "InventoryTabData.h"
 #include "InventoryWidget.h"
-#include "InventorySlotObject.h"
+#include "InventorySlotData.h"
 #include "InventorySlotWidget.h"
 #include "WanderingWarrior/WWGameInstance.h"
 
@@ -20,9 +20,9 @@ UMarchantInventory::UMarchantInventory()
 
 	InventoryComponent->InitTabArray(TabCount::QUICKSLOT_TAB_COUNT);
 
-	TArray<UInventoryTabObject*>& TabArray = InventoryComponent->GetTabArray();
+	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
 
-	TabArray[0] = CreateDefaultSubobject<UInventoryTabObject>(TEXT("AllTab"));
+	TabArray[0] = CreateDefaultSubobject<UInventoryTabData>(TEXT("AllTab"));
 	check(TabArray[0] != nullptr);
 	TabArray[0]->InitSlots(SlotCount::MARCHANT_SLOT_COUNT);
 	TabArray[0]->SetTabType(ETabType::AllTab);
@@ -63,11 +63,11 @@ bool UMarchantInventory::ObtainItem(EMiscItemName MiscItemName)
 	return ObtainItem(*ItemData, InventoryComponent->GetTabArray()[int(ETabType::MiscTab)]);
 }
 
-bool UMarchantInventory::ObtainItem(const FItemDataRow& NewItemData, class UInventoryTabObject* Tab)
+bool UMarchantInventory::ObtainItem(const FItemDataRow& NewItemData, class UInventoryTabData* Tab)
 {
 	check(InventoryWidget);
 
-	UInventorySlotObject* Slot = Tab->GetHoldableItemSlot();
+	UInventorySlotData* Slot = Tab->GetHoldableItemSlot();
 
 	ETabType TabType = Tab->GetTabType();
 
@@ -93,19 +93,19 @@ bool UMarchantInventory::ObtainItem(const FItemDataRow& NewItemData, class UInve
 
 void UMarchantInventory::RemoveAllItem(int32 SlotIndex)
 {
-	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
+	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
 
 	Slot->ClearSlotItem();
 }
 
 bool UMarchantInventory::UseSlotItemFormSlotIndex(int Index)
 {
-	UInventorySlotObject*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
+	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
 
 	return UseSlotItemFromSlot(Slot);
 }
 
-bool UMarchantInventory::UseSlotItemFromSlot(UInventorySlotObject*& Slot)
+bool UMarchantInventory::UseSlotItemFromSlot(UInventorySlotData*& Slot)
 {
 	if (Slot == nullptr || Slot->GetHeldItemCount() == 0)
 	{

@@ -6,7 +6,7 @@
 
 #include "UObject/NoExportTypes.h"
 
-#include "InventoryTabObject.generated.h"
+#include "InventoryTabData.generated.h"
 
 enum class ETabType : uint8;
 
@@ -14,25 +14,25 @@ enum class ETabType : uint8;
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API UInventoryTabObject : public UObject
+class WANDERINGWARRIOR_API UInventoryTabData : public UObject
 {
 	GENERATED_BODY()
 
 public:
 
-	UInventoryTabObject();
+	UInventoryTabData();
 
 	//virtual void PostInitProperties() override;
 
 	int GetSlotCount();
 	void InitSlots(int NewSlotCount);
 
-	class UInventorySlotObject*& GetSlotFromIndex(int Index);
+	class UInventorySlotData*& GetSlotFromIndex(int Index);
 
 	//SlotIndex is Getted Slot Index, if Failed to Get Slot, SlotIndex is -1.
-	class UInventorySlotObject* GetEmptySlot();
+	class UInventorySlotData* GetEmptySlot();
 
-	class UInventorySlotObject* GetHoldableItemSlot();
+	class UInventorySlotData* GetHoldableItemSlot();
 
 	ETabType GetTabType();
 	void SetTabType(ETabType NewTabType);
@@ -42,7 +42,7 @@ private:
 	int SlotCount;
 
 	UPROPERTY()
-	TArray<class UInventorySlotObject*> InventorySlotArray;
+	TArray<class UInventorySlotData*> InventorySlotArray;
 
 	ETabType TabType;
 };

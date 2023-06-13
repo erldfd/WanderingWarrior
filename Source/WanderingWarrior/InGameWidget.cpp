@@ -9,7 +9,7 @@
 #include "WWEnumClassContainer.h"
 #include "ConversationWidget.h"
 #include "Inventory/InventoryItemInfoWidget.h"
-#include "Inventory/InventoryTabButton.h"
+#include "Inventory/InventoryTabButtonWidget.h"
 
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"

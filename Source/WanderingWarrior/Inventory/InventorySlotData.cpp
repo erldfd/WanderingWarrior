@@ -1,57 +1,56 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "InventorySlotObject.h"
+#include "InventorySlotData.h"
 
 #include "WanderingWarrior/Item/Weapon.h"
 #include "WanderingWarrior/Item/MiscItem.h"
 #include "WanderingWarrior/WWGameInstance.h"
-//#include "ItemData.h"
 
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"
 
-UInventorySlotObject::UInventorySlotObject() : HeldItemCount(0)
+UInventorySlotData::UInventorySlotData() : HeldItemCount(0)
 {
 }
 
-const FItemDataRow& UInventorySlotObject::GetSlotItemData() const
+const FItemDataRow& UInventorySlotData::GetSlotItemData() const
 {
 	return SlotItemData;
 }
 
-void UInventorySlotObject::SetSlotItemData(const FItemDataRow& NewItemData)
+void UInventorySlotData::SetSlotItemData(const FItemDataRow& NewItemData)
 {
 	SlotItemData = NewItemData;
 }
 
-void UInventorySlotObject::ClearSlotItem()
+void UInventorySlotData::ClearSlotItem()
 {
 	SlotItem = nullptr;
 	HeldItemCount = 0;
 }
 
-bool UInventorySlotObject::IsEmpty()
+bool UInventorySlotData::IsEmpty()
 {
 	return (HeldItemCount == 0);
 }
 
-const int& UInventorySlotObject::GetSlotIndex() const
+const int& UInventorySlotData::GetSlotIndex() const
 {
 	return SlotIndex;
 }
 
-void UInventorySlotObject::SetSlotIndex(int NewIndex)
+void UInventorySlotData::SetSlotIndex(int NewIndex)
 {
 	SlotIndex = NewIndex;
 }
 
-const int& UInventorySlotObject::GetHeldItemCount() const
+const int& UInventorySlotData::GetHeldItemCount() const
 {
 	return HeldItemCount;
 }
 
-bool UInventorySlotObject::SetHeldItemCount(int NewCount)
+bool UInventorySlotData::SetHeldItemCount(int NewCount)
 {
 	if (NewCount < 0 || NewCount > SlotItemData.MaxItemCount)
 	{
@@ -63,7 +62,7 @@ bool UInventorySlotObject::SetHeldItemCount(int NewCount)
 	return true;
 }
 
-bool UInventorySlotObject::UseSlotItem(const UWorld& World)
+bool UInventorySlotData::UseSlotItem(const UWorld& World)
 {
 	if (HeldItemCount <= 0)
 	{
