@@ -25,9 +25,9 @@ public:
 	//virtual void PostInitProperties() override;
 
 	int GetSlotCount();
-	void InitSlots(int NewSlotCount);
+	void InitSlots(int32 NewSlotCount);
 
-	class UInventorySlotData*& GetSlotFromIndex(int Index);
+	class UInventorySlotData*& GetSlotFromIndex(int32 Index);
 
 	//SlotIndex is Getted Slot Index, if Failed to Get Slot, SlotIndex is -1.
 	class UInventorySlotData* GetEmptySlot();
@@ -39,7 +39,7 @@ public:
 
 private:
 
-	int SlotCount;
+	int32 SlotCount;
 
 	UPROPERTY()
 	TArray<class UInventorySlotData*> InventorySlotArray;

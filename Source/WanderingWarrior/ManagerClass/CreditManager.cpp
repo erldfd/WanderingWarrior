@@ -13,7 +13,7 @@ int UCreditManager::GetCredits(ECreditOwner Owner)
 	return CharacterCreditArray[int(Owner)];
 }
 
-void UCreditManager::SetCredits(int Credits, ECreditOwner Owner)
+void UCreditManager::SetCredits(int32 Credits, ECreditOwner Owner)
 {
 	if (Credits > MAX_int16 - 1 || Credits < 0)
 	{

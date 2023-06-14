@@ -15,7 +15,7 @@ int UInventoryDragDropOperation::GetStartDragSlotIndex()
 	return StartDragSlotIndex;
 }
 
-void UInventoryDragDropOperation::SetStartDragSlotIndex(int NewIndex)
+void UInventoryDragDropOperation::SetStartDragSlotIndex(int32 NewIndex)
 {
 	StartDragSlotIndex = NewIndex;
 }

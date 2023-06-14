@@ -22,9 +22,4 @@ public:
 
 private:
 
-	/*UPROPERTY()
-	TSubclassOf<class UMainMenuWidget> MainMenuWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<class UMainMenuWidget> MainMenuWidget;*/
 };

@@ -62,7 +62,7 @@ TArray<class UInventoryTabData*>& UInventoryComponent::GetTabArray()
 	return TabArray;
 }
 
-void UInventoryComponent::InitTabArray(int TabCount)
+void UInventoryComponent::InitTabArray(int32 TabCount)
 {
 	TabArray.Init(nullptr, TabCount);
 }

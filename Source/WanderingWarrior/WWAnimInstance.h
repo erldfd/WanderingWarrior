@@ -104,16 +104,16 @@ private:
 	float CurentPawnSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
-	bool bIsInAir;
+	uint8 bIsInAir : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
-	bool bIsDead;
+	uint8 bIsDead : 1;
 
-	bool bIsAttacking;
-	bool bCanComboAttack;
-	bool bWillPlayNextCombo;
-	bool bIsPlayingJumpToGroundSkillAnim;
-	bool bIsPlayingCharacterHitMontage;
+	uint8 bIsAttacking : 1;
+	uint8 bCanComboAttack : 1;
+	uint8 bWillPlayNextCombo : 1;
+	uint8 bIsPlayingJumpToGroundSkillAnim : 1;
+	uint8 bIsPlayingCharacterHitMontage : 1;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> AttackMontage;
@@ -124,7 +124,7 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> CharacterHitMongtage;
 
-	int ComboCount;
+	int32 ComboCount;
 
 	
 };

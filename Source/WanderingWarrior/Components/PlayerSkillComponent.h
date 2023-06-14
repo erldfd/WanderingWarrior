@@ -39,7 +39,7 @@ private:
 	FTimerHandle RepeatSometingTimerHandle;
 	FTimerHandle CoolDownTimerHandle;
 
-	int MoveCount;
+	int32 MoveCount;
 
 	UPROPERTY()
 	TObjectPtr<UParticleSystem> PS_RockBurst0;

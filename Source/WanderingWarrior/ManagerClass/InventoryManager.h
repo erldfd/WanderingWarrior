@@ -23,9 +23,9 @@ public:
 
 	UInventoryManager();
 
-	void ExchangeOrMoveInventoryItem(int DragStartSlotIndex, int DragEndSlotIndex, 
-		int DragStartInventory, int DragEndInventory, 
-		int DragStartSlotTabType, int DragEndSlotTabType);
+	void ExchangeOrMoveInventoryItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, 
+		int32 DragStartInventory, int32 DragEndInventory, 
+		int32 DragStartSlotTabType, int32 DragEndSlotTabType);
 
 	void AddToInventoryArray(EInventory InventoryType, class UAInventory* Inventory);
 	void InitManager();
@@ -35,9 +35,9 @@ public:
 private:
 
 	UFUNCTION()
-	void OnDragDropInventoryItem(int DragStartSlotIndex, int DragEndSlotIndex, 
-		int DragStartInventory, int DragEndInventory, 
-		int DragStartSlotTabType, int DragEndSlotTabType);
+	void OnDragDropInventoryItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, 
+		int32 DragStartInventory, int32 DragEndInventory, 
+		int32 DragStartSlotTabType, int32 DragEndSlotTabType);
 
 	void ExchangeOrMoveInventoryItemInternal(class UInventorySlotData* DragStartSlot, class UInventorySlotData* DragEndSlot,
 		EInventory DragStartInventory, EInventory DragEndInventory,

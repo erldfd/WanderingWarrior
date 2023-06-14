@@ -51,7 +51,7 @@ int AAItem::GetMaxItemCount()
 	return MaxItemCount;
 }
 
-void AAItem::SetMaxItemCount(int Count)
+void AAItem::SetMaxItemCount(int32 Count)
 {
 	MaxItemCount = FMath::Clamp(Count, 0, 1000);//임의로 최대 1000...
 }

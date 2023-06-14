@@ -32,10 +32,10 @@ public:
 	bool IsEmpty();
 
 	const int& GetSlotIndex() const;
-	void SetSlotIndex(int NewIndex);
+	void SetSlotIndex(int32 NewIndex);
 
 	const int& GetHeldItemCount() const;
-	bool SetHeldItemCount(int NewCount);
+	bool SetHeldItemCount(int32 NewCount);
 
 	bool UseSlotItem(const UWorld& World);
 
@@ -44,8 +44,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<class AAItem> SlotItem;
 
-	int SlotIndex;
-	int HeldItemCount;
+	int32 SlotIndex;
+	int32 HeldItemCount;
 
 	FItemDataRow SlotItemData;
 };

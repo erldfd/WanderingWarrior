@@ -9,13 +9,13 @@ UInventoryTabButtonWidget::UInventoryTabButtonWidget()
 	UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, UInventoryTabButtonWidget, OnClicked is bound? : %d"), OnClicked.IsBound());
 }
 
-void UInventoryTabButtonWidget::InitSlotWidgetArray(int SlotWidgetCount)
+void UInventoryTabButtonWidget::InitSlotWidgetArray(int32 SlotWidgetCount)
 {
 	check(SlotWidgetCount > 0);
 	SlotWidgetArray.Init(nullptr, SlotWidgetCount);
 }
 
-void UInventoryTabButtonWidget::InitSlotItemCountTextArray(int SlotItemCountArrayCount)
+void UInventoryTabButtonWidget::InitSlotItemCountTextArray(int32 SlotItemCountArrayCount)
 {
 	check(SlotItemCountArrayCount > 0);
 	SlotItemCountTextArray.Init(nullptr, SlotItemCountArrayCount);

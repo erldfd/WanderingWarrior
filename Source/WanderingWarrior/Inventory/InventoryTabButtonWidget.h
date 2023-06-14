@@ -26,10 +26,10 @@ public:
 	UInventoryTabButtonWidget();
 
 	//init to nullptr
-	void InitSlotWidgetArray(int SlotWidgetCount);
+	void InitSlotWidgetArray(int32 SlotWidgetCount);
 
 	//init to nullptr
-	void InitSlotItemCountTextArray(int SlotItemCountArrayCount);
+	void InitSlotItemCountTextArray(int32 SlotItemCountArrayCount);
 
 	TArray<class UInventorySlotWidget*>& GetSlotWidgetArray();
 	TArray<class UTextBlock*>& GetSlotItemCountTextArray();

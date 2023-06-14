@@ -26,8 +26,8 @@ public:
 
 	virtual void RemoveAllItem(int32 SlotIndex) override;
 
-	virtual bool UseSlotItemFormSlotIndex(int Index) override;
+	virtual bool UseSlotItemFormSlotIndex(int32 Index) override;
 	virtual bool UseSlotItemFromSlot(class UInventorySlotData*& Slot) override;
 
-	virtual void ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEndSlotIndex, ETabType DragSlotTabType) override;
+	virtual void ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType) override;
 };

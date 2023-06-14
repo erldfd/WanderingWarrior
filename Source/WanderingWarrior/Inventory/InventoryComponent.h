@@ -27,21 +27,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/*class UInventoryTabObject* GetTab(ETabType Tab);
-
-	class UInventoryWidget* GetInventoryWidget();
-	void SetInventoryWidget(class UInventoryWidget* NewInventoryWidget);
-
-	bool ObtainItem(EWeaponName WeaponName);
-	bool ObtainItem(EMiscItemName MiscItemName);
-
-	bool UseSlotItemFromSlot(class UInventorySlotObject* Slot);
-	bool UseSlotItemFormSlotIndex(int Index);*/
-
-	/*void OpenAndCloseInventory();*/
-
-	/*bool IsInventoryVisible();*/
-
 	class UInventoryTabData* GetCurrentActivatedTab();
 	void SetCurrentActivatedTab(UInventoryTabData* Tab);
 	
@@ -49,23 +34,11 @@ public:
 	void SetCurrentActivatedTabType(ETabType NewTabType);
 
 	TArray<class UInventoryTabData*>& GetTabArray();
-	void InitTabArray(int TabCount);
-
-public:
-
-	/*FOnOpenAndCloseInventoryDelegate OnOpenAndCloseInventoryDelegate;*/
+	void InitTabArray(int32 TabCount);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-private:
-
-	void OnSlotImageWidgetClicked(int SlotIndex);
-	void OnConvertTab(int TabIndex);
-	void OnDragDropSlot(int StartDragSlotIndex, int SlotIndex);
-
-	void ExchangeOrMoveSlotItem(int SlotIndex1, int SlotIndex2);
 
 private:
 
@@ -74,23 +47,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<class UInventoryTabData>> TabArray;
 
-
-
-
-	// lagacyssssssssssssssssssssssssssss
-
-	//UPROPERTY()
-	//TObjectPtr<class UInventoryTabObject> WeaponTab;
-
-	//UPROPERTY()
-	//TObjectPtr<class UInventoryTabObject> MiscTab;
-
 	UPROPERTY()
 	TObjectPtr<class UInventoryTabData> CurrentActivatedTab;
-		
-	//UPROPERTY()
-	//TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
-
-	//UPROPERTY()
-	//TObjectPtr<class UInventoryWidget> InventoryWidget;
 };

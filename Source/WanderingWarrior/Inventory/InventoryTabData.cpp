@@ -10,21 +10,7 @@
 
 UInventoryTabData::UInventoryTabData() : SlotCount(0)
 {
-	/*InventorySlotArray.Init(nullptr, SlotCount);
 
-	FString SlotNameString("Slot");
-
-	for (int i = 0; i < SlotCount; ++i)
-	{
-		if (InventorySlotArray.IsValidIndex(i))
-		{
-			SlotNameString.Append(FString::FromInt(i));
-			FName SlotName(*SlotNameString);
-
-			InventorySlotArray[i] = CreateDefaultSubobject<UInventorySlotObject>(SlotName);
-			InventorySlotArray[i]->SetSlotIndex(i);
-		}
-	}*/
 }
 
 int UInventoryTabData::GetSlotCount()
@@ -32,10 +18,8 @@ int UInventoryTabData::GetSlotCount()
 	return SlotCount;
 }
 
-void UInventoryTabData::InitSlots(int NewSlotCount)
+void UInventoryTabData::InitSlots(int32 NewSlotCount)
 {
-	// 임시 함수... 퀵슬롯의 슬롯이 8개이기 때문에 ㅎ므....... 어쩌지......
-
 	SlotCount = NewSlotCount;
 
 	InventorySlotArray.Init(nullptr, SlotCount);
@@ -55,11 +39,8 @@ void UInventoryTabData::InitSlots(int NewSlotCount)
 	}
 }
 
-UInventorySlotData*& UInventoryTabData::GetSlotFromIndex(int Index)
+UInventorySlotData*& UInventoryTabData::GetSlotFromIndex(int32 Index)
 {
-	//UInventorySlotObject* Temp = nullptr;
-	//if (ensureMsgf(InventorySlotArray.IsValidIndex(Index), TEXT("InventoryTabObject, GetSlotFromindex, InvalidIndex : %d"), Index) == false) return Temp;
-
 	return InventorySlotArray[Index];
 }
 

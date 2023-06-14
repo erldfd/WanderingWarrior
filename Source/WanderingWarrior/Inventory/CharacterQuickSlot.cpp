@@ -126,7 +126,7 @@ void UCharacterQuickSlot::RemoveAllItem(int32 SlotIndex)
 	Slot->ClearSlotItem();
 }
 
-bool UCharacterQuickSlot::UseSlotItemFormSlotIndex(int Index)
+bool UCharacterQuickSlot::UseSlotItemFormSlotIndex(int32 Index)
 {
 	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
 
@@ -163,7 +163,7 @@ bool UCharacterQuickSlot::UseSlotItemFromSlot(UInventorySlotData*& Slot)
 	return true;
 }
 
-void UCharacterQuickSlot::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEndSlotIndex, ETabType DragSlotTabType)
+void UCharacterQuickSlot::ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType)
 {
 	UE_LOG(LogTemp, Warning, TEXT("CharacterQuickSlot, ExchangeOrMoveSlotItem, DragStartSlotIndex : %d, DragEndSlotIndex : %d"), DragStartSlotIndex, DragEndSlotIndex);
 
@@ -213,7 +213,7 @@ void UCharacterQuickSlot::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int Dra
 	}
 }
 
-void UCharacterQuickSlot::OnSlotImageWidgetClicked(int SlotIndex)
+void UCharacterQuickSlot::OnSlotImageWidgetClicked(int32 SlotIndex)
 {
 	UseSlotItemFormSlotIndex(SlotIndex);
 }

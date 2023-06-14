@@ -40,7 +40,7 @@ const int& UInventorySlotData::GetSlotIndex() const
 	return SlotIndex;
 }
 
-void UInventorySlotData::SetSlotIndex(int NewIndex)
+void UInventorySlotData::SetSlotIndex(int32 NewIndex)
 {
 	SlotIndex = NewIndex;
 }
@@ -50,7 +50,7 @@ const int& UInventorySlotData::GetHeldItemCount() const
 	return HeldItemCount;
 }
 
-bool UInventorySlotData::SetHeldItemCount(int NewCount)
+bool UInventorySlotData::SetHeldItemCount(int32 NewCount)
 {
 	if (NewCount < 0 || NewCount > SlotItemData.MaxItemCount)
 	{

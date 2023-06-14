@@ -23,7 +23,7 @@ public:
 	UInventoryDragDropOperation();
 
 	int GetStartDragSlotIndex();
-	void SetStartDragSlotIndex(int NewIndex);
+	void SetStartDragSlotIndex(int32 NewIndex);
 
 	ETabType GetTabTypeBelongTo();
 	void SetTabTypeBelongTo(ETabType TabType);
@@ -32,7 +32,7 @@ public:
 
 private:
 
-	int StartDragSlotIndex;
+	int32 StartDragSlotIndex;
 	ETabType TabTypeBelongTo;
 	EInventory InventoryBelongTo;
 };

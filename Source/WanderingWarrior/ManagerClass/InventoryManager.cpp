@@ -40,14 +40,14 @@ void UInventoryManager::BindFunctionToDragDropDelegate(EInventory InventoryType,
 	}
 }
 
-void UInventoryManager::OnDragDropInventoryItem(int DragStartSlotIndex, int DragEndSlotIndex,
-	int DragStartInventory, int DragEndInventory, int DragStartSlotTabType, int DragEndSlotTabType)
+void UInventoryManager::OnDragDropInventoryItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex,
+	int32 DragStartInventory, int32 DragEndInventory, int32 DragStartSlotTabType, int32 DragEndSlotTabType)
 {
 	ExchangeOrMoveInventoryItem(DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType);
 }
 
-void UInventoryManager::ExchangeOrMoveInventoryItem(int DragStartSlotIndex, int DragEndSlotIndex,
-	int DragStartInventory, int DragEndInventory, int DragStartSlotTabType,  int DragEndSlotTabType)
+void UInventoryManager::ExchangeOrMoveInventoryItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex,
+	int32 DragStartInventory, int32 DragEndInventory, int32 DragStartSlotTabType,  int32 DragEndSlotTabType)
 {
 	if (DragEndInventory == (int)EInventory::EmptySpace)
 	{

@@ -12,9 +12,9 @@ enum class ETabType : uint8;
 enum class EInventory : uint8;
 
 //param : SlotIndex
-DECLARE_DELEGATE_OneParam(FOnSlotImageWigetClickedDelegate, int);
+DECLARE_DELEGATE_OneParam(FOnSlotImageWigetClickedDelegate, int32);
 //param : TabIndex, 0= weapontab, 1 = misctab
-DECLARE_DELEGATE_OneParam(FOnConvertTabDelegate, int);
+DECLARE_DELEGATE_OneParam(FOnConvertTabDelegate, int32);
 /**
  * 
  */
@@ -26,8 +26,8 @@ struct FInventoryWidgetSettings
 
 public:
 
-	int TabCount;
-	int SlotCountByTab;
+	int32 TabCount;
+	int32 SlotCountByTab;
 
 	EInventory InventoryType;
 	TArray<ETabType> TabTypeArray;
@@ -43,12 +43,12 @@ public:
 	TArray<class UInventorySlotWidget*>& GetSlotWidgetArray(ETabType TabType);
 
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
-	void SetSlotWidgetImageFromTexture(ETabType TabType, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
-	void SetSlotWidgetImageFromTexture(const TArray<UInventorySlotWidget*>& SlotImageArray, int SlotIndex, class UTexture2D* SlotTexture = nullptr);
+	void SetSlotWidgetImageFromTexture(ETabType TabType, int32 SlotIndex, class UTexture2D* SlotTexture = nullptr);
+	void SetSlotWidgetImageFromTexture(const TArray<UInventorySlotWidget*>& SlotImageArray, int32 SlotIndex, class UTexture2D* SlotTexture = nullptr);
 	void SetSlotWidgetImageFromTexture(UInventorySlotWidget*& SlotWidget, class UTexture2D* SlotTexture = nullptr);
-	void SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType);
+	void SetSlotItemCountText(int32 SlotItemCount, int32 SlotIndex, ETabType TabType);
 
-	void InitNullTabButtonArray(int ArrayCount);
+	void InitNullTabButtonArray(int32 ArrayCount);
 
 	TArray<class UInventoryTabButtonWidget*>& GetTabButtonArray();
 
@@ -68,11 +68,11 @@ protected:
 
 private:
 
-	void OnWeaponTabSlotClicked(int SlotIndex);
-	void OnMiscTabSlotClicked(int SlotIndex);
+	void OnWeaponTabSlotClicked(int32 SlotIndex);
+	void OnMiscTabSlotClicked(int32 SlotIndex);
 
 	UFUNCTION()
-	void ConvertTab(int TabNum);
+	void ConvertTab(int32 TabNum);
 
 	UFUNCTION()
 	void ConvertToWeaponTab();
@@ -85,38 +85,12 @@ private:
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<class UInventoryTabButtonWidget>> TabButtonArray;
 
-	/*UPROPERTY(EditAnywhere)
-	TArray<> SlotWidgetArrays;*/
-
-	/*UPROPERTY(EditAnywhere)
-	TArray<TArray<class UTextBlock>> SlotItemCountTextArrays;*/
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UWidgetSwitcher> InventoryWidgetTabSwitcher;
 
-	/*UPROPERTY(EditAnywhere)
-	TObjectPtr<class UButton> WeaponTabButton;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UButton> MiscTabButton;
-
-	UPROPERTY()
-	TArray<TObjectPtr<class UInventorySlotWidget>> WeaponTabSlotWidgetArray;
-
-	UPROPERTY()
-	TArray<TObjectPtr<class UTextBlock>> WeaponTabItemCountTextArray;
-
-	UPROPERTY()
-	TArray<TObjectPtr<class UInventorySlotWidget>> MiscTabSlotWidgetArray;
-
-	UPROPERTY()
-	TArray<TObjectPtr<class UTextBlock>> MiscTabItemCountTextArray;*/
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTexture2D> EmptySlotTexture;
-
-	/*UPROPERTY(meta = (BindWidget))
-	class UWidgetSwitcher* InventoryWidgetTabSwitcher;*/
 
 	EInventory InventoryType;
 };

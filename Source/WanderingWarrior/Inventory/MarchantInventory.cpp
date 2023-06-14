@@ -98,7 +98,7 @@ void UMarchantInventory::RemoveAllItem(int32 SlotIndex)
 	Slot->ClearSlotItem();
 }
 
-bool UMarchantInventory::UseSlotItemFormSlotIndex(int Index)
+bool UMarchantInventory::UseSlotItemFormSlotIndex(int32 Index)
 {
 	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
 
@@ -135,7 +135,7 @@ bool UMarchantInventory::UseSlotItemFromSlot(UInventorySlotData*& Slot)
 	return true;
 }
 
-void UMarchantInventory::ExchangeOrMoveSlotItem(int DragStartSlotIndex, int DragEndSlotIndex, ETabType DragSlotTabType)
+void UMarchantInventory::ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType)
 {
 
 }

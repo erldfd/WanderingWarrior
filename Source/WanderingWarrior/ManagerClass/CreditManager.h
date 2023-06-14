@@ -23,7 +23,7 @@ public:
 	UCreditManager();
 
 	int GetCredits(ECreditOwner Owner);
-	void SetCredits(int Credits, ECreditOwner Owner);
+	void SetCredits(int32 Credits, ECreditOwner Owner);
 
 private:
 

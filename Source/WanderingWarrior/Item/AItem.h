@@ -37,7 +37,7 @@ public:
 
 	int GetMaxItemCount();
 	// Max Count = 1000
-	void SetMaxItemCount(int Count);
+	void SetMaxItemCount(int32 Count);
 
 	void SetItemType(EItemType NewItemType);
 
@@ -50,10 +50,10 @@ protected:
 	FText ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	int FieldItemCount;
+	int32 FieldItemCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	int MaxItemCount;
+	int32 MaxItemCount;
 
 	UPROPERTY()
 	TObjectPtr<class UTexture2D> ItemSlotTexture;

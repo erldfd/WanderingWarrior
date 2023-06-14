@@ -27,14 +27,14 @@ TArray<UInventorySlotWidget*>& UInventoryWidget::GetSlotWidgetArray(ETabType Tab
 	return TabButtonArray[FMath::Clamp(int(TabType), 0, TabButtonArray.Num()-1)]->GetSlotWidgetArray();
 }
 
-void UInventoryWidget::SetSlotWidgetImageFromTexture(ETabType TabType, int SlotIndex, UTexture2D* SlotTexture)
+void UInventoryWidget::SetSlotWidgetImageFromTexture(ETabType TabType, int32 SlotIndex, UTexture2D* SlotTexture)
 {
 	const TArray<UInventorySlotWidget*>& SlotWidgetArray = TabButtonArray[FMath::Clamp(int(TabType), 0, TabButtonArray.Num())]->GetSlotWidgetArray();
 
 	SetSlotWidgetImageFromTexture(SlotWidgetArray, SlotIndex, SlotTexture);
 }
 
-void UInventoryWidget::SetSlotWidgetImageFromTexture(const TArray<UInventorySlotWidget*>& SlotWidgetArray, int SlotIndex, UTexture2D* SlotTexture)
+void UInventoryWidget::SetSlotWidgetImageFromTexture(const TArray<UInventorySlotWidget*>& SlotWidgetArray, int32 SlotIndex, UTexture2D* SlotTexture)
 {
 	if (SlotIndex < 0 || SlotIndex > SlotWidgetArray.Num() - 1)
 	{
@@ -67,7 +67,7 @@ void UInventoryWidget::SetSlotWidgetImageFromTexture(UInventorySlotWidget*& Slot
 	SlotWidget->GetDragSlotImage()->SetDesiredSizeOverride(FVector2D(170, 115));
 }
 
-void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ETabType TabType)
+void UInventoryWidget::SetSlotItemCountText(int32 SlotItemCount, int32 SlotIndex, ETabType TabType)
 {
 	FText ItemCountText;
 
@@ -83,7 +83,7 @@ void UInventoryWidget::SetSlotItemCountText(int SlotItemCount, int SlotIndex, ET
 	TabButtonArray[int(TabType)]->GetSlotItemCountTextArray()[SlotIndex]->SetText(ItemCountText);
 }
 
-void UInventoryWidget::InitNullTabButtonArray(int ArrayCount)
+void UInventoryWidget::InitNullTabButtonArray(int32 ArrayCount)
 {
 	TabButtonArray.Init(nullptr, ArrayCount);
 }
@@ -171,7 +171,7 @@ void UInventoryWidget::SetInventoryType(EInventory NewInventoryType)
 	InventoryType = NewInventoryType;
 }
 
-void UInventoryWidget::OnWeaponTabSlotClicked(int SlotIndex)
+void UInventoryWidget::OnWeaponTabSlotClicked(int32 SlotIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnWeaponTabSlotClicked"));
 
@@ -194,7 +194,7 @@ void UInventoryWidget::OnWeaponTabSlotClicked(int SlotIndex)
 	 OnSlotImageWidgetClickedDelegate.Execute(SlotIndex);
 }
 
-void UInventoryWidget::OnMiscTabSlotClicked(int SlotIndex)
+void UInventoryWidget::OnMiscTabSlotClicked(int32 SlotIndex)
 {
 	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget : OnMiscTabSlotClicked"));
 
@@ -217,7 +217,7 @@ void UInventoryWidget::OnMiscTabSlotClicked(int SlotIndex)
 	OnSlotImageWidgetClickedDelegate.Execute(SlotIndex);
 }
 
-void UInventoryWidget::ConvertTab(int TabNum)
+void UInventoryWidget::ConvertTab(int32 TabNum)
 {
 	InventoryWidgetTabSwitcher->SetActiveWidgetIndex(TabNum);
 
