@@ -4,9 +4,9 @@
 #include "InventoryTabData.h"
 
 #include "InventorySlotData.h"
-#include "WanderingWarrior/Item/AItem.h"
+#include "Item/AItem.h"
 #include "ItemData.h"
-#include "WanderingWarrior/WWConstContainer.h"
+#include "WWConstContainer.h"
 
 UInventoryTabData::UInventoryTabData() : SlotCount(0)
 {

@@ -3,14 +3,14 @@
 
 #include "EnemyCharacter.h"
 
-#include "WanderingWarrior/WWAnimInstance.h"
-#include "WanderingWarrior/WWGameInstance.h"
-#include "WanderingWarrior/WWGameMode.h"
+#include "WWAnimInstance.h"
+#include "WWGameInstance.h"
+#include "WWGameMode.h"
 
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
-AEnemyCharacter::AEnemyCharacter()
+AEnemyCharacter::AEnemyCharacter() : bIsDamaged(false)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

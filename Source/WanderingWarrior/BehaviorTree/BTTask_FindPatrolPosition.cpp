@@ -3,9 +3,9 @@
 
 #include "BTTask_FindPatrolPosition.h"
 
-#include "WanderingWarrior/Controller/EnemyAIController.h"
-#include "WanderingWarrior/Character/WWCharacter.h"
-#include "WanderingWarrior/WWAnimInstance.h"
+#include "Controller/EnemyAIController.h"
+#include "Character/WWCharacter.h"
+#include "WWAnimInstance.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
@@ -27,8 +27,8 @@ EBTNodeResult::Type UBTTask_FindPatrolPosition::ExecuteTask(UBehaviorTreeCompone
 		return EBTNodeResult::Failed;
 	}
 
-	UWWAnimInstance* AnimInstance = ThisCharacter->GetAnimInstance();
-	if (AnimInstance == nullptr || AnimInstance->GetIsDead())
+	UWWAnimInstance& AnimInstance = ThisCharacter->GetAnimInstance();
+	if (AnimInstance.GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}

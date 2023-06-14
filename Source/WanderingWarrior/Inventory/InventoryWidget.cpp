@@ -5,8 +5,8 @@
 
 #include "InventoryTabData.h"
 #include "InventorySlotWidget.h"
-#include "WanderingWarrior/WWConstContainer.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
+#include "WWConstContainer.h"
+#include "WWEnumClassContainer.h"
 #include "InventoryTabButtonWidget.h"
 
 #include "Components/Button.h"

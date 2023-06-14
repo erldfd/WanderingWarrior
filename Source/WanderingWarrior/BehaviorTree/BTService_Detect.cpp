@@ -3,9 +3,9 @@
 
 #include "BTService_Detect.h"
 
-#include "WanderingWarrior/Controller/EnemyAIController.h"
-#include "WanderingWarrior/Character/WWCharacter.h"
-#include "WanderingWarrior/WWAnimInstance.h"
+#include "Controller/EnemyAIController.h"
+#include "Character/WWCharacter.h"
+#include "WWAnimInstance.h"
 
 #include "Engine/EngineTypes.h"
 #include "DrawDebugHelpers.h"
@@ -27,8 +27,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	UWWAnimInstance* AnimInstance = ThisCharacter->GetAnimInstance();
-	if (AnimInstance ==nullptr || AnimInstance->GetIsDead())
+	UWWAnimInstance& AnimInstance = ThisCharacter->GetAnimInstance();
+	if (AnimInstance.GetIsDead())
 	{
 		return;
 	}

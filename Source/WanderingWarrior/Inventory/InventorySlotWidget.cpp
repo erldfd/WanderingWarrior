@@ -4,8 +4,7 @@
 #include "InventorySlotWidget.h"
 
 #include "InventoryDragDropOperation.h"
-//#include "InventoryTabObject.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
+#include "WWEnumClassContainer.h"
 
 #include "Components/Image.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"

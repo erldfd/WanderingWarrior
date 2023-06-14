@@ -75,5 +75,5 @@ private:
 	UPROPERTY()
 	TObjectPtr<class APlayerCharacter> PlayerCharacter;
 
-	bool bIsInputModeGameOnly = true;
+	uint8 bIsInputModeGameOnly : 1;
 };

@@ -7,12 +7,12 @@
 #include "InventorySlotData.h"
 #include "InventoryWidget.h"
 #include "InventorySlotWidget.h"
-#include "WanderingWarrior/Item/Weapon.h"
-#include "WanderingWarrior/Item/MiscItem.h"
-#include "WanderingWarrior/InGameWidget.h"
+#include "Item/Weapon.h"
+#include "Item/MiscItem.h"
+#include "InGameWidget.h"
 #include "ItemData.h"
-#include "WanderingWarrior/WWGameInstance.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
+#include "WWGameInstance.h"
+#include "WWEnumClassContainer.h"
 
 #include "Kismet/GameplayStatics.h"
 

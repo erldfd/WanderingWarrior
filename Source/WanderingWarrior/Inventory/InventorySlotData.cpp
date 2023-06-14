@@ -3,9 +3,9 @@
 
 #include "InventorySlotData.h"
 
-#include "WanderingWarrior/Item/Weapon.h"
-#include "WanderingWarrior/Item/MiscItem.h"
-#include "WanderingWarrior/WWGameInstance.h"
+#include "Item/Weapon.h"
+#include "Item/MiscItem.h"
+#include "WWGameInstance.h"
 
 #include "Engine/Texture2D.h"
 #include "Kismet/GameplayStatics.h"

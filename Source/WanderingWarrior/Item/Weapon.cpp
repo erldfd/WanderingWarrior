@@ -3,13 +3,13 @@
 
 #include "Weapon.h"
 
-#include "WanderingWarrior/Character/EnemyCharacter.h"
-#include "WanderingWarrior/WWAnimInstance.h"
-#include "WanderingWarrior/InGameWidget.h"
-#include "WanderingWarrior/Controller/WWPlayerController.h"
-#include "WanderingWarrior/WWGameMode.h"
-#include "WanderingWarrior/Components/CharacterStatComponent.h"
-#include "WanderingWarrior/Character/PlayerCharacter.h"
+#include "Character/EnemyCharacter.h"
+#include "Character/PlayerCharacter.h"
+#include "WWAnimInstance.h"
+#include "InGameWidget.h"
+#include "WWGameMode.h"
+#include "Controller/WWPlayerController.h"
+#include "Components/CharacterStatComponent.h"
 
 #include "Components/BoxComponent.h"
 
@@ -66,7 +66,7 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
 		ensure(PlayerInGameWidget != nullptr);
 
-		PlayerInGameWidget->SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent()->GetHPRatio());
+		PlayerInGameWidget->SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent().GetHPRatio());
 		PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
 	}
 }

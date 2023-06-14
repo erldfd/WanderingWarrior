@@ -3,15 +3,15 @@
 
 #include "InventoryManager.h"
 
-#include "WanderingWarrior/WWEnumClassContainer.h"
-#include "WanderingWarrior/WWConstContainer.h"
-#include "WanderingWarrior/Inventory/AInventory.h"
-#include "WanderingWarrior/Inventory/InventoryWidget.h"
-#include "WanderingWarrior/Inventory/InventorySlotWidget.h"
-#include "WanderingWarrior/Inventory/CharacterInventory.h"
-#include "WanderingWarrior/Inventory/InventorySlotData.h"
-#include "WanderingWarrior/Inventory/InventoryComponent.h"
-#include "WanderingWarrior/Inventory/InventoryTabData.h"
+#include "WWEnumClassContainer.h"
+#include "WWConstContainer.h"
+#include "Inventory/AInventory.h"
+#include "Inventory/InventoryWidget.h"
+#include "Inventory/InventorySlotWidget.h"
+#include "Inventory/CharacterInventory.h"
+#include "Inventory/InventorySlotData.h"
+#include "Inventory/InventoryComponent.h"
+#include "Inventory/InventoryTabData.h"
 
 #include "Components/Image.h"
 

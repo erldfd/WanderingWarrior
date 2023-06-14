@@ -40,5 +40,5 @@ protected:
 
 private:
 
-	bool bIsDamaged = false;
+	uint8 bIsDamaged : 1;
 };

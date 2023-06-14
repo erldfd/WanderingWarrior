@@ -28,13 +28,13 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	class UWWAnimInstance* GetAnimInstance();
+	class UWWAnimInstance& GetAnimInstance();
 
 	virtual void Attack(float Value);
 
-	class UCharacterStatComponent* GetCharacterStatComponent();
+	class UCharacterStatComponent& GetCharacterStatComponent();
 
-	FName GetCharacterName();
+	const FName& GetCharacterName() const;
 
 	void EquipWeapon(class AWeapon* Weapon);
 
@@ -56,13 +56,14 @@ protected:
 
 protected:
 
+	UPROPERTY()
 	TObjectPtr<class UWWAnimInstance> AnimInstance = nullptr;
 
-	float InputForwardValue = 0;
-	float InputRightValue = 0;
+	float InputForwardValue;
+	float InputRightValue;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bWIllSweepAttack = false;
+	uint8 bWIllSweepAttack :1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	TObjectPtr<class UCharacterStatComponent> CharacterStatComponent;
@@ -80,11 +81,11 @@ private:
 private:
 
 	UPROPERTY()
-	TObjectPtr<class AWeapon> CurrentWeapon = nullptr;
+	TObjectPtr<class AWeapon> CurrentWeapon;
 
-	int ComboCount = 0;
+	int32 ComboCount;
 
-	bool bIsAnimMoveStart = false;
+	uint8 bIsAnimMoveStart : 1;
 
-	float AttackMoveSpeed = 5;
+	float AttackMoveSpeed;
 };

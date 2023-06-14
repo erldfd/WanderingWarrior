@@ -25,7 +25,7 @@ public:
 
 	const FString& GetNPCName() const;
 
-	class UMarchantInventory* GetInventory();
+	class UMarchantInventory& GetInventory();
 
 protected:
 

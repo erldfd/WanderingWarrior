@@ -3,9 +3,9 @@
 
 #include "BTDecorator_IsDead.h"
 
-#include "WanderingWarrior/Controller/EnemyAIController.h"
-#include "WanderingWarrior/Character/WWCharacter.h"
-#include "WanderingWarrior/WWAnimInstance.h"
+#include "Controller/EnemyAIController.h"
+#include "Character/WWCharacter.h"
+#include "WWAnimInstance.h"
 
 UBTDecorator_IsDead::UBTDecorator_IsDead()
 {
@@ -21,8 +21,8 @@ bool UBTDecorator_IsDead::CalculateRawConditionValue(UBehaviorTreeComponent& Own
 		return true;
 	}
 
-	UWWAnimInstance* AnimInstance = ThisCharacter->GetAnimInstance();
-	if (AnimInstance == nullptr || AnimInstance->GetIsDead())
+	UWWAnimInstance& AnimInstance = ThisCharacter->GetAnimInstance();
+	if (AnimInstance.GetIsDead())
 	{
 		return true;
 	}

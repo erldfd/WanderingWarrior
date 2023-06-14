@@ -3,27 +3,23 @@
 
 #include "WWPlayerController.h"
 
-#include "WanderingWarrior/InGameWidget.h"
-#include "WanderingWarrior/Components/CharacterStatComponent.h"
-#include "WanderingWarrior/Components/PlayerSkillComponent.h"
-
-#include "WanderingWarrior/Character/PlayerCharacter.h"
-
-#include "WanderingWarrior/Inventory/InventoryComponent.h"
-#include "WanderingWarrior/Inventory/CharacterQuickSlot.h"
-#include "WanderingWarrior/Inventory/CharacterInventory.h"
-
-#include "WanderingWarrior/WWGameInstance.h"
-#include "WanderingWarrior/ConversationWidget.h"
-
-#include "WanderingWarrior/ManagerClass/ConversationManager.h"
-#include "WanderingWarrior/ManagerClass/InteractionManager.h"
-#include "WanderingWarrior/ManagerClass/StoreManager.h"
+#include "InGameWidget.h"
+#include "WWGameInstance.h"
+#include "ConversationWidget.h"
+#include "Components/CharacterStatComponent.h"
+#include "Components/PlayerSkillComponent.h"
+#include "Character/PlayerCharacter.h"
+#include "Inventory/InventoryComponent.h"
+#include "Inventory/CharacterQuickSlot.h"
+#include "Inventory/CharacterInventory.h"
+#include "ManagerClass/ConversationManager.h"
+#include "ManagerClass/InteractionManager.h"
+#include "ManagerClass/StoreManager.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 
-AWWPlayerController::AWWPlayerController()
+AWWPlayerController::AWWPlayerController() : bIsInputModeGameOnly(true)
 {
 	static ConstructorHelpers::FClassFinder<UInGameWidget> WBP_InGameWidget(TEXT("/Game/UI/WBP_InGameWidget.WBP_InGameWidget_C"));
 	if (WBP_InGameWidget.Succeeded())
@@ -38,14 +34,14 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	UE_LOG(LogTemp, Warning, TEXT("PalyerController OnPossess"));
 
 	PlayerCharacter = Cast<APlayerCharacter>(aPawn);
-	CharacterStat = PlayerCharacter->GetCharacterStatComponent();
+	CharacterStat = &PlayerCharacter->GetCharacterStatComponent();
 
 	InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
-	check(InGameWidget != nullptr);
+	check(InGameWidget);
 
 	InGameWidget->AddToViewport();
 
-	PlayerCharacter->GetQuickSlot()->SetInventoryWidget(InGameWidget->GetQuickSlotWidget());
+	PlayerCharacter->GetQuickSlot().SetInventoryWidget(InGameWidget->GetQuickSlotWidget());
 
 	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
 
@@ -67,7 +63,7 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 
 UInGameWidget* AWWPlayerController::GetInGameWidget()
 {
-	check(InGameWidget != nullptr);
+	check(InGameWidget);
 	return InGameWidget;
 }
 
@@ -131,8 +127,8 @@ void AWWPlayerController::SetupInputComponent()
 
 void AWWPlayerController::OnHPChanged()
 {
-	check(InGameWidget != nullptr);
-	check(CharacterStat != nullptr);
+	check(InGameWidget);
+	check(CharacterStat);
 
 	InGameWidget->SetMyHPBarPercent(CharacterStat->GetHPRatio());
 }
@@ -173,49 +169,46 @@ void AWWPlayerController::OnMouseRightButtonClicked()
 
 void AWWPlayerController::UseQuickSlot0()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(0);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(0);
 }
 
 void AWWPlayerController::UseQuickSlot1()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(1);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(1);
 }
 
 void AWWPlayerController::UseQuickSlot2()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(2);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(2);
 }
 
 void AWWPlayerController::UseQuickSlot3()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(3);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(3);
 }
 
 void AWWPlayerController::UseQuickSlot4()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(4);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(4);
 }
 
 void AWWPlayerController::UseQuickSlot5()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(5);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(5);
 }
 
 void AWWPlayerController::UseQuickSlot6()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(6);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(6);
 }
 
 void AWWPlayerController::UseQuickSlot7()
 {
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(7);
+	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(7);
 }
 
 void AWWPlayerController::OnKeyEButtonPressed()
 {
-	//FHitResult Hit;
-	//bool bResult = GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel9, false, Hit);
-
 	UWorld* World = PlayerCharacter->GetWorld();
 	FVector Center = PlayerCharacter->GetActorLocation();
 	float DetectRadius = 200;
@@ -255,20 +248,9 @@ void AWWPlayerController::OnKeyEButtonPressed()
 			DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
 			UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController, OnKeyEButtonPressed, Found Marchant"));
 
-			/*if (InGameWidget->GetConversationWidget()->GetVisibility() == ESlateVisibility::Hidden)
-			{
-				InGameWidget->GetConversationWidget()->SetVisibility(ESlateVisibility::Visible);
-			}
-			else
-			{
-				InGameWidget->GetConversationWidget()->SetVisibility(ESlateVisibility::Hidden);
-			}*/
-
 			SetShowMouseCursor(true);
 
 			FInputModeUIOnly InputMode;
-			//InputMode.SetWidgetToFocus(InGameWidget->GetQuickSlotWidget()->TakeWidget());
-			//FInputModeUIOnly InputMode;
 			SetInputMode(InputMode);
 
 			bIsInputModeGameOnly = false;

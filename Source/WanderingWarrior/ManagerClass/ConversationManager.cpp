@@ -4,9 +4,9 @@
 #include "ConversationManager.h"
 
 #include "ConversationScriptData.h"
-#include "WanderingWarrior/ConversationWidget.h"
-#include "WanderingWarrior/Controller/WWPlayerController.h"
-#include "WanderingWarrior/Character/NPCCharacter.h"
+#include "ConversationWidget.h"
+#include "Controller/WWPlayerController.h"
+#include "Character/NPCCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
 

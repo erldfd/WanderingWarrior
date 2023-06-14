@@ -3,7 +3,7 @@
 
 #include "AItem.h"
 
-#include "WanderingWarrior/WWGameInstance.h"
+#include "WWGameInstance.h"
 
 //#include "Engine/DataTable.h"
 #include "Engine/Texture2D.h"

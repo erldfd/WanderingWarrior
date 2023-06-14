@@ -3,20 +3,20 @@
 
 #include "PlayerCharacter.h"
 
-#include "WanderingWarrior/WWAnimInstance.h"
-#include "WanderingWarrior/WWGameInstance.h"
-#include "WanderingWarrior/WWGameMode.h"
-#include "WanderingWarrior/Inventory/InventoryComponent.h"
-#include "WanderingWarrior/Item/Weapon.h"
-#include "WanderingWarrior/Item/MiscItem.h"
-#include "WanderingWarrior/Components/PlayerSkillComponent.h"
-#include "WanderingWarrior/Inventory/InventorySlotWidget.h"
-#include "WanderingWarrior/Inventory/InventoryWidget.h"
-#include "WanderingWarrior/Inventory/InventoryTabData.h"
-#include "WanderingWarrior/Inventory/InventorySlotData.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
-#include "WanderingWarrior/Inventory/CharacterInventory.h"
-#include "WanderingWarrior/Inventory/CharacterQuickSlot.h"
+#include "WWAnimInstance.h"
+#include "WWGameInstance.h"
+#include "WWGameMode.h"
+#include "WWEnumClassContainer.h"
+#include "Item/Weapon.h"
+#include "Item/MiscItem.h"
+#include "Components/PlayerSkillComponent.h"
+#include "Inventory/InventorySlotWidget.h"
+#include "Inventory/InventoryWidget.h"
+#include "Inventory/InventoryTabData.h"
+#include "Inventory/InventorySlotData.h"
+#include "Inventory/CharacterInventory.h"
+#include "Inventory/CharacterQuickSlot.h"
+#include "Inventory/InventoryComponent.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -30,10 +30,10 @@ APlayerCharacter::APlayerCharacter()
 	Super::bWIllSweepAttack = true;
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
-	check(SpringArm != nullptr);
+	check(SpringArm);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
-	check(Camera != nullptr);
+	check(Camera);
 
 	SpringArm->bUsePawnControlRotation = true;//SpringArm이 마우스따라 상하로 로테이션하는듯?
 	SpringArm->bInheritPitch = true;//로컬 로테이션인가 뭐지..... 암튼 상하
@@ -110,14 +110,14 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 UPlayerSkillComponent* APlayerCharacter::GetPlayerSkillComponenet()
 {
-	check(PlayerSkillComponent != nullptr);
+	check(PlayerSkillComponent);
 	return PlayerSkillComponent;
 }
 
-class UCharacterQuickSlot* APlayerCharacter::GetQuickSlot()
+class UCharacterQuickSlot& APlayerCharacter::GetQuickSlot()
 {
-	check(QuickSlot != nullptr);
-	return QuickSlot;
+	check(QuickSlot);
+	return *QuickSlot;
 }
 
 UCharacterInventory& APlayerCharacter::GetInventory() const

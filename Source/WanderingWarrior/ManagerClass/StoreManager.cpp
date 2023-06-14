@@ -4,7 +4,6 @@
 #include "ManagerClass/StoreManager.h"
 
 #include "CreditManager.h"
-
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/MarchantInventory.h"
 #include "Inventory/InventoryTabData.h"
@@ -12,7 +11,6 @@
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/InventoryWidget.h"
 #include "Inventory/InventorySlotWidget.h"
-
 #include "WWEnumClassContainer.h"
 #include "WWGameInstance.h"
 

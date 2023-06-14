@@ -4,8 +4,8 @@
 #include "InteractionManager.h"
 
 #include "ConversationManager.h"
-#include "WanderingWarrior/WWGameInstance.h"
-#include "WanderingWarrior/Character/NPCCharacter.h"
+#include "WWGameInstance.h"
+#include "Character/NPCCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
 

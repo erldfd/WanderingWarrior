@@ -4,16 +4,16 @@
 #include "CharacterQuickSlot.h"
 
 #include "ItemData.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
-#include "WanderingWarrior/WWGameInstance.h"
+#include "WWEnumClassContainer.h"
+#include "WWGameInstance.h"
 #include "InventoryTabData.h"
 #include "InventorySlotData.h"
 #include "InventoryWidget.h"
 #include "InventorySlotWidget.h"
 #include "InventoryComponent.h"
 #include "InventoryTabButtonWidget.h"
-#include "WanderingWarrior/WWConstContainer.h"
-#include "WanderingWarrior/ManagerClass/InventoryManager.h"
+#include "WWConstContainer.h"
+#include "ManagerClass/InventoryManager.h"
 
 #include "Kismet/GameplayStatics.h"
 

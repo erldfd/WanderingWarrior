@@ -3,9 +3,9 @@
 
 #include "BTTask_Attack.h"
 
-#include "WanderingWarrior/Character/WWCharacter.h"
-#include "WanderingWarrior/Controller/EnemyAIController.h"
-#include "WanderingWarrior/WWAnimInstance.h"
+#include "Character/WWCharacter.h"
+#include "Controller/EnemyAIController.h"
+#include "WWAnimInstance.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {
@@ -19,10 +19,9 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	AWWCharacter* Character = Cast <AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	check(Character != nullptr);
 
-	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
-	check(AnimInstance != nullptr);
+	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
 
-	if (AnimInstance->GetIsDead())
+	if (AnimInstance.GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}
@@ -39,10 +38,9 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	AWWCharacter* Character = Cast <AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	check(Character != nullptr);
 
-	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
-	check(AnimInstance != nullptr);
+	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
 
-	if (AnimInstance->GetIsAttacking())
+	if (AnimInstance.GetIsAttacking())
 	{
 		return;
 	}

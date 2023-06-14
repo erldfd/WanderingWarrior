@@ -6,8 +6,6 @@
 
 #include "WWCharacter.h"
 
-//#include "GameFramework/Character.h"
-
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -31,7 +29,7 @@ public:
 
 	class UPlayerSkillComponent* GetPlayerSkillComponenet();
 
-	class UCharacterQuickSlot* GetQuickSlot();
+	class UCharacterQuickSlot& GetQuickSlot();
 
 	class UCharacterInventory& GetInventory() const;
 

@@ -4,10 +4,10 @@
 #include "PlayerSkillComponent.h"
 
 #include "CharacterStatComponent.h"
-#include "WanderingWarrior/Character/PlayerCharacter.h"
-#include "WanderingWarrior/WWAnimInstance.h"
-#include "WanderingWarrior/Controller/WWPlayerController.h"
-#include "WanderingWarrior/InGameWidget.h"
+#include "WWAnimInstance.h"
+#include "InGameWidget.h"
+#include "Character/PlayerCharacter.h"
+#include "Controller/WWPlayerController.h"
 
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
@@ -48,7 +48,7 @@ void UPlayerSkillComponent::BeginPlay()
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
 	check(PlayerCharacter != nullptr);
 
-	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(PlayerCharacter->GetAnimInstance());
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(&PlayerCharacter->GetAnimInstance());
 	check(AnimInstance != nullptr);
 
 	AnimInstance->OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
@@ -57,7 +57,7 @@ void UPlayerSkillComponent::BeginPlay()
 		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
 		check(PlayerCharacter != nullptr);
 
-		UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(PlayerCharacter->GetAnimInstance());
+		UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(&PlayerCharacter->GetAnimInstance());
 		check(AnimInstance != nullptr);
 
 		AnimInstance->SetIsPlayingJumpToGroundSkillAnim(false);
@@ -81,7 +81,7 @@ void UPlayerSkillComponent::JumpToGroundSkillImplement()
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
 	check(PlayerCharacter != nullptr);
 
-	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(PlayerCharacter->GetAnimInstance());
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(&PlayerCharacter->GetAnimInstance());
 	check(AnimInstance != nullptr);
 
 	if (AnimInstance->IsPlayingSomething())
@@ -155,7 +155,7 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
 			ensure(PlayerInGameWidget != nullptr);
 
-			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent().GetHPRatio());
 			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);

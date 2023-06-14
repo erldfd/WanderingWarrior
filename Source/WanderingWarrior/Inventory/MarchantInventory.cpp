@@ -3,14 +3,14 @@
 
 #include "MarchantInventory.h"
 
-#include "WanderingWarrior/WWEnumClassContainer.h"
+#include "WWEnumClassContainer.h"
 #include "InventoryComponent.h"
-#include "WanderingWarrior/WWConstContainer.h"
+#include "WWConstContainer.h"
 #include "InventoryTabData.h"
 #include "InventoryWidget.h"
 #include "InventorySlotData.h"
 #include "InventorySlotWidget.h"
-#include "WanderingWarrior/WWGameInstance.h"
+#include "WWGameInstance.h"
 
 #include "Kismet/GameplayStatics.h"
 

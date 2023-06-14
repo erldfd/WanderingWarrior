@@ -3,8 +3,8 @@
 
 #include "NPCCharacter.h"
 
-#include "WanderingWarrior/Inventory/MarchantInventory.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
+#include "Inventory/MarchantInventory.h"
+#include "WWEnumClassContainer.h"
 
 ANPCCharacter::ANPCCharacter()
 {
@@ -41,7 +41,7 @@ const FString& ANPCCharacter::GetNPCName() const
 	return NPCName;
 }
 
-UMarchantInventory* ANPCCharacter::GetInventory()
+UMarchantInventory& ANPCCharacter::GetInventory()
 {
-	return Inventory;
+	return *Inventory;
 }

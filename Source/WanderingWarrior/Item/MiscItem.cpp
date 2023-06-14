@@ -3,10 +3,10 @@
 
 #include "MiscItem.h"
 
-#include "WanderingWarrior/Components/CharacterStatComponent.h"
-#include "WanderingWarrior/Controller/WWPlayerController.h"
-#include "WanderingWarrior/Character/PlayerCharacter.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
+#include "Components/CharacterStatComponent.h"
+#include "Controller/WWPlayerController.h"
+#include "Character/PlayerCharacter.h"
+#include "WWEnumClassContainer.h"
 
 AMiscItem::AMiscItem()
 {
@@ -22,7 +22,7 @@ void AMiscItem::Use(const UWorld& World)
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
 	check(PlayerCharacter != nullptr);
 
-	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(PlayerCharacter->GetCharacterStatComponent());
+	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(&PlayerCharacter->GetCharacterStatComponent());
 	check(CharacterStat != nullptr);
 
 	switch (MiscItemName)

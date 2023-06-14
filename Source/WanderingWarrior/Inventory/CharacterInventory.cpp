@@ -4,8 +4,9 @@
 #include "CharacterInventory.h"
 
 #include "ItemData.h"
-#include "WanderingWarrior/WWEnumClassContainer.h"
-#include "WanderingWarrior/WWGameInstance.h"
+#include "WWEnumClassContainer.h"
+#include "WWGameInstance.h"
+#include "WWConstContainer.h"
 #include "InventoryTabData.h"
 #include "InventorySlotData.h"
 #include "InventoryWidget.h"
@@ -13,8 +14,7 @@
 #include "InventoryComponent.h"
 #include "InventoryTabButtonWidget.h"
 #include "Inventory/InventoryItemInfoWidget.h"
-#include "WanderingWarrior/WWConstContainer.h"
-#include "WanderingWarrior/ManagerClass/InventoryManager.h"
+#include "ManagerClass/InventoryManager.h"
 #include "Controller/WWPlayerController.h"
 
 #include "Kismet/GameplayStatics.h"

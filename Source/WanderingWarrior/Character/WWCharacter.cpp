@@ -3,9 +3,9 @@
 
 #include "WWCharacter.h"
 
-#include "WanderingWarrior/WWAnimInstance.h"
-#include "WanderingWarrior/Components/CharacterStatComponent.h"
-#include "WanderingWarrior/Item/Weapon.h"
+#include "WWAnimInstance.h"
+#include "Components/CharacterStatComponent.h"
+#include "Item/Weapon.h"
 
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -14,13 +14,14 @@
 #include "DrawDebugHelpers.h"
 
 // Sets default values
-AWWCharacter::AWWCharacter()
+// 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
+AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false), ComboCount(0), bIsAnimMoveStart(false), AttackMoveSpeed(5)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CharacterStatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("CharacterStat"));
-	check(CharacterStatComponent != nullptr);
+	check(CharacterStatComponent);
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;//이동 방향으로 캐릭터가 로테이션함
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);//로테이션 속도인듯
@@ -31,7 +32,7 @@ AWWCharacter::AWWCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 
 	USkeletalMeshComponent* CharacterMeshComponent = GetMesh();
-	check(CharacterMeshComponent != nullptr);
+	check(CharacterMeshComponent);
 
 	CharacterMeshComponent->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 
@@ -53,7 +54,7 @@ void AWWCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
-	if (ensure(AnimInstance != nullptr) == false) return;
+	if (ensure(AnimInstance) == false) return;
 
 	AnimInstance->OnAnimMoveStartDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveStart);
 	AnimInstance->OnAnimMoveEndDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveEnd);
@@ -91,9 +92,9 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	return Damage;
 }
 
-UWWAnimInstance* AWWCharacter::GetAnimInstance()
+UWWAnimInstance& AWWCharacter::GetAnimInstance()
 {
-	return AnimInstance;
+	return *AnimInstance;
 }
 
 // Called every frame
@@ -180,7 +181,7 @@ void AWWCharacter::InputMoveRight(float Value)
 
 void AWWCharacter::MoveRight(float Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if (Controller && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -280,22 +281,22 @@ void AWWCharacter::Attack(float Value)
 	}
 }
 
-UCharacterStatComponent* AWWCharacter::GetCharacterStatComponent()
+UCharacterStatComponent& AWWCharacter::GetCharacterStatComponent()
 {
-	check(CharacterStatComponent != nullptr);
-	return CharacterStatComponent;
+	check(CharacterStatComponent);
+	return *CharacterStatComponent;
 }
 
-FName AWWCharacter::GetCharacterName()
+const FName& AWWCharacter::GetCharacterName() const
 {
 	return CharacterName;
 }
 
 void AWWCharacter::EquipWeapon(AWeapon* Weapon)
 {
-	check(Weapon != nullptr);
+	check(Weapon);
 
-	if (nullptr != CurrentWeapon)
+	if (CurrentWeapon)
 	{
 		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		CurrentWeapon->Destroy();
@@ -303,7 +304,7 @@ void AWWCharacter::EquipWeapon(AWeapon* Weapon)
 	}
 
 	FName WeaponSocket(TEXT("hand_rSocket"));
-	if (nullptr != Weapon)
+	if (Weapon)
 	{
 		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 		Weapon->SetOwner(this);

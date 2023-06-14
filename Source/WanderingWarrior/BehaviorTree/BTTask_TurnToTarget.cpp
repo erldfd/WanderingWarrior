@@ -3,9 +3,9 @@
 
 #include "BTTask_TurnToTarget.h"
 
-#include "WanderingWarrior/Character/WWCharacter.h"
-#include "WanderingWarrior/Controller/EnemyAIController.h"
-#include "WanderingWarrior/WWAnimInstance.h"
+#include "Character/WWCharacter.h"
+#include "Controller/EnemyAIController.h"
+#include "WWAnimInstance.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -30,8 +30,8 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 		return EBTNodeResult::Failed;
 	}
 
-	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
-	if (AnimInstance == nullptr || AnimInstance->GetIsDead())
+	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
+	if (AnimInstance.GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}
