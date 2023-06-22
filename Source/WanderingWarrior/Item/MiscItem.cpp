@@ -12,18 +12,20 @@ AMiscItem::AMiscItem()
 {
 	ItemStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemStaticMeshComponent"));
 	RootComponent = ItemStaticMeshComponent;
+
+
 }
 
 void AMiscItem::Use(const UWorld& World)
 {
 	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(World.GetFirstPlayerController());
-	check(PlayerController != nullptr);
+	check(PlayerController);
 
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
-	check(PlayerCharacter != nullptr);
+	check(PlayerCharacter);
 
 	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(&PlayerCharacter->GetCharacterStatComponent());
-	check(CharacterStat != nullptr);
+	check(CharacterStat);
 
 	switch (MiscItemName)
 	{
@@ -35,4 +37,9 @@ void AMiscItem::Use(const UWorld& World)
 	default:
 		break;
 	}
+}
+
+void AMiscItem::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	
 }

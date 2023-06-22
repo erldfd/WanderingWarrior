@@ -26,12 +26,12 @@ public:
 
 	virtual bool ObtainItem(EWeaponName WeaponName) override;
 	virtual bool ObtainItem(EMiscItemName MiscItemName) override;
-	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabData* Tab) override;
+	virtual bool ObtainItem(const struct FItemDataRow& NewItemData, class UInventoryTabData& Tab) override;
 
 	virtual void RemoveAllItem(int32 SlotIndex) override;
 
 	virtual bool UseSlotItemFormSlotIndex(int32 Index) override;
-	virtual bool UseSlotItemFromSlot(class UInventorySlotData*& Slot) override;
+	virtual bool UseSlotItemFromSlot(class UInventorySlotData& Slot) override;
 
 	virtual void ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType) override;
 

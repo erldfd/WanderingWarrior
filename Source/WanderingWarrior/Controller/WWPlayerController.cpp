@@ -9,12 +9,17 @@
 #include "Components/CharacterStatComponent.h"
 #include "Components/PlayerSkillComponent.h"
 #include "Character/PlayerCharacter.h"
+#include "Character/NPCCharacter.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/CharacterQuickSlot.h"
 #include "Inventory/CharacterInventory.h"
+#include "Inventory/MarchantInventory.h"
+#include "Inventory/InventoryWidget.h"
 #include "ManagerClass/ConversationManager.h"
 #include "ManagerClass/InteractionManager.h"
 #include "ManagerClass/StoreManager.h"
+#include "Item/Weapon.h"
+#include "Item/MiscItem.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
@@ -41,30 +46,41 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 
 	InGameWidget->AddToViewport();
 
-	PlayerCharacter->GetQuickSlot().SetInventoryWidget(InGameWidget->GetQuickSlotWidget());
+	PlayerCharacter->GetQuickSlot().SetInventoryWidget(*InGameWidget->GetQuickSlotWidget());
 
 	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
 
-	PlayerInventory.SetInventoryWidget(InGameWidget->GetInventoryWidget());
+	PlayerInventory.SetInventoryWidget(*InGameWidget->GetInventoryWidget());
 	PlayerInventory.SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
-	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
-	GameInstance->GetConversationManager()->SetConversationWidget(InGameWidget->GetConversationWidget());
-	GameInstance->GetConversationManager()->BindConversationWidgetSignature();
-	GameInstance->GetStoreManager()->SetStoreWidget(InGameWidget->GetMarchantInventoryWidget());
+	TArray<AActor*> NPCCharacterArray;
+	UGameplayStatics::GetAllActorsOfClass(this, ANPCCharacter::StaticClass(), NPCCharacterArray);
+
+	TempMarchantCharacter = Cast<ANPCCharacter>(NPCCharacterArray[0]);
+	check(TempMarchantCharacter);
+
+	UMarchantInventory& MarchantInventory = TempMarchantCharacter->GetInventory();
+	check(&MarchantInventory);
+
+	MarchantInventory.SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
+
+	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
+	GameInstance.GetConversationManager().SetConversationWidget(*InGameWidget->GetConversationWidget());
+	GameInstance.GetConversationManager().BindConversationWidgetSignature();
+	GameInstance.GetStoreManager().SetStoreWidget(InGameWidget->GetMarchantInventoryWidget());
 
 	SetShowMouseCursor(false);
 
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 
-	OnMarchantConversateSignagture.AddUObject(this, &AWWPlayerController::OnMarchantConversation);
+	OnKeyEPressedSignature.AddUObject(this, &AWWPlayerController::OnMarchantConversation);
 }
 
-UInGameWidget* AWWPlayerController::GetInGameWidget()
+UInGameWidget& AWWPlayerController::GetInGameWidget()
 {
 	check(InGameWidget);
-	return InGameWidget;
+	return *InGameWidget;
 }
 
 void AWWPlayerController::SetGameModeGameAndUI()
@@ -163,8 +179,8 @@ void AWWPlayerController::OpenAndCloseInventory()
 
 void AWWPlayerController::OnMouseRightButtonClicked()
 {
-	UPlayerSkillComponent* PlayerSkill = PlayerCharacter->GetPlayerSkillComponenet();
-	PlayerSkill->JumpToGroundSkillImplement();
+	UPlayerSkillComponent& PlayerSkill = PlayerCharacter->GetPlayerSkillComponenet();
+	PlayerSkill.JumpToGroundSkillImplement();
 }
 
 void AWWPlayerController::UseQuickSlot0()
@@ -209,18 +225,18 @@ void AWWPlayerController::UseQuickSlot7()
 
 void AWWPlayerController::OnKeyEButtonPressed()
 {
-	UWorld* World = PlayerCharacter->GetWorld();
-	FVector Center = PlayerCharacter->GetActorLocation();
+	UWorld& World = *PlayerCharacter->GetWorld();
+	const FVector& Center = PlayerCharacter->GetActorLocation();
 	float DetectRadius = 200;
 
-	if (World == nullptr)
+	if (&World == nullptr)
 	{
 		return;
 	}
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, PlayerCharacter);
-	bool bResult = World->OverlapMultiByChannel(
+	bool bResult = World.OverlapMultiByChannel(
 		OverlapResults,
 		Center,
 		FQuat::Identity,
@@ -234,18 +250,24 @@ void AWWPlayerController::OnKeyEButtonPressed()
 		return;
 	}
 
-	if (OnMarchantConversateSignagture.IsBound())
-	{
-		OnMarchantConversateSignagture.Broadcast(OverlapResults);
-	}
-
 	for (int32 i = 0; i < OverlapResults.Num(); ++i)
 	{
+		check(&OverlapResults[i]);
+
 		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController, OnKeyEButtonPressed, OverlapResults[%d] : %s"), i, *OverlapResults[i].GetActor()->GetName());
 
-		if (OverlapResults[i].GetActor()->Tags.IsValidIndex(0) && OverlapResults[i].GetActor()->Tags[0] == "Marchant")
+		AActor& OverlappedActor = *OverlapResults[i].GetActor();
+
+		if (OverlappedActor.Tags.IsValidIndex(0) == false)
 		{
-			DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
+			continue;
+		}
+
+		FName& ActorTag = OverlappedActor.Tags[0];
+
+		if (ActorTag == "Marchant")
+		{
+			DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
 			UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController, OnKeyEButtonPressed, Found Marchant"));
 
 			SetShowMouseCursor(true);
@@ -259,10 +281,13 @@ void AWWPlayerController::OnKeyEButtonPressed()
 		}
 	}
 
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.5);
+	if (OnKeyEPressedSignature.IsBound())
+	{
+		OnKeyEPressedSignature.Broadcast(OverlapResults);
+	}
 }
 
 void AWWPlayerController::OnMarchantConversation(const TArray<FOverlapResult>& OverlapResults)
 {
-	Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this))->GetInteractionManager()->AnalyzeInteraction(OverlapResults);
+	Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this))->GetInteractionManager().AnalyzeInteraction(OverlapResults);
 }

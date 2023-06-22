@@ -45,7 +45,7 @@ public:
 	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
 	void SetSlotWidgetImageFromTexture(ETabType TabType, int32 SlotIndex, class UTexture2D* SlotTexture = nullptr);
 	void SetSlotWidgetImageFromTexture(const TArray<UInventorySlotWidget*>& SlotImageArray, int32 SlotIndex, class UTexture2D* SlotTexture = nullptr);
-	void SetSlotWidgetImageFromTexture(UInventorySlotWidget*& SlotWidget, class UTexture2D* SlotTexture = nullptr);
+	void SetSlotWidgetImageFromTexture(UInventorySlotWidget& SlotWidget, class UTexture2D* SlotTexture = nullptr);
 	void SetSlotItemCountText(int32 SlotItemCount, int32 SlotIndex, ETabType TabType);
 
 	void InitNullTabButtonArray(int32 ArrayCount);

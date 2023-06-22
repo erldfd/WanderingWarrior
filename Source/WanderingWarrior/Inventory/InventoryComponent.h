@@ -27,7 +27,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	class UInventoryTabData* GetCurrentActivatedTab();
+	class UInventoryTabData& GetCurrentActivatedTab();
 	void SetCurrentActivatedTab(UInventoryTabData* Tab);
 	
 	ETabType GetCurrentActivatedTabType();

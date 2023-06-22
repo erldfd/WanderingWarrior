@@ -30,4 +30,9 @@ protected:
 	TObjectPtr<UStaticMeshComponent> ItemStaticMeshComponent;
 
 	EMiscItemName MiscItemName;
+
+private:
+
+	UFUNCTION()
+	void OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

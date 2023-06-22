@@ -27,7 +27,7 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	class UPlayerSkillComponent* GetPlayerSkillComponenet();
+	class UPlayerSkillComponent& GetPlayerSkillComponenet();
 
 	class UCharacterQuickSlot& GetQuickSlot();
 

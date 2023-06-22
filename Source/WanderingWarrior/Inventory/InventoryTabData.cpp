@@ -39,9 +39,10 @@ void UInventoryTabData::InitSlots(int32 NewSlotCount)
 	}
 }
 
-UInventorySlotData*& UInventoryTabData::GetSlotFromIndex(int32 Index)
+UInventorySlotData& UInventoryTabData::GetSlotFromIndex(int32 Index)
 {
-	return InventorySlotArray[Index];
+	check(InventorySlotArray[Index]);
+	return *InventorySlotArray[Index];
 }
 
 UInventorySlotData* UInventoryTabData::GetEmptySlot()

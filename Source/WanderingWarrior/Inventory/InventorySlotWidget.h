@@ -38,11 +38,11 @@ public:
 	int GetSlotIndex();
 	void SetSlotIndex(int32 NewIndex);
 
-	class UImage* GetSlotImage();
-	void SetSlotImage(UImage* NewSlotImage);
+	class UImage& GetSlotImage();
+	void SetSlotImage(UImage& NewSlotImage);
 
-	class UImage* GetDragSlotImage();
-	void SetDragSlotImage(UImage* NewSlotImage);
+	class UImage& GetDragSlotImage();
+	void SetDragSlotImage(UImage& NewSlotImage);
 
 	uint8 GetIsEmptySlotImage();
 	void SetIsEmptySlotImage(uint8 bIsEmpty);

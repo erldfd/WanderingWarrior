@@ -8,7 +8,7 @@
 
 #include "WWPlayerController.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMarchantConversateSignagture, const TArray<FOverlapResult>&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnKeyEPressedSignature, const TArray<FOverlapResult>&);
 /**
  * 
  */
@@ -23,7 +23,7 @@ public:
 
 	virtual void OnPossess(APawn* aPawn) override;
 
-	class UInGameWidget* GetInGameWidget();
+	class UInGameWidget& GetInGameWidget();
 
 	void SetGameModeGameAndUI();
 	void SetGameModeGameOnly();
@@ -31,7 +31,7 @@ public:
 
 public:
 
-	FOnMarchantConversateSignagture OnMarchantConversateSignagture;
+	FOnKeyEPressedSignature OnKeyEPressedSignature;
 
 protected:
 
@@ -74,6 +74,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class APlayerCharacter> PlayerCharacter;
+
+	UPROPERTY(EditAnywhere, meta = (PrivateAccess = true))
+	TObjectPtr<class ANPCCharacter> TempMarchantCharacter;
 
 	uint8 bIsInputModeGameOnly : 1;
 };

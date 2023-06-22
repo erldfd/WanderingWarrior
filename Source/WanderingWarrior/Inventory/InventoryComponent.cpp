@@ -37,9 +37,10 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-class UInventoryTabData* UInventoryComponent::GetCurrentActivatedTab()
+class UInventoryTabData& UInventoryComponent::GetCurrentActivatedTab()
 {
-	return CurrentActivatedTab;
+	check(CurrentActivatedTab);
+	return *CurrentActivatedTab;
 }
 
 void UInventoryComponent::SetCurrentActivatedTab(UInventoryTabData* Tab)

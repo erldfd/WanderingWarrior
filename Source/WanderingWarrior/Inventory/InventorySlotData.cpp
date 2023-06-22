@@ -70,16 +70,16 @@ bool UInventorySlotData::UseSlotItem(const UWorld& World)
 		return false;
 	}
 
-	check(&World != nullptr);
+	check(&World);
 
 	FName TagName = SlotItemData.ItemTypeTag.GetTagName();
 
-	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(&World));
+	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(&World));
 
 	if (TagName == "Weapon")
 	{
-		AWeapon* Weapon = GameInstance->SpawnWeapon((EWeaponName)SlotItemData.ID);
-		Weapon->Use(World);
+		AWeapon& Weapon = GameInstance.SpawnWeapon((EWeaponName)SlotItemData.ID);
+		Weapon.Use(World);
 		
 		//SlotItem->Use();
 	}

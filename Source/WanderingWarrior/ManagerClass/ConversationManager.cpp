@@ -5,8 +5,14 @@
 
 #include "ConversationScriptData.h"
 #include "ConversationWidget.h"
+#include "WWGameInstance.h"
+#include "StoreManager.h"
+#include "WWEnumClassContainer.h"
 #include "Controller/WWPlayerController.h"
 #include "Character/NPCCharacter.h"
+#include "Inventory/MarchantInventory.h"
+#include "Inventory/InventoryWidget.h"
+#include "Inventory/InventorySlotWidget.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -15,9 +21,9 @@ UConversationManager::UConversationManager() : bIsConversationWidgetOpened(false
 	
 }
 
-void UConversationManager::SetConversationWidget(UConversationWidget* InConversationWidget)
+void UConversationManager::SetConversationWidget(UConversationWidget& InConversationWidget)
 {
-	ConversationWidget = InConversationWidget;
+	ConversationWidget = &InConversationWidget;
 }
 
 void UConversationManager::SetNPCNameText(const FText& InText)
@@ -38,7 +44,7 @@ void UConversationManager::SetBehavior(EBehavior Behavior)
 	switch (Behavior)
 	{
 	case EBehavior::OpenStore:
-
+		OpenStore();
 		break;
 	case EBehavior::JustClose:
 		FinishConversation();
@@ -74,9 +80,9 @@ void UConversationManager::SetConversationScriptDataArray(const TArray<FConversa
 	}
 }
 
-void UConversationManager::SetConversationNPC(ANPCCharacter* NPC)
+void UConversationManager::SetConversationNPC(ANPCCharacter& NPC)
 {
-	ConversationNPC = NPC;
+	ConversationNPC = &NPC;
 }
 
 void UConversationManager::OpenConversationWidget()
@@ -132,7 +138,9 @@ void UConversationManager::OnNPCConversationPageClicked()
 		}
 		else
 		{
-			SetBehavior(EBehavior::JustClose);
+			//SetBehavior(EBehavior::OpenStore);
+			OpenStore();
+			FinishConversation();
 			//TODO :: 상점 열기 등 행동
 			UE_LOG(LogTemp, Warning, TEXT("UConversationManager::OnNPCConversationPageClicked, ELSE"));
 		}
@@ -160,4 +168,15 @@ void UConversationManager::OnAnswerButtonClickedSignature(int32 ButtonIndex)
 	// TODO : 행동을 정해야 한다..........
 	// 그리고 INDEX 설정에 대해 고민해야한다
 	// enum으로 할까
+}
+
+void UConversationManager::OpenStore()
+{
+	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
+	check(&GameInstance);
+
+	UStoreManager& StoreManager = GameInstance.GetStoreManager();
+	check(&StoreManager);
+
+	ConversationNPC->GetInventory().GetInventoryWidget().SetVisibility(ESlateVisibility::Visible);
 }

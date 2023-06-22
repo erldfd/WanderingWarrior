@@ -7,6 +7,7 @@
 #include "WWGameInstance.h"
 #include "WWGameMode.h"
 #include "WWEnumClassContainer.h"
+#include "WWConstContainer.h"
 #include "Item/Weapon.h"
 #include "Item/MiscItem.h"
 #include "Components/PlayerSkillComponent.h"
@@ -47,7 +48,7 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationRoll = false;// y로테이션
 
 	UCapsuleComponent* BodyCapsuleComponent = GetCapsuleComponent();
-	check(BodyCapsuleComponent != nullptr);
+	check(BodyCapsuleComponent);
 
 	SpringArm->SetupAttachment((USceneComponent*)BodyCapsuleComponent);
 	Camera->SetupAttachment(SpringArm);
@@ -76,6 +77,11 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	for (int i = 0; i < SlotCount::WEAPON_TAB_SLOT_COUNT; ++i)
+	{
+		Inventory->RemoveAllItem(i);
+	}
+	
 	Inventory->ObtainItem(EWeaponName::BlackSword);
 	Inventory->ObtainItem(EWeaponName::WhiteSword);
 	
@@ -108,10 +114,10 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	//Super::EquipWeapon(Cast<UWWGameInstance>(GetGameInstance())->GetWeapon(EWeaponName::BlackSword));
 }
 
-UPlayerSkillComponent* APlayerCharacter::GetPlayerSkillComponenet()
+UPlayerSkillComponent& APlayerCharacter::GetPlayerSkillComponenet()
 {
 	check(PlayerSkillComponent);
-	return PlayerSkillComponent;
+	return *PlayerSkillComponent;
 }
 
 class UCharacterQuickSlot& APlayerCharacter::GetQuickSlot()

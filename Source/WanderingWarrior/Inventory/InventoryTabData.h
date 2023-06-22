@@ -27,7 +27,7 @@ public:
 	int GetSlotCount();
 	void InitSlots(int32 NewSlotCount);
 
-	class UInventorySlotData*& GetSlotFromIndex(int32 Index);
+	class UInventorySlotData& GetSlotFromIndex(int32 Index);
 
 	//SlotIndex is Getted Slot Index, if Failed to Get Slot, SlotIndex is -1.
 	class UInventorySlotData* GetEmptySlot();

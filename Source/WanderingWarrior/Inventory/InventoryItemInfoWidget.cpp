@@ -4,6 +4,17 @@
 #include "Inventory/InventoryItemInfoWidget.h"
 
 #include "Components/TextBlock.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+
+void UInventoryItemInfoWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
+
+void UInventoryItemInfoWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+}
 
 void UInventoryItemInfoWidget::SetItemNameText(const FText& InText)
 {

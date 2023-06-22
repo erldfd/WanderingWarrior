@@ -26,21 +26,23 @@ public:
 
 	virtual void Init() override;
 
-	class AWeapon* SpawnWeapon(EWeaponName Name);
-	//class AMiscItem* SpawnMiscItem(EMiscItemName Name);
+	class AWeapon& SpawnWeapon(EWeaponName Name);
+	class AWeapon& SpawnWeapon(EWeaponName Name, const FVector& Location);
 
-	struct FItemDataRow* GetWeaponData(EWeaponName Name) const;
-	struct FItemDataRow* GetMiscItemData(EMiscItemName Name) const;
+	class AMiscItem& SpawnMiscItem(EMiscItemName Name, const FVector& Location);
 
-	class UInventoryManager* GetInventoryManager();
+	const struct FItemDataRow& GetWeaponData(EWeaponName Name) const;
+	const struct FItemDataRow& GetMiscItemData(EMiscItemName Name) const;
 
-	class UCreditManager* GetCreditManagner();
+	class UInventoryManager& GetInventoryManager();
 
-	class UConversationManager* GetConversationManager();
+	class UCreditManager& GetCreditManagner();
 
-	class UInteractionManager* GetInteractionManager();
+	class UConversationManager& GetConversationManager();
 
-	class UStoreManager* GetStoreManager();
+	class UInteractionManager& GetInteractionManager();
+
+	class UStoreManager& GetStoreManager();
 
 private:
 

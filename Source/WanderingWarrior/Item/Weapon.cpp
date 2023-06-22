@@ -42,14 +42,19 @@ void AWeapon::BeginPlay()
 
 void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (Super::bIsFieldItem)
+	{
+		return;
+	}
+	
 	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(OtherActor);
-	ensure(EnemyCharacter != nullptr);
+	ensure(EnemyCharacter);
 
 	AWWGameMode* GameMode = Cast<AWWGameMode>(GetWorld()->GetAuthGameMode());
-	ensure(GameMode != nullptr);
+	ensure(GameMode);
 
 	UWWAnimInstance* PlayerAnimInstance = GameMode->GetPlayerAnimInstance();
-	ensure(PlayerAnimInstance != nullptr);
+	ensure(PlayerAnimInstance);
 
 	bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
 
@@ -58,16 +63,16 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		EnemyCharacter->SetIsDamaged(true);
 
 		FDamageEvent DamageEvent;
-		EnemyCharacter->Super::TakeDamage(AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), this);
+		EnemyCharacter->TakeDamage(AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), this);
 
 		AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-		ensure(PlayerController != nullptr);
+		if (ensure(PlayerController)) return;
 
-		UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-		ensure(PlayerInGameWidget != nullptr);
+		UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
+		if (ensure(&PlayerInGameWidget)) return;
 
-		PlayerInGameWidget->SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent().GetHPRatio());
-		PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
+		PlayerInGameWidget.SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent().GetHPRatio());
+		PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
 	}
 }
 
@@ -84,13 +89,13 @@ void AWeapon::SetAttackDamage(float NewDamage)
 
 void AWeapon::Use(const UWorld& World)
 {
-	check(&World != nullptr);
+	check(&World);
 
 	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(World.GetFirstPlayerController());
-	check(PlayerController != nullptr);
+	check(PlayerController);
 
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
-	check(PlayerCharacter != nullptr);
+	check(PlayerCharacter);
 
 	PlayerCharacter->EquipWeapon(this);
 }

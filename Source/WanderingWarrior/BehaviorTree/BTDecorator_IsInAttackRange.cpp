@@ -18,13 +18,13 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 {
 	bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
-	AWWCharacter* ThisCharacter = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (ThisCharacter == nullptr)
+	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (&ThisCharacter == nullptr)
 	{
 		return false;
 	}
 
-	UWWAnimInstance& AnimInstance = ThisCharacter->GetAnimInstance();
+	UWWAnimInstance& AnimInstance = ThisCharacter.GetAnimInstance();
 	if (AnimInstance.GetIsDead())
 	{
 		return false;
@@ -36,7 +36,7 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 		return false;
 	}
 
-	bResult = (Target->GetDistanceTo(ThisCharacter) <= 200);
+	bResult = (Target->GetDistanceTo(&ThisCharacter) <= 200);
 
 	return bResult;
 }

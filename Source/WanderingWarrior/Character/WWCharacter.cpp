@@ -31,19 +31,19 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 
-	USkeletalMeshComponent* CharacterMeshComponent = GetMesh();
-	check(CharacterMeshComponent);
+	USkeletalMeshComponent& CharacterMeshComponent = *GetMesh();
+	check(&CharacterMeshComponent);
 
-	CharacterMeshComponent->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
+	CharacterMeshComponent.SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	const ConstructorHelpers::FObjectFinder<USkeletalMesh> MESH(TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard"));
 	if (MESH.Succeeded())
 	{
-		CharacterMeshComponent->SetSkeletalMesh(MESH.Object);
+		CharacterMeshComponent.SetSkeletalMesh(MESH.Object);
 	}
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> Anim(TEXT("/Game/Animations/BP_WarriorAnim.BP_WarriorAnim_C"));
-	CharacterMeshComponent->SetAnimInstanceClass(Anim.Class);
+	CharacterMeshComponent.SetAnimInstanceClass(Anim.Class);
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
 	GetMesh()->SetGenerateOverlapEvents(true);
@@ -72,9 +72,8 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
 	float HPBeforeDamage = CharacterStatComponent->GetHP();
-	
-
 	float HPAfterDamage = HPBeforeDamage - Damage;
+
 	CharacterStatComponent->SetHP(HPAfterDamage);
 
 	if (HPAfterDamage <= 0)

@@ -20,28 +20,28 @@ void UInventorySlotWidget::SetSlotIndex(int32 NewIndex)
 	SlotIndex = NewIndex;
 }
 
-UImage* UInventorySlotWidget::GetSlotImage()
+UImage& UInventorySlotWidget::GetSlotImage()
 {
-	check(SlotImage != nullptr);
-	return SlotImage;
+	check(SlotImage);
+	return *SlotImage;
 }
 
-void UInventorySlotWidget::SetSlotImage(UImage* NewSlotImage)
+void UInventorySlotWidget::SetSlotImage(UImage& NewSlotImage)
 {
-	check(NewSlotImage != nullptr);
-	SlotImage = NewSlotImage;
+	check(&NewSlotImage);
+	SlotImage = &NewSlotImage;
 }
 
-UImage* UInventorySlotWidget::GetDragSlotImage()
+UImage& UInventorySlotWidget::GetDragSlotImage()
 {
-	check(DragSlotImage != nullptr);
-	return DragSlotImage;
+	check(DragSlotImage);
+	return *DragSlotImage;
 }
 
-void UInventorySlotWidget::SetDragSlotImage(UImage* NewSlotImage)
+void UInventorySlotWidget::SetDragSlotImage(UImage& NewSlotImage)
 {
-	check(NewSlotImage != nullptr);
-	DragSlotImage = NewSlotImage;
+	check(&NewSlotImage);
+	DragSlotImage = &NewSlotImage;
 }
 
 uint8 UInventorySlotWidget::GetIsEmptySlotImage()
@@ -65,8 +65,6 @@ void UInventorySlotWidget::NativeOnInitialized()
 	StartDragSlotIndex = -1;
 	bIsEmptySlotImage = true;
 	DragSlotImage->SetDesiredSizeOverride(FVector2D(170, 120));
-	//DragSlotImage->Visibility = ESlateVisibility::Visible;
-	//DragSlotImage->SetColorAndOpacity(FLinearColor(1, 1, 1, 0));
 }
 
 FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -81,7 +79,6 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 		if (bIsEmptySlotImage == false)
 		{
 			reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
-			//DragSlotImage->SetColorAndOpacity(FLinearColor(1, 1, 1, 1));
 		}
 		
 		if (OnLeftMouseButtonDownDelegate.IsBound() == false)
@@ -159,27 +156,13 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
-	check(InventoryDragDropOperation != nullptr);
-	check(DragSlotImage != nullptr);
+	check(InventoryDragDropOperation);
+	check(DragSlotImage);
 	
 	UE_LOG(LogTemp, Warning, TEXT("Parent : %s"), *DragSlotImage->GetParent()->GetName());
-	/*UPanelWidget* Parent = Cast<UPanelWidget>(DragSlotImage->GetParent());
-	check(Parent != nullptr);
-
-	Parent->AddChild(DragSlotImage);
-
-	if (Parent->GetChildIndex(DragSlotImage) == INDEX_NONE)
-	{
-		Parent->AddChild(DragSlotImage);
-	}*/
 
 	DragSlotImage->SetVisibility(ESlateVisibility::Visible);
 	InventoryDragDropOperation->DefaultDragVisual = Cast<UWidget>(DragSlotImage);
-
-	//UImage* Image = Cast<UImage>(InventoryDragDropOperation->DefaultDragVisual);
-	//check(Image != nullptr);
-
-	//Image->SetVisibility(ESlateVisibility::Visible);
 
 	InventoryDragDropOperation->SetStartDragSlotIndex(SlotIndex);
 	InventoryDragDropOperation->Pivot = EDragPivot::MouseDown;
@@ -190,26 +173,17 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 
 bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	check(InOperation != nullptr);
-	UInventoryDragDropOperation* Operation = Cast<UInventoryDragDropOperation>(InOperation);
-	check(Operation != nullptr);
+	check(InOperation);
+	UInventoryDragDropOperation& Operation = *Cast<UInventoryDragDropOperation>(InOperation);
+	check(&Operation);
 
-	StartDragSlotIndex = Operation->GetStartDragSlotIndex();
-	UE_LOG(LogTemp, Warning, TEXT("StartDragSlotIndex : %d"), Operation->GetStartDragSlotIndex());
+	StartDragSlotIndex = Operation.GetStartDragSlotIndex();
+	UE_LOG(LogTemp, Warning, TEXT("StartDragSlotIndex : %d"), Operation.GetStartDragSlotIndex());
 
-	UImage* Image = Cast<UImage>(InOperation->DefaultDragVisual);
-	check(Image != nullptr);
+	UImage& Image = *Cast<UImage>(InOperation->DefaultDragVisual);
+	check(&Image);
 
-	Image->SetVisibility(ESlateVisibility::Hidden);
-
-	/*if (OnDragDropDelegate.IsBound() == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidget, NativeOnDrop, OnDragDropDelegate is not bound"));
-		return false;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Start TabType : %d, EndTabType : %d"), Operation->GetTabTypeBelongTo(), InventoryDragDropOperation->GetTabTypeBelongTo());
-	OnDragDropDelegate.Execute(StartDragSlotIndex, SlotIndex, (int)Operation->GetTabTypeBelongTo(), (int)InventoryDragDropOperation->GetTabTypeBelongTo());*/
+	Image.SetVisibility(ESlateVisibility::Hidden);
 
 	if (OnDragDropInventoryItemDelegate.IsBound() == false)
 	{
@@ -217,10 +191,12 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 		return false;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Start TabType : %d, EndTabType : %d"), Operation->GetTabTypeBelongTo(), InventoryDragDropOperation->GetTabTypeBelongTo());
+	UE_LOG(LogTemp, Warning, TEXT("Start TabType : %d, EndTabType : %d"), Operation.GetTabTypeBelongTo(), InventoryDragDropOperation->GetTabTypeBelongTo());
 
 	//param : DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType
-	OnDragDropInventoryItemDelegate.Execute(StartDragSlotIndex, SlotIndex, (int)Operation->GetInventoryBelongTo(), (int)InventoryDragDropOperation->GetInventoryBelongTo(), (int)Operation->GetTabTypeBelongTo(), (int)InventoryDragDropOperation->GetTabTypeBelongTo());
+	OnDragDropInventoryItemDelegate.Execute(StartDragSlotIndex, SlotIndex, 
+		(int)Operation.GetInventoryBelongTo(), (int)InventoryDragDropOperation->GetInventoryBelongTo(), 
+		(int)Operation.GetTabTypeBelongTo(), (int)InventoryDragDropOperation->GetTabTypeBelongTo());
 
 	return true;
 }
@@ -247,10 +223,10 @@ void UInventorySlotWidget::NativeOnDragCancelled(const FDragDropEvent& InDragDro
 {
 	UE_LOG(LogTemp, Warning, TEXT("NativeOnDragCancelled, Index : %d"), SlotIndex);
 
-	UImage* Image = Cast<UImage>(InOperation->DefaultDragVisual);
-	check(Image != nullptr);
+	UImage& Image = *Cast<UImage>(InOperation->DefaultDragVisual);
+	check(&Image);
 
-	Image->SetVisibility(ESlateVisibility::Hidden);
+	Image.SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UInventorySlotWidget::SetTabTypeBelongTo(ETabType NewTabType)

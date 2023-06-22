@@ -36,7 +36,7 @@ public:
 
 	void SetStoreWidget(class UInventoryWidget* NewStoreWidget);
 
-	void OpenStore();
+	void OpenStore(UInventoryWidget* InStoreWidget);
 	//void SetStore()
 
 private:

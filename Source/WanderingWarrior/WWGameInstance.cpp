@@ -80,70 +80,103 @@ void UWWGameInstance::Init()
 	StoreManager = NewObject<UStoreManager>(this);
 }
 
-AWeapon* UWWGameInstance::SpawnWeapon(EWeaponName Name)
+AWeapon& UWWGameInstance::SpawnWeapon(EWeaponName Name)
 {
 	int Index = FMath::Clamp((int)Name, 0, WeaponClassArray.Num());
 	check(WeaponClassArray.IsValidIndex(Index));
 
-	auto NewWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClassArray[Index]);
-	NewWeapon->SetAttackDamage(WeaponDataArray[Index]->Damage);
-	NewWeapon->SetItemName(WeaponDataArray[Index]->Name);
-	NewWeapon->SetItemSlotTexture(WeaponDataArray[Index]->SlotTexture);
+	AWeapon& NewWeapon = *GetWorld()->SpawnActor<AWeapon>(WeaponClassArray[Index]);
+	NewWeapon.SetAttackDamage(WeaponDataArray[Index]->Damage);
+	NewWeapon.SetItemName(WeaponDataArray[Index]->Name);
+	NewWeapon.SetItemSlotTexture(*WeaponDataArray[Index]->SlotTexture);
 
 	return NewWeapon;
 }
 
-FItemDataRow* UWWGameInstance::GetWeaponData(EWeaponName Name) const
+AWeapon& UWWGameInstance::SpawnWeapon(EWeaponName Name, const FVector& Location)
+{
+	int Index = FMath::Clamp((int)Name, 0, WeaponClassArray.Num());
+	check(WeaponClassArray.IsValidIndex(Index));
+
+	FTransform Transform;
+	Transform.SetLocation(Location);
+
+	AWeapon& NewWeapon = *GetWorld()->SpawnActor<AWeapon>(WeaponClassArray[Index], Transform);
+	NewWeapon.SetAttackDamage(WeaponDataArray[Index]->Damage);
+	NewWeapon.SetItemName(WeaponDataArray[Index]->Name);
+	NewWeapon.SetItemSlotTexture(*WeaponDataArray[Index]->SlotTexture);
+	NewWeapon.SetbIsFieldItem(true);
+
+	return NewWeapon;
+}
+
+AMiscItem& UWWGameInstance::SpawnMiscItem(EMiscItemName Name, const FVector& Location)
+{
+	int Index = FMath::Clamp((int)Name, 0, MiscItemClassArray.Num());
+	check(MiscItemClassArray.IsValidIndex(Index));
+
+	FTransform Transform;
+	Transform.SetLocation(Location);
+
+	AMiscItem& NewItem = *GetWorld()->SpawnActor<AMiscItem>(MiscItemClassArray[Index], Transform);
+	NewItem.SetItemName(MiscItemDataArray[Index]->Name);
+	NewItem.SetItemSlotTexture(*MiscItemDataArray[Index]->SlotTexture);
+	NewItem.SetbIsFieldItem(true);
+
+	return NewItem;
+}
+
+const FItemDataRow& UWWGameInstance::GetWeaponData(EWeaponName Name) const
 {
 	int Index = FMath::Clamp((int)Name, 0, WeaponDataArray.Num());
 	check(WeaponDataArray.IsValidIndex(Index));
 
-	return WeaponDataArray[Index];
+	return *WeaponDataArray[Index];
 }
 
-FItemDataRow* UWWGameInstance::GetMiscItemData(EMiscItemName Name) const
+const FItemDataRow& UWWGameInstance::GetMiscItemData(EMiscItemName Name) const
 {
 	int Index = FMath::Clamp((int)Name, 0, MiscItemDataArray.Num());
 	check(MiscItemDataArray.IsValidIndex(Index));
 
-	return MiscItemDataArray[Index];
+	return *MiscItemDataArray[Index];
 }
 
-UInventoryManager* UWWGameInstance::GetInventoryManager()
+UInventoryManager& UWWGameInstance::GetInventoryManager()
 {
-	check(InventoryManager != nullptr);
-	return InventoryManager;
+	check(InventoryManager);
+	return *InventoryManager;
 }
 
-UCreditManager* UWWGameInstance::GetCreditManagner()
+UCreditManager& UWWGameInstance::GetCreditManagner()
 {
-	check(CreditMamager != nullptr);
-	return CreditMamager;
+	check(CreditMamager);
+	return *CreditMamager;
 }
 
-UConversationManager* UWWGameInstance::GetConversationManager()
+UConversationManager& UWWGameInstance::GetConversationManager()
 {
 	check(ConversationManager);
-	return ConversationManager;
+	return *ConversationManager;
 }
 
-UInteractionManager* UWWGameInstance::GetInteractionManager()
+UInteractionManager& UWWGameInstance::GetInteractionManager()
 {
 	check(InteractionManager);
-	return InteractionManager;
+	return *InteractionManager;
 }
 
-UStoreManager* UWWGameInstance::GetStoreManager()
+UStoreManager& UWWGameInstance::GetStoreManager()
 {
 	check(StoreManager);
-	return StoreManager;
+	return *StoreManager;
 }
 
 void UWWGameInstance::OnStartConversation(ANPCCharacter* InteractionActor)
 {
 	int32 StartIndex = InteractionActor->GetConversationIndex();
 
-	ConversationManager->SetConversationNPC(InteractionActor);
+	ConversationManager->SetConversationNPC(*InteractionActor);
 	ConversationManager->OpenConversationWidget();
 	ConversationManager->SetNPCConversation(StartIndex);
 	ConversationManager->OpenNPCConversationWidget();

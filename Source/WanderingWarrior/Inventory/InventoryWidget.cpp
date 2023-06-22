@@ -50,21 +50,21 @@ void UInventoryWidget::SetSlotWidgetImageFromTexture(const TArray<UInventorySlot
 		SlotTexture = EmptySlotTexture;
 	}
 	
-	SlotWidgetArray[SlotIndex]->GetSlotImage()->SetBrushFromTexture(SlotTexture);
-	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetBrushFromTexture(SlotTexture);
-	SlotWidgetArray[SlotIndex]->GetDragSlotImage()->SetDesiredSizeOverride(FVector2D(170, 115));
+	SlotWidgetArray[SlotIndex]->GetSlotImage().SetBrushFromTexture(SlotTexture);
+	SlotWidgetArray[SlotIndex]->GetDragSlotImage().SetBrushFromTexture(SlotTexture);
+	SlotWidgetArray[SlotIndex]->GetDragSlotImage().SetDesiredSizeOverride(FVector2D(170, 115));
 }
 
-void UInventoryWidget::SetSlotWidgetImageFromTexture(UInventorySlotWidget*& SlotWidget, UTexture2D* SlotTexture)
+void UInventoryWidget::SetSlotWidgetImageFromTexture(UInventorySlotWidget& SlotWidget, UTexture2D* SlotTexture)
 {
 	if (SlotTexture == nullptr)
 	{
 		SlotTexture = EmptySlotTexture;
 	}
 
-	SlotWidget->GetSlotImage()->SetBrushFromTexture(SlotTexture);
-	SlotWidget->GetDragSlotImage()->SetBrushFromTexture(SlotTexture);
-	SlotWidget->GetDragSlotImage()->SetDesiredSizeOverride(FVector2D(170, 115));
+	SlotWidget.GetSlotImage().SetBrushFromTexture(SlotTexture);
+	SlotWidget.GetDragSlotImage().SetBrushFromTexture(SlotTexture);
+	SlotWidget.GetDragSlotImage().SetDesiredSizeOverride(FVector2D(170, 115));
 }
 
 void UInventoryWidget::SetSlotItemCountText(int32 SlotItemCount, int32 SlotIndex, ETabType TabType)
@@ -135,8 +135,8 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 			check(SlotWidget);
 
 			TabSlotWidgetArray[j] = SlotWidget;
-			TabSlotWidgetArray[j]->GetSlotImage()->SetBrushFromTexture(EmptySlotTexture);
-			TabSlotWidgetArray[j]->GetDragSlotImage()->SetBrushFromTexture(EmptySlotTexture);
+			TabSlotWidgetArray[j]->GetSlotImage().SetBrushFromTexture(EmptySlotTexture);
+			TabSlotWidgetArray[j]->GetDragSlotImage().SetBrushFromTexture(EmptySlotTexture);
 			TabSlotWidgetArray[j]->OnLeftMouseButtonUpDelegate.BindUObject(this, &UInventoryWidget::OnWeaponTabSlotClicked);
 			TabSlotWidgetArray[j]->SetSlotIndex(j);
 			TabSlotWidgetArray[j]->SetTabTypeBelongTo(TabTypeArray[i]);
@@ -148,10 +148,10 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 			WidgetNameString.Append(FString::FromInt(j));
 			WidgetName = FName(WidgetNameString);
 
-			UTextBlock* TextBlock = Cast<UTextBlock>(GetWidgetFromName(WidgetName));
-			check(TextBlock);
+			UTextBlock& TextBlock = *Cast<UTextBlock>(GetWidgetFromName(WidgetName));
+			check(&TextBlock);
 
-			TabItemCountTextArray[j] = TextBlock;
+			TabItemCountTextArray[j] = &TextBlock;
 			TabItemCountTextArray[j]->SetText(FText());
 		}
 

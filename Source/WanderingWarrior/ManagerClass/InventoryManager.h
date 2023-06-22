@@ -39,7 +39,7 @@ private:
 		int32 DragStartInventory, int32 DragEndInventory, 
 		int32 DragStartSlotTabType, int32 DragEndSlotTabType);
 
-	void ExchangeOrMoveInventoryItemInternal(class UInventorySlotData* DragStartSlot, class UInventorySlotData* DragEndSlot,
+	void ExchangeOrMoveInventoryItemInternal(class UInventorySlotData& DragStartSlot, class UInventorySlotData& DragEndSlot,
 		EInventory DragStartInventory, EInventory DragEndInventory,
 		ETabType DragStartSlotTabType, ETabType DragEndSlotTabType);
 

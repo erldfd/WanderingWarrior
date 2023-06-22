@@ -20,15 +20,15 @@ enum class EItemType : uint8
 UENUM()
 enum class EWeaponName : uint8
 {
-	BlackSword,
-	WhiteSword
+	BlackSword UMETA(DisplayName = "BlackSword"),
+	WhiteSword UMETA(DisplayName = "WhiteSword")
 };
 
 UENUM()
 enum class EMiscItemName : uint8
 {
-	HPPotion,
-	MPPotion
+	HPPotion UMETA(DisplayName = "HPPotion"),
+	MPPotion UMETA(DisplayName = "MPPotion")
 };
 
 UENUM()
@@ -45,4 +45,13 @@ enum class ECreditOwner : uint8
 {
 	Player,
 	Marchant1
+};
+
+UENUM()
+enum class EDropItem : uint8
+{
+	None,
+	BlackSword,
+	WhiteSword,
+	HPPotion
 };

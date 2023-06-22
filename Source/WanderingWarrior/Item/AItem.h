@@ -31,7 +31,7 @@ public:
 	void SetItemName(const FText& NewItemName);
 
 	class UTexture2D* GetItemSlotTexture();
-	void SetItemSlotTexture(class UTexture2D* NewTexture);
+	void SetItemSlotTexture(class UTexture2D& NewTexture);
 
 	virtual void Use(const UWorld& World) PURE_VIRTUAL(AAItem::Use, );
 
@@ -43,6 +43,11 @@ public:
 
 	int32 GetBuyPrice();
 	int32 GetSellPrice();
+
+	void SetbisRotatingOnField(bool IsRotating);
+
+	bool GetbIsFieldItem();
+	void SetbIsFieldItem(bool IsFieldItem);
 
 protected:
 
@@ -66,4 +71,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Item)
 	int32 SellPrice;
+
+	UPROPERTY(EditAnywhere, Category = Item)
+	uint8 bIsRotatingOnField : 1;
+
+	UPROPERTY(EditAnywhere, Category = Item)
+	uint8 bIsFieldItem : 1;
 };

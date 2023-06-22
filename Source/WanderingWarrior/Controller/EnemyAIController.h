@@ -31,8 +31,8 @@ public:
 private:
 
 	UPROPERTY()
-	class UBehaviorTree* BTEnemyAI;
+	TObjectPtr<class UBehaviorTree> BTEnemyAI;
 
 	UPROPERTY()
-	class UBlackboardData* BBEnemyAI;
+	TObjectPtr<class UBlackboardData> BBEnemyAI;
 };

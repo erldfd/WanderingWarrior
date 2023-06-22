@@ -16,7 +16,7 @@ void UMainMenuWidget::OnNewGameButtonClicked()
 	UE_LOG(LogTemp, Warning, TEXT("MainMenuWidget, OnNewGamebuttonClicked, NewGameButtonClicked"));
 
 	UWorld* World = GetWorld();
-	check(World != nullptr);
+	check(World);
 
 	UGameplayStatics::OpenLevel(World, "/Game/Maps/TestLevel");
 

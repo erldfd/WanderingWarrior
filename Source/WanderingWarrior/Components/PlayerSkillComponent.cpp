@@ -45,22 +45,22 @@ void UPlayerSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
-	check(PlayerCharacter != nullptr);
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
 
-	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(&PlayerCharacter->GetAnimInstance());
-	check(AnimInstance != nullptr);
+	UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
+	check(&AnimInstance);
 
-	AnimInstance->OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
-	AnimInstance->OnJumpToGroundAnimEndDelegate.AddLambda([this]()-> void {
+	AnimInstance.OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
+	AnimInstance.OnJumpToGroundAnimEndDelegate.AddLambda([this]()-> void {
 
-		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
-		check(PlayerCharacter != nullptr);
+		APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+		check(&PlayerCharacter);
 
-		UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(&PlayerCharacter->GetAnimInstance());
-		check(AnimInstance != nullptr);
+		UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
+		check(&AnimInstance);
 
-		AnimInstance->SetIsPlayingJumpToGroundSkillAnim(false);
+		AnimInstance.SetIsPlayingJumpToGroundSkillAnim(false);
 	});
 	// ...
 	
@@ -78,30 +78,30 @@ void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UPlayerSkillComponent::JumpToGroundSkillImplement()
 {
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
-	check(PlayerCharacter != nullptr);
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
 
-	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(&PlayerCharacter->GetAnimInstance());
-	check(AnimInstance != nullptr);
+	UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
+	check(&AnimInstance);
 
-	if (AnimInstance->IsPlayingSomething())
+	if (AnimInstance.IsPlayingSomething())
 	{
 		return;
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::MoveForward), 0.01, true);
-	AnimInstance->PlayJumpToGrundAnim();
+	AnimInstance.PlayJumpToGrundAnim();
 }
 
 void UPlayerSkillComponent::DamageJumpToGrundSkill()
 {
 	UE_LOG(LogTemp, Warning, TEXT("DamageJumpToGround"));
 
-	UWorld* World = GetWorld();
-	FVector Center = GetOwner()->GetActorLocation();
+	UWorld& World = *GetWorld();
+	const FVector& Center = GetOwner()->GetActorLocation();
 	float Radius = 300;
 
-	if (World == nullptr)
+	if (&World == nullptr)
 	{
 		return;
 	}
@@ -112,10 +112,10 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 	// get forward vector
 	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector SkillLocation = Center + Direction * 150;
-	UGameplayStatics::SpawnEmitterAtLocation(World, PS_RockBurst0, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Rotation, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnEmitterAtLocation(&World, PS_RockBurst0, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Rotation, true, EPSCPoolMethod::AutoRelease);
 	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, GetOwner()->GetActorLocation());
 
-	World->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
+	World.GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
 
 		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
 	}), 1, false, 0.3);
@@ -124,7 +124,7 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
-	bool bResult = World->OverlapMultiByChannel(
+	bool bResult = World.OverlapMultiByChannel(
 		OverlapResults,
 		FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88),
 		FQuat::Identity,
@@ -137,46 +137,46 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			AWWCharacter* Character = Cast<AWWCharacter>(OverlapResult.GetActor());
+			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
 
-			if (Character == nullptr || Character == GetOwner())
+			if (&Character == nullptr || &Character == GetOwner())
 			{
 				continue;
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character->TakeDamage(5, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			Character.TakeDamage(10, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
 
-			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			ensure(PlayerController != nullptr);
+			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (ensure(&PlayerController) == false) return;
 
-			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-			ensure(PlayerInGameWidget != nullptr);
+			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent().GetHPRatio());
-			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
-		DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+		DrawDebugSphere(&World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Red, false, 1, 0, 1);
+	DrawDebugSphere(&World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Red, false, 1, 0, 1);
 }
 
 void UPlayerSkillComponent::MoveForward()
 {
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(GetOwner());
-	check(PlayerCharacter != nullptr);
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
 
 	FHitResult Hit;
-	PlayerCharacter->AddActorWorldOffset(PlayerCharacter->GetActorForwardVector() * 5, true, &Hit);
+	PlayerCharacter.AddActorWorldOffset(PlayerCharacter.GetActorForwardVector() * 5, true, &Hit);
 
 	MoveCount++;
 

@@ -32,18 +32,20 @@ void UAInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	// ...
 }
 
-UInventoryWidget* UAInventory::GetInventoryWidget()
+UInventoryWidget& UAInventory::GetInventoryWidget()
 {
-	return InventoryWidget;
+	check(InventoryWidget);
+	return *InventoryWidget;
 }
 
-void UAInventory::SetInventoryWidget(UInventoryWidget* NewInventoryWidget)
+void UAInventory::SetInventoryWidget(UInventoryWidget& NewInventoryWidget)
 {
-	InventoryWidget = NewInventoryWidget;
+	InventoryWidget = &NewInventoryWidget;
 }
 
-UInventoryComponent* UAInventory::GetInventoryComponent()
+UInventoryComponent& UAInventory::GetInventoryComponent()
 {
-	return InventoryComponent;
+	check(InventoryComponent);
+	return *InventoryComponent;
 }
 

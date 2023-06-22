@@ -15,13 +15,13 @@ bool UBTDecorator_IsDead::CalculateRawConditionValue(UBehaviorTreeComponent& Own
 {
 	bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
-	AWWCharacter* ThisCharacter = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (ThisCharacter == nullptr)
+	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (&ThisCharacter == nullptr)
 	{
 		return true;
 	}
 
-	UWWAnimInstance& AnimInstance = ThisCharacter->GetAnimInstance();
+	UWWAnimInstance& AnimInstance = ThisCharacter.GetAnimInstance();
 	if (AnimInstance.GetIsDead())
 	{
 		return true;

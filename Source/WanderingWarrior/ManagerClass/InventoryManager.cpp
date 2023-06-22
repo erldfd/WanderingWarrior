@@ -30,7 +30,7 @@ void UInventoryManager::InitManager()
 
 void UInventoryManager::BindFunctionToDragDropDelegate(EInventory InventoryType, ETabType InventoryTabType)
 {
-	TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryArray[int(InventoryType)]->GetInventoryWidget()->GetSlotWidgetArray(InventoryTabType);
+	TArray<UInventorySlotWidget*> SlotWidgetArray = InventoryArray[int(InventoryType)]->GetInventoryWidget().GetSlotWidgetArray(InventoryTabType);
 
 	for (int i = 0; i < SlotWidgetArray.Num(); ++i)
 	{
@@ -66,16 +66,16 @@ void UInventoryManager::ExchangeOrMoveInventoryItem(int32 DragStartSlotIndex, in
 		return;
 	}
 
-	UInventorySlotData* DragStartSlot =
-		InventoryArray[DragStartInventory]->GetInventoryComponent()->GetTabArray()[DragStartSlotTabType]->GetSlotFromIndex(DragStartSlotIndex);
-	UInventorySlotData* DragEndSlot =
-		InventoryArray[DragEndInventory]->GetInventoryComponent()->GetTabArray()[DragEndSlotTabType]->GetSlotFromIndex(DragEndSlotIndex);
-	check(DragStartSlot != nullptr);
-	check(DragEndSlot != nullptr);
+	UInventorySlotData& DragStartSlot =
+		InventoryArray[DragStartInventory]->GetInventoryComponent().GetTabArray()[DragStartSlotTabType]->GetSlotFromIndex(DragStartSlotIndex);
+	UInventorySlotData& DragEndSlot =
+		InventoryArray[DragEndInventory]->GetInventoryComponent().GetTabArray()[DragEndSlotTabType]->GetSlotFromIndex(DragEndSlotIndex);
+	check(&DragStartSlot);
+	check(&DragEndSlot);
 
 	if (DragEndInventory != (int)EInventory::CharacterInventory ||
-		(DragEndSlotTabType == (int)ETabType::WeaponTab && DragStartSlot->GetSlotItemData().ItemTypeTag.GetTagName() == "Weapon") ||
-		(DragEndSlotTabType == (int)ETabType::MiscTab && DragStartSlot->GetSlotItemData().ItemTypeTag.GetTagName() == "Misc"))
+		(DragEndSlotTabType == (int)ETabType::WeaponTab && DragStartSlot.GetSlotItemData().ItemTypeTag.GetTagName() == "Weapon") ||
+		(DragEndSlotTabType == (int)ETabType::MiscTab && DragStartSlot.GetSlotItemData().ItemTypeTag.GetTagName() == "Misc"))
 	{
 		ExchangeOrMoveInventoryItemInternal(DragStartSlot, DragEndSlot, 
 			EInventory(DragStartInventory), EInventory(DragEndInventory), 
@@ -85,51 +85,51 @@ void UInventoryManager::ExchangeOrMoveInventoryItem(int32 DragStartSlotIndex, in
 	}
 }
 
-void UInventoryManager::ExchangeOrMoveInventoryItemInternal(class UInventorySlotData* DragStartSlot, class UInventorySlotData* DragEndSlot,
+void UInventoryManager::ExchangeOrMoveInventoryItemInternal(class UInventorySlotData& DragStartSlot, class UInventorySlotData& DragEndSlot,
 	EInventory DragStartInventory, EInventory DragEndInventory,
 	ETabType DragStartSlotTabType, ETabType DragEndSlotTabType)
 {
-	UInventoryWidget* DragStartInventoryWidget = InventoryArray[(int)DragStartInventory]->GetInventoryWidget();
-	UInventoryWidget* DragEndInventoryWidget = InventoryArray[(int)DragEndInventory]->GetInventoryWidget();
+	UInventoryWidget& DragStartInventoryWidget = InventoryArray[(int)DragStartInventory]->GetInventoryWidget();
+	UInventoryWidget& DragEndInventoryWidget = InventoryArray[(int)DragEndInventory]->GetInventoryWidget();
 
 	UInventorySlotWidget* DragStartSlotWidget =
-		DragStartInventoryWidget->GetSlotWidgetArray(DragStartSlotTabType)[DragStartSlot->GetSlotIndex()];
+		DragStartInventoryWidget.GetSlotWidgetArray(DragStartSlotTabType)[DragStartSlot.GetSlotIndex()];
 	UInventorySlotWidget* DragEndSlotWidget =
-		DragEndInventoryWidget->GetSlotWidgetArray(DragEndSlotTabType)[DragEndSlot->GetSlotIndex()];
+		DragEndInventoryWidget.GetSlotWidgetArray(DragEndSlotTabType)[DragEndSlot.GetSlotIndex()];
 
-	if (DragEndSlot->IsEmpty())
+	if (DragEndSlot.IsEmpty())
 	{
-		DragEndSlot->SetSlotItemData(DragStartSlot->GetSlotItemData());
-		DragEndSlot->SetHeldItemCount(DragStartSlot->GetHeldItemCount());
+		DragEndSlot.SetSlotItemData(DragStartSlot.GetSlotItemData());
+		DragEndSlot.SetHeldItemCount(DragStartSlot.GetHeldItemCount());
 
-		DragStartSlot->SetHeldItemCount(0);
+		DragStartSlot.SetHeldItemCount(0);
 
-		DragStartInventoryWidget->SetSlotWidgetImageFromTexture(DragStartSlotWidget);
-		DragStartInventoryWidget->SetSlotItemCountText(0, DragStartSlot->GetSlotIndex(), DragStartSlotTabType);
-		DragStartInventoryWidget->GetSlotWidgetArray(DragStartSlotTabType)[DragStartSlot->GetSlotIndex()]->SetIsEmptySlotImage(true);
+		DragStartInventoryWidget.SetSlotWidgetImageFromTexture(*DragStartSlotWidget);
+		DragStartInventoryWidget.SetSlotItemCountText(0, DragStartSlot.GetSlotIndex(), DragStartSlotTabType);
+		DragStartInventoryWidget.GetSlotWidgetArray(DragStartSlotTabType)[DragStartSlot.GetSlotIndex()]->SetIsEmptySlotImage(true);
 
-		DragEndInventoryWidget->SetSlotWidgetImageFromTexture(DragEndSlotWidget, DragEndSlot->GetSlotItemData().SlotTexture);
-		DragEndInventoryWidget->SetSlotItemCountText(DragEndSlot->GetHeldItemCount(), DragEndSlot->GetSlotIndex(), DragEndSlotTabType);
-		DragEndInventoryWidget->GetSlotWidgetArray(DragEndSlotTabType)[DragEndSlot->GetSlotIndex()]->SetIsEmptySlotImage(false);
+		DragEndInventoryWidget.SetSlotWidgetImageFromTexture(*DragEndSlotWidget, DragEndSlot.GetSlotItemData().SlotTexture);
+		DragEndInventoryWidget.SetSlotItemCountText(DragEndSlot.GetHeldItemCount(), DragEndSlot.GetSlotIndex(), DragEndSlotTabType);
+		DragEndInventoryWidget.GetSlotWidgetArray(DragEndSlotTabType)[DragEndSlot.GetSlotIndex()]->SetIsEmptySlotImage(false);
 	}
-	else if((DragEndSlot->GetSlotItemData().ItemTypeTag.ToString() == "Misc" && DragStartSlotTabType == ETabType::MiscTab) ||
-		(DragEndSlot->GetSlotItemData().ItemTypeTag.ToString() == "Weapon" && DragStartSlotTabType == ETabType::WeaponTab))
+	else if((DragEndSlot.GetSlotItemData().ItemTypeTag.ToString() == "Misc" && DragStartSlotTabType == ETabType::MiscTab) ||
+		(DragEndSlot.GetSlotItemData().ItemTypeTag.ToString() == "Weapon" && DragStartSlotTabType == ETabType::WeaponTab))
 	{
 		
-		TempSwapSlot->SetSlotItemData(DragStartSlot->GetSlotItemData());
-		TempSwapSlot->SetHeldItemCount(DragStartSlot->GetHeldItemCount());
+		TempSwapSlot->SetSlotItemData(DragStartSlot.GetSlotItemData());
+		TempSwapSlot->SetHeldItemCount(DragStartSlot.GetHeldItemCount());
 
-		DragStartSlot->SetSlotItemData(DragEndSlot->GetSlotItemData());
-		DragStartSlot->SetHeldItemCount(DragEndSlot->GetHeldItemCount());
+		DragStartSlot.SetSlotItemData(DragEndSlot.GetSlotItemData());
+		DragStartSlot.SetHeldItemCount(DragEndSlot.GetHeldItemCount());
 
-		DragEndSlot->SetSlotItemData(TempSwapSlot->GetSlotItemData());
-		DragEndSlot->SetHeldItemCount(TempSwapSlot->GetHeldItemCount());
+		DragEndSlot.SetSlotItemData(TempSwapSlot->GetSlotItemData());
+		DragEndSlot.SetHeldItemCount(TempSwapSlot->GetHeldItemCount());
 
-		DragStartInventoryWidget->SetSlotWidgetImageFromTexture(DragStartSlotWidget, DragStartSlot->GetSlotItemData().SlotTexture);
-		DragStartInventoryWidget->SetSlotItemCountText(DragStartSlot->GetHeldItemCount(), DragStartSlot->GetSlotIndex(), DragStartSlotTabType);
+		DragStartInventoryWidget.SetSlotWidgetImageFromTexture(*DragStartSlotWidget, DragStartSlot.GetSlotItemData().SlotTexture);
+		DragStartInventoryWidget.SetSlotItemCountText(DragStartSlot.GetHeldItemCount(), DragStartSlot.GetSlotIndex(), DragStartSlotTabType);
 
-		DragEndInventoryWidget->SetSlotWidgetImageFromTexture(DragEndSlotWidget, DragEndSlot->GetSlotItemData().SlotTexture);
-		DragEndInventoryWidget->SetSlotItemCountText(DragEndSlot->GetHeldItemCount(), DragEndSlot->GetSlotIndex(), DragEndSlotTabType);
+		DragEndInventoryWidget.SetSlotWidgetImageFromTexture(*DragEndSlotWidget, DragEndSlot.GetSlotItemData().SlotTexture);
+		DragEndInventoryWidget.SetSlotItemCountText(DragEndSlot.GetHeldItemCount(), DragEndSlot.GetSlotIndex(), DragEndSlotTabType);
 	}
 }
 

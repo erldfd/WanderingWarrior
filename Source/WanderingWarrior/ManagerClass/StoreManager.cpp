@@ -53,9 +53,9 @@ void UStoreManager::SetStoreWidget(UInventoryWidget* NewStoreWidget)
 	StoreWidget = NewStoreWidget;
 }
 
-void UStoreManager::OpenStore()
+void UStoreManager::OpenStore(UInventoryWidget* InStoreWidget)
 {
-	StoreWidget->SetVisibility(ESlateVisibility::Visible);
+	InStoreWidget->SetVisibility(ESlateVisibility::Visible);
 	//StoreWidget->GetSlotWidgetArray(ETabType::AllTab);
 }
 

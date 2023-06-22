@@ -22,7 +22,7 @@ public:
 
 	UConversationManager();
 
-	void SetConversationWidget(class UConversationWidget* InConversationWidget);
+	void SetConversationWidget(class UConversationWidget& InConversationWidget);
 
 	void SetNPCNameText(const FText& InText);
 
@@ -32,7 +32,7 @@ public:
 
 	void SetConversationScriptDataArray(const TArray<struct FConversationScriptDataRow*>& InConversationScriptDataArray);
 
-	void SetConversationNPC(class ANPCCharacter* NPC);
+	void SetConversationNPC(class ANPCCharacter& NPC);
 
 	void OpenConversationWidget();
 
@@ -55,13 +55,14 @@ private:
 	UFUNCTION()
 	void OnAnswerButtonClickedSignature(int32 ButtonIndex);
 
+	void OpenStore();
+
 private:
 
 	UPROPERTY()
 	TObjectPtr<class UConversationWidget> ConversationWidget;
 
 	TArray<struct FConversationScriptDataRow*> ConversationScriptDataArray;
-
 
 	int8 bIsConversationWidgetOpened : 1;
 

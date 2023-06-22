@@ -23,7 +23,7 @@ UMarchantInventory::UMarchantInventory()
 	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
 
 	TabArray[0] = CreateDefaultSubobject<UInventoryTabData>(TEXT("AllTab"));
-	check(TabArray[0] != nullptr);
+	check(TabArray[0]);
 	TabArray[0]->InitSlots(SlotCount::MARCHANT_SLOT_COUNT);
 	TabArray[0]->SetTabType(ETabType::AllTab);
 
@@ -32,58 +32,58 @@ UMarchantInventory::UMarchantInventory()
 
 bool UMarchantInventory::ObtainItem(EWeaponName WeaponName)
 {
-	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	check(GameInstance);
+	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	check(&GameInstance);
 
-	FItemDataRow* ItemData = GameInstance->GetWeaponData(WeaponName);
+	const FItemDataRow& ItemData = GameInstance.GetWeaponData(WeaponName);
 
-	if (ItemData == nullptr)
+	if (&ItemData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UMarchantInventory::ObtainItem, ItemData == nullptr"));
 		return false;
 	}
 
-	return ObtainItem(*ItemData, InventoryComponent->GetTabArray()[int(ETabType::WeaponTab)]);
+	return ObtainItem(ItemData, *InventoryComponent->GetTabArray()[int(ETabType::WeaponTab)]);
 }
 
 bool UMarchantInventory::ObtainItem(EMiscItemName MiscItemName)
 {
-	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
-	check(GameInstance);
+	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	check(&GameInstance);
 
-	FItemDataRow* ItemData = GameInstance->GetMiscItemData(MiscItemName);
+	const FItemDataRow& ItemData = GameInstance.GetMiscItemData(MiscItemName);
 
-	if (ItemData == nullptr)
+	if (&ItemData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UMarchantInventory::ObtainItem, ItemData == nullptr"));
 		return false;
 	}
 
 
-	return ObtainItem(*ItemData, InventoryComponent->GetTabArray()[int(ETabType::MiscTab)]);
+	return ObtainItem(ItemData, *InventoryComponent->GetTabArray()[int(ETabType::MiscTab)]);
 }
 
-bool UMarchantInventory::ObtainItem(const FItemDataRow& NewItemData, class UInventoryTabData* Tab)
+bool UMarchantInventory::ObtainItem(const FItemDataRow& NewItemData, class UInventoryTabData& Tab)
 {
 	check(InventoryWidget);
 
-	UInventorySlotData* Slot = Tab->GetHoldableItemSlot();
+	UInventorySlotData& Slot = *Tab.GetHoldableItemSlot();
 
-	ETabType TabType = Tab->GetTabType();
+	ETabType TabType = Tab.GetTabType();
 
-	if (Slot == nullptr)
+	if (&Slot == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UMarchantInventory::ObtainItem, Slot == nullptr"));
 		return false;
 	}
 
-	Slot->SetSlotItemData(NewItemData);
+	Slot.SetSlotItemData(NewItemData);
 
-	int SlotIndex = Slot->GetSlotIndex();
+	int SlotIndex = Slot.GetSlotIndex();
 	InventoryWidget->SetSlotWidgetImageFromTexture(TabType, SlotIndex, NewItemData.SlotTexture);
 
-	Slot->SetHeldItemCount(Slot->GetHeldItemCount() + 1);
-	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), SlotIndex, TabType);
+	Slot.SetHeldItemCount(Slot.GetHeldItemCount() + 1);
+	InventoryWidget->SetSlotItemCountText(Slot.GetHeldItemCount(), SlotIndex, TabType);
 
 	TArray<UInventorySlotWidget*>& SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(TabType);
 	SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(false);
@@ -93,21 +93,21 @@ bool UMarchantInventory::ObtainItem(const FItemDataRow& NewItemData, class UInve
 
 void UMarchantInventory::RemoveAllItem(int32 SlotIndex)
 {
-	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(SlotIndex);
+	UInventorySlotData& Slot = InventoryComponent->GetCurrentActivatedTab().GetSlotFromIndex(SlotIndex);
 
-	Slot->ClearSlotItem();
+	Slot.ClearSlotItem();
 }
 
 bool UMarchantInventory::UseSlotItemFormSlotIndex(int32 Index)
 {
-	UInventorySlotData*& Slot = InventoryComponent->GetCurrentActivatedTab()->GetSlotFromIndex(Index);
+	UInventorySlotData& Slot = InventoryComponent->GetCurrentActivatedTab().GetSlotFromIndex(Index);
 
 	return UseSlotItemFromSlot(Slot);
 }
 
-bool UMarchantInventory::UseSlotItemFromSlot(UInventorySlotData*& Slot)
+bool UMarchantInventory::UseSlotItemFromSlot(UInventorySlotData& Slot)
 {
-	if (Slot == nullptr || Slot->GetHeldItemCount() == 0)
+	if (&Slot == nullptr || Slot.GetHeldItemCount() == 0)
 	{
 		return false;
 	}
@@ -115,18 +115,18 @@ bool UMarchantInventory::UseSlotItemFromSlot(UInventorySlotData*& Slot)
 	UWorld* World = GetWorld();
 	check(World);
 
-	Slot->UseSlotItem(*World);
+	Slot.UseSlotItem(*World);
 
-	ETabType CurrentActivatedTabType = InventoryComponent->GetCurrentActivatedTab()->GetTabType();
+	ETabType CurrentActivatedTabType = InventoryComponent->GetCurrentActivatedTab().GetTabType();
 
-	InventoryWidget->SetSlotItemCountText(Slot->GetHeldItemCount(), Slot->GetSlotIndex(), CurrentActivatedTabType);
+	InventoryWidget->SetSlotItemCountText(Slot.GetHeldItemCount(), Slot.GetSlotIndex(), CurrentActivatedTabType);
 
-	if (Slot->GetHeldItemCount() == 0)
+	if (Slot.GetHeldItemCount() == 0)
 	{
-		int SlotIndex = Slot->GetSlotIndex();
+		int SlotIndex = Slot.GetSlotIndex();
 
 		check(InventoryWidget);
-		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, Slot->GetSlotIndex());
+		InventoryWidget->SetSlotWidgetImageFromTexture(CurrentActivatedTabType, Slot.GetSlotIndex());
 
 		TArray<UInventorySlotWidget*>& SlotWidgetArray = InventoryWidget->GetSlotWidgetArray(CurrentActivatedTabType);
 		SlotWidgetArray[SlotIndex]->SetIsEmptySlotImage(true);
