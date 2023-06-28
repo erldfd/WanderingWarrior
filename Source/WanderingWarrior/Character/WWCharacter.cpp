@@ -89,6 +89,7 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		bIsAnimMoveStart = false;
 		FVector MoveDir = GetActorLocation() - DamageCauser->GetActorLocation();
 		MoveDir.Normalize();
+		MoveDir.Z = 0;
 		//GetMovementComponent()->AddInputVector(MoveDir * 5);
 		//SetActorLocation(GetActorLocation() + MoveDir * 200);
 		AddActorWorldTransform(FTransform(MoveDir * 100));

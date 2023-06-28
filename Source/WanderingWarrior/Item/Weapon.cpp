@@ -52,13 +52,13 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 	
 	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(OtherActor);
-	ensure(EnemyCharacter);
+	if(ensure(EnemyCharacter) == false) return;
 
 	AWWGameMode* GameMode = Cast<AWWGameMode>(GetWorld()->GetAuthGameMode());
-	ensure(GameMode);
+	if(ensure(GameMode) == false) return;
 
 	UWWAnimInstance* PlayerAnimInstance = GameMode->GetPlayerAnimInstance();
-	ensure(PlayerAnimInstance);
+	if(ensure(PlayerAnimInstance) == false) return;
 
 	bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
 
@@ -66,14 +66,17 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		EnemyCharacter->SetIsDamaged(true);
 
+		static AActor& WeaponOwner = *GetOwner();
+		if (ensure(&WeaponOwner) == false) return;
+
+		static AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(WeaponOwner.GetInstigatorController());
+		if (ensure(&PlayerController) == false) return;
+
 		FDamageEvent DamageEvent;
-		EnemyCharacter->TakeDamage(AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+		EnemyCharacter->TakeDamage(AttackDamage, DamageEvent, &PlayerController, &WeaponOwner);
 
-		AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-		if (ensure(PlayerController)) return;
-
-		UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
-		if (ensure(&PlayerInGameWidget)) return;
+		UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+		if (ensure(&PlayerInGameWidget) == false) return;
 
 		PlayerInGameWidget.SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent().GetHPRatio());
 		PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
