@@ -22,8 +22,6 @@ void UConversationWidget::NativeOnInitialized()
 		FName WidgetName(WidgetString);
 
 		NPCConversationTextBlockArray.Emplace(Cast<UTextBlock>(GetWidgetFromName(WidgetName)));
-		UE_LOG(LogTemp, Warning, TEXT("UConversationWidget, NativeOnInitialized, NPCConversationTextBlockArray %d is Valid index ? : %d"),
-			i, NPCConversationTextBlockArray.IsValidIndex(i));
 	}
 
 	AnswerTextBlockArray.Reserve(4);
@@ -35,8 +33,6 @@ void UConversationWidget::NativeOnInitialized()
 		FName WidgetName(WidgetString);
 
 		AnswerTextBlockArray.Emplace(Cast<UTextBlock>(GetWidgetFromName(WidgetName)));
-		UE_LOG(LogTemp, Warning, TEXT("UConversationWidget, NativeOnInitialized, AnswerTextBlockArray %d is Valid index ? : %d"),
-			i, AnswerTextBlockArray.IsValidIndex(i));
 	}
 
 	AnswerButtonArray.Reserve(4);
@@ -48,8 +44,6 @@ void UConversationWidget::NativeOnInitialized()
 		FName WidgetName(WidgetString);
 
 		AnswerButtonArray.Emplace(Cast<UConversationAnswerButton>(GetWidgetFromName(WidgetName)));
-		UE_LOG(LogTemp, Warning, TEXT("UConversationWidget, NativeOnInitialized, AnswerButtonArray %d is Valid index ? : %d"),
-			i, AnswerButtonArray.IsValidIndex(i));
 
 		AnswerButtonArray[i]->SetButtonIndex(i);
 		AnswerButtonArray[i]->OnButtonClickedSignature.BindUObject(this, &UConversationWidget::OnAnswerButtonClicked);

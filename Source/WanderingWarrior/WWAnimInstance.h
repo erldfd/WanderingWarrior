@@ -30,6 +30,7 @@ public:
 
 	UWWAnimInstance();
 
+	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	void PlayAttackMontage();
@@ -126,5 +127,6 @@ private:
 
 	int32 ComboCount;
 
-	
+	UPROPERTY(EditAnywhere, meta = (PrivateAccess = true))
+	float HitAnimRate;
 };

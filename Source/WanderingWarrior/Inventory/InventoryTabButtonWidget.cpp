@@ -6,7 +6,6 @@
 UInventoryTabButtonWidget::UInventoryTabButtonWidget()
 {
 	OnClicked.AddDynamic(this, &UInventoryTabButtonWidget::OnTabButtonClicked);
-	UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, UInventoryTabButtonWidget, OnClicked is bound? : %d"), OnClicked.IsBound());
 }
 
 void UInventoryTabButtonWidget::InitSlotWidgetArray(int32 SlotWidgetCount)
@@ -48,7 +47,6 @@ void UInventoryTabButtonWidget::OnTabButtonClicked()
 	if (OnTabButtonClickedDelegate.IsBound())
 	{
 		OnTabButtonClickedDelegate.Execute(int(TabType));
-		UE_LOG(LogTemp, Warning, TEXT("InventoryTabButton, OnTabButtonClicked, OnTabButtonClickedDelegate.Execute(int(%d))"), int(TabType));
 	}
 	else
 	{

@@ -87,5 +87,4 @@ ETabType UInventoryTabData::GetTabType()
 void UInventoryTabData::SetTabType(ETabType NewTabType)
 {
 	TabType = NewTabType;
-	UE_LOG(LogTemp, Warning, TEXT("TabType : %d"), TabType);
 }

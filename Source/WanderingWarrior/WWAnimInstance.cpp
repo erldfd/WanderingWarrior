@@ -3,6 +3,10 @@
 
 #include "WWAnimInstance.h"
 
+#include "Character/EnemyCharacter.h"
+#include "Character/NPCCharacter.h"
+#include "Character/PlayerCharacter.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Actor.h"
 
@@ -24,6 +28,33 @@ UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0)
 	if (CHARACTER_HIT_MONTAGE.Succeeded())
 	{
 		CharacterHitMongtage = CHARACTER_HIT_MONTAGE.Object;
+	}
+}
+
+void UWWAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	APawn& Pawn = *TryGetPawnOwner();
+
+	if (IsValid(&Pawn) == false)
+	{
+		return;
+	}
+
+	AEnemyCharacter& Enemy = *Cast<AEnemyCharacter>(&Pawn);
+
+	if (&Enemy)
+	{
+		HitAnimRate = 0.8f;
+		return;
+	}
+	
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(&Pawn);
+
+	if (&Player)
+	{
+		HitAnimRate = 1.5f;
 	}
 }
 
@@ -128,8 +159,10 @@ void UWWAnimInstance::PlayCharacterHitMontage()
 {
 	InitBoolCondition();
 	bIsPlayingCharacterHitMontage = true;
-	ensure(CharacterHitMongtage != nullptr);
-	Montage_Play(CharacterHitMongtage);
+
+	if (ensure(CharacterHitMongtage) == false) return;
+
+	Montage_Play(CharacterHitMongtage, HitAnimRate);
 }
 
 bool UWWAnimInstance::GetIsPlayingCharacterHitMontage()

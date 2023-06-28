@@ -18,8 +18,6 @@
 void UInventoryWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-
-	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget NativeOnInitailized"));
 }
 
 TArray<UInventorySlotWidget*>& UInventoryWidget::GetSlotWidgetArray(ETabType TabType)
@@ -110,7 +108,6 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 		TabButtonArray[i] = Cast<UInventoryTabButtonWidget>(GetWidgetFromName(WidgetName));
 		check(TabButtonArray[i]);
 
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, InitInventoryWidget, TabButtonArray%d is null? : %d, WidgetName : %s"), i, TabButtonArray[i] == nullptr, *WidgetName.ToString());
 		TabButtonArray[i]->InitSlotWidgetArray(SlotCount);
 		TabButtonArray[i]->InitSlotItemCountTextArray(SlotCount);
 		TabButtonArray[i]->SetTabType(TabTypeArray[i]);
@@ -156,13 +153,11 @@ void UInventoryWidget::InitInventoryWidget(const FInventoryWidgetSettings& Setti
 		}
 
 		TabButtonArray[i]->OnTabButtonClickedDelegate.BindUObject(this, &UInventoryWidget::ConvertTab);
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, InitInventoryWidget, TabButton_%d Onclicked is Bound? : %d"), i, TabButtonArray[i]->OnTabButtonClickedDelegate.IsBound());
 	}
 
 	if (TabButtonArray.Num() > 1)
 	{
 		InventoryWidgetTabSwitcher = Cast<UWidgetSwitcher>(GetWidgetFromName(TEXT("InventoryWidgetTabSwitcher")));
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, InitInventoryWidget, InventoryWidgetTabSwitcher is null? : %d"), InventoryWidgetTabSwitcher == nullptr);
 	}
 }
 
@@ -173,8 +168,6 @@ void UInventoryWidget::SetInventoryType(EInventory NewInventoryType)
 
 void UInventoryWidget::OnWeaponTabSlotClicked(int32 SlotIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnWeaponTabSlotClicked"));
-
 	auto WeaponTabSlotWidgetArray = TabButtonArray[int(ETabType::WeaponTab)]->GetSlotWidgetArray();
 	auto WeaponTabItemCountTextArray = TabButtonArray[int(ETabType::WeaponTab)]->GetSlotItemCountTextArray();
 
@@ -196,21 +189,19 @@ void UInventoryWidget::OnWeaponTabSlotClicked(int32 SlotIndex)
 
 void UInventoryWidget::OnMiscTabSlotClicked(int32 SlotIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget : OnMiscTabSlotClicked"));
-
 	auto MiscTabSlotWidgetArray = TabButtonArray[int(ETabType::MiscTab)]->GetSlotWidgetArray();
 	auto MiscTabItemCountTextArray = TabButtonArray[int(ETabType::MiscTab)]->GetSlotItemCountTextArray();
 
 	if (MiscTabSlotWidgetArray.IsValidIndex(SlotIndex) == false ||
 		MiscTabSlotWidgetArray[SlotIndex] == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnMiscTabSlotClicked, It is invailed index"));
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnMiscTabSlotClicked, It is invailed index"));
 		return;
 	}
 
 	if (OnSlotImageWidgetClickedDelegate.IsBound() == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnSlotImageWidgetClickedDelegate is not bound."));
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnMiscTabSlotClicked, OnSlotImageWidgetClickedDelegate is not bound."));
 		return;
 	}
 
@@ -223,7 +214,7 @@ void UInventoryWidget::ConvertTab(int32 TabNum)
 
 	if (OnConvertTabDelegate.IsBound() == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnConvertTabDelegate is not bound."));
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::ConvertTab, OnConvertTabDelegate is not bound."));
 		return;
 	}
 
@@ -236,7 +227,7 @@ void UInventoryWidget::ConvertToWeaponTab()
 
 	if (OnConvertTabDelegate.IsBound() == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnConvertTabDelegate is not bound."));
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::ConvertToWeaponTab, OnConvertTabDelegate is not bound."));
 		return;
 	}
 
@@ -249,7 +240,7 @@ void UInventoryWidget::ConvertToMiscTab()
 
 	if (OnConvertTabDelegate.IsBound() == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventoryWidget, OnConvertTabDelegate is not bound."));
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::ConvertToMiscTab, OnConvertTabDelegate is not bound."));
 		return;
 	}
 

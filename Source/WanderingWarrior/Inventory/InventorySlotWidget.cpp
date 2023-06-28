@@ -69,7 +69,6 @@ void UInventorySlotWidget::NativeOnInitialized()
 
 FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonDown, Index : %d"), SlotIndex);
 	FEventReply reply;
 
 	reply.NativeReply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -121,8 +120,6 @@ FReply UInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, 
 void UInventorySlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
-
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseEnter, Index : %d"), SlotIndex);
 	
 	bIsMouseEntered = true;
 
@@ -138,8 +135,6 @@ void UInventorySlotWidget::NativeOnMouseEnter(const FGeometry& InGeometry, const
 void UInventorySlotWidget::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
-
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseLeave, Index : %d"), SlotIndex);
 
 	bIsMouseEntered = false;
 
@@ -158,8 +153,6 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 
 	check(InventoryDragDropOperation);
 	check(DragSlotImage);
-	
-	UE_LOG(LogTemp, Warning, TEXT("Parent : %s"), *DragSlotImage->GetParent()->GetName());
 
 	DragSlotImage->SetVisibility(ESlateVisibility::Visible);
 	InventoryDragDropOperation->DefaultDragVisual = Cast<UWidget>(DragSlotImage);
@@ -168,7 +161,6 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 	InventoryDragDropOperation->Pivot = EDragPivot::MouseDown;
 
 	OutOperation = InventoryDragDropOperation;
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnDragDetected, Index : %d"), SlotIndex);
 }
 
 bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -178,7 +170,6 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	check(&Operation);
 
 	StartDragSlotIndex = Operation.GetStartDragSlotIndex();
-	UE_LOG(LogTemp, Warning, TEXT("StartDragSlotIndex : %d"), Operation.GetStartDragSlotIndex());
 
 	UImage& Image = *Cast<UImage>(InOperation->DefaultDragVisual);
 	check(&Image);
@@ -187,11 +178,9 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 
 	if (OnDragDropInventoryItemDelegate.IsBound() == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidget, NativeOnDrop, OnDragDropInventoryItemDelegate is not bound"));
+		UE_LOG(LogTemp, Warning, TEXT("InventorySlotWidget, NativeOnDrop, OnDragDropInventoryItemDelegate is NOT bound"));
 		return false;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Start TabType : %d, EndTabType : %d"), Operation.GetTabTypeBelongTo(), InventoryDragDropOperation->GetTabTypeBelongTo());
 
 	//param : DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType
 	OnDragDropInventoryItemDelegate.Execute(StartDragSlotIndex, SlotIndex, 
@@ -204,25 +193,20 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 void UInventorySlotWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragEnter(InGeometry, InDragDropEvent, InOperation);
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnDragEnter, Index : %d"), SlotIndex);
 }
 
 void UInventorySlotWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnDragLeave, Index : %d"), SlotIndex);
 }
 
 bool UInventorySlotWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("NativeOnDragOver, Index : %d"), SlotIndex);
 	return false;
 }
 
 void UInventorySlotWidget::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	UE_LOG(LogTemp, Warning, TEXT("NativeOnDragCancelled, Index : %d"), SlotIndex);
-
 	UImage& Image = *Cast<UImage>(InOperation->DefaultDragVisual);
 	check(&Image);
 

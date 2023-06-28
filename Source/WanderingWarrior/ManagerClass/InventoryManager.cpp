@@ -35,8 +35,6 @@ void UInventoryManager::BindFunctionToDragDropDelegate(EInventory InventoryType,
 	for (int i = 0; i < SlotWidgetArray.Num(); ++i)
 	{
 		SlotWidgetArray[i]->OnDragDropInventoryItemDelegate.BindUObject(this, &UInventoryManager::OnDragDropInventoryItem);
-		
-		UE_LOG(LogTemp, Warning, TEXT("InventoryManager, BindFunctionToDragDropDelegate, OnDragDropInventoryItemDelegate is bound? : %d"), SlotWidgetArray[i]->OnDragDropInventoryItemDelegate.IsBound());
 	}
 }
 

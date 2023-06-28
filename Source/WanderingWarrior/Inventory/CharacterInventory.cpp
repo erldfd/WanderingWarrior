@@ -58,15 +58,11 @@ void UCharacterInventory::OnComponentCreated()
 void UCharacterInventory::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("CharacterInventory, BeginPlay"));
+
 	check(InventoryWidget);
 
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UCharacterInventory::OnSlotImageWidgetClicked);
-	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CharacterInventory, BeginPlay, OnSlotImageWidgetClickedDelegate is Bound"));
-	}
-	else
+	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound() == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CharacterInventory, BeginPlay, OnSlotImageWidgetClickedDelegate is NOT Bound"));
 	}

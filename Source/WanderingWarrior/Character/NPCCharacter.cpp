@@ -8,7 +8,8 @@
 
 ANPCCharacter::ANPCCharacter()
 {
-	Inventory = CreateDefaultSubobject<UMarchantInventory>(TEXT("NPCInventory"));
+	Inventory = CreateDefaultSubobject<UMarchantInventory>(TEXT("MarchantInventory"));
+	UE_LOG(LogTemp, Warning, TEXT("ANPCCharacter::ANPCCharacter, this name : %s, Inventory is nullptr? : %d"), *GetName(), Inventory == nullptr);
 }
 
 void ANPCCharacter::BeginPlay()
@@ -41,7 +42,7 @@ const FString& ANPCCharacter::GetNPCName() const
 	return NPCName;
 }
 
-UMarchantInventory& ANPCCharacter::GetInventory()
+UMarchantInventory& ANPCCharacter::GetInventory() const
 {
 	return *Inventory;
 }

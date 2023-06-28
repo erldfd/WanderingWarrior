@@ -25,7 +25,7 @@ public:
 
 	const FString& GetNPCName() const;
 
-	class UMarchantInventory& GetInventory();
+	class UMarchantInventory& GetInventory() const;
 
 protected:
 
@@ -33,7 +33,7 @@ protected:
 
 private:
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (PrivateAccess = true), Category = "Inventory")
 	TObjectPtr<class UMarchantInventory> Inventory;
 
 	UPROPERTY(EditAnywhere)

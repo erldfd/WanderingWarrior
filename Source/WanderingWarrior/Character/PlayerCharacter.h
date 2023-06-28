@@ -58,7 +58,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UInventorySlotData> TempSwapSlot;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (PrivateAccess = true), Category = "Inventory")
 	TObjectPtr<class UCharacterInventory> Inventory;
 
 	UPROPERTY()

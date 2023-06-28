@@ -36,7 +36,7 @@ AWWPlayerController::AWWPlayerController() : bIsInputModeGameOnly(true)
 void AWWPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-	UE_LOG(LogTemp, Warning, TEXT("PalyerController OnPossess"));
+	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::AWWPlayerController, PalyerController OnPossess"));
 
 	PlayerCharacter = Cast<APlayerCharacter>(aPawn);
 	CharacterStat = &PlayerCharacter->GetCharacterStatComponent();
@@ -53,16 +53,14 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	PlayerInventory.SetInventoryWidget(*InGameWidget->GetInventoryWidget());
 	PlayerInventory.SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
-	TArray<AActor*> NPCCharacterArray;
-	UGameplayStatics::GetAllActorsOfClass(this, ANPCCharacter::StaticClass(), NPCCharacterArray);
+	TempMarchantCharacter = Cast<ANPCCharacter>(UGameplayStatics::GetActorOfClass(this, ANPCCharacter::StaticClass()));
+	ensure(TempMarchantCharacter);
 
-	TempMarchantCharacter = Cast<ANPCCharacter>(NPCCharacterArray[0]);
-	check(TempMarchantCharacter);
+	UMarchantInventory* MarchantInventory = &TempMarchantCharacter->GetInventory();
+	check(MarchantInventory);
 
-	UMarchantInventory& MarchantInventory = TempMarchantCharacter->GetInventory();
-	check(&MarchantInventory);
-
-	MarchantInventory.SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
+	MarchantInventory->SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
+	
 
 	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
 	GameInstance.GetConversationManager().SetConversationWidget(*InGameWidget->GetConversationWidget());
@@ -74,7 +72,12 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 
-	OnKeyEPressedSignature.AddUObject(this, &AWWPlayerController::OnMarchantConversation);
+	OnKeyEPressedSignature.AddUObject(this, &AWWPlayerController::OnInteraction);
+
+	if (OnKeyEPressedSignature.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, OnKeyEPressedSignature is NOT Bound"));
+	}
 }
 
 UInGameWidget& AWWPlayerController::GetInGameWidget()
@@ -250,6 +253,14 @@ void AWWPlayerController::OnKeyEButtonPressed()
 		return;
 	}
 
+	
+
+	if (OnKeyEPressedSignature.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnKeyEButtonPressed, OnKeyEPressedSignature.IsBound() == false"));
+		return;
+	}
+
 	for (int32 i = 0; i < OverlapResults.Num(); ++i)
 	{
 		check(&OverlapResults[i]);
@@ -277,17 +288,15 @@ void AWWPlayerController::OnKeyEButtonPressed()
 
 			bIsInputModeGameOnly = false;
 			// 임시 UI 코드
-			return;
+			break;
 		}
 	}
 
-	if (OnKeyEPressedSignature.IsBound())
-	{
-		OnKeyEPressedSignature.Broadcast(OverlapResults);
-	}
+	OnKeyEPressedSignature.Broadcast(OverlapResults);
 }
 
-void AWWPlayerController::OnMarchantConversation(const TArray<FOverlapResult>& OverlapResults)
+void AWWPlayerController::OnInteraction(const TArray<FOverlapResult>& OverlapResults)
 {
+	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnInteraction"));
 	Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this))->GetInteractionManager().AnalyzeInteraction(OverlapResults);
 }

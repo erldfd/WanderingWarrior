@@ -38,15 +38,10 @@ void UCharacterQuickSlot::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("CharacterQuickSlot, BeginPlay"));
 	check(InventoryWidget);
 
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UCharacterQuickSlot::OnSlotImageWidgetClicked);
-	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("CharacterQuickSlot, BeginPlay, OnSlotImageWidgetClickedDelegate is Bound"));
-	}
-	else
+	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound() == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("CharacterQuickSlot, BeginPlay, OnSlotImageWidgetClickedDelegate is NOT Bound"));
 	}

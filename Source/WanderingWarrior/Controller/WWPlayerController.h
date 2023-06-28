@@ -59,7 +59,7 @@ private:
 	void OnKeyEButtonPressed();
 
 	UFUNCTION()
-	void OnMarchantConversation(const TArray<FOverlapResult>& OverlapResults);
+	void OnInteraction(const TArray<FOverlapResult>& OverlapResults);
 
 private:
 
@@ -75,7 +75,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<class APlayerCharacter> PlayerCharacter;
 
-	UPROPERTY(EditAnywhere, meta = (PrivateAccess = true))
+	UPROPERTY()
 	TObjectPtr<class ANPCCharacter> TempMarchantCharacter;
 
 	uint8 bIsInputModeGameOnly : 1;

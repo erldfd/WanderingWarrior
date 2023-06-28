@@ -76,6 +76,8 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	CharacterStatComponent->SetHP(HPAfterDamage);
 
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
 	if (HPAfterDamage <= 0)
 	{
 		AnimInstance->SetIsDead(true);
@@ -85,9 +87,15 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	{
 		AnimInstance->PlayCharacterHitMontage();
 		bIsAnimMoveStart = false;
+		FVector MoveDir = GetActorLocation() - DamageCauser->GetActorLocation();
+		MoveDir.Normalize();
+		//GetMovementComponent()->AddInputVector(MoveDir * 5);
+		//SetActorLocation(GetActorLocation() + MoveDir * 200);
+		AddActorWorldTransform(FTransform(MoveDir * 100));
+		//AddActorWorldOffset(MoveDir * 5);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Damage : %f, ActorHP : %f, Actor : %s"), Damage, HPAfterDamage, *GetName());
+	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamage, Damage : %f, ActorHP : %f, Actor : %s"), Damage, HPAfterDamage, *GetName());
 	return Damage;
 }
 
@@ -114,6 +122,16 @@ void AWWCharacter::Tick(float DeltaTime)
 		{
 			AttackMoveSpeed = 5;
 		}
+	}
+
+	if (AnimInstance->GetIsPlayingCharacterHitMontage())
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	}
+	else if(GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_None)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		//GetCharacterMovement()->SetDefaultMovementMode();
 	}
 }
 

@@ -73,11 +73,6 @@ void UConversationManager::SetConversationScriptDataArray(const TArray<FConversa
 {
 	ConversationScriptDataArray = InConversationScriptDataArray;
 	if (ensure(ConversationScriptDataArray.Num() > 0) == false) return;
-
-	for (int i = 0; i < ConversationScriptDataArray.Num(); ++i)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UConversationManager, SetConversationScriptDataArray, %d"), ConversationScriptDataArray[i]->Index);
-	}
 }
 
 void UConversationManager::SetConversationNPC(ANPCCharacter& NPC)

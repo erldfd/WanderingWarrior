@@ -26,7 +26,11 @@ AWeapon::AWeapon() : AttackDamage(1)
 	BoxComponent->SetCollisionProfileName(TEXT("PlayerWeaponProfile"));
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnMeshBeginOverlap);
 	BoxComponent->SetGenerateOverlapEvents(true);
-	UE_LOG(LogTemp, Warning, TEXT("Mesh Overlap Fn Bound? %d"), BoxComponent->OnComponentBeginOverlap.IsBound());
+
+	if (BoxComponent->OnComponentBeginOverlap.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::AWeapon, BoxComponent->OnComponentBeginOverlap is NOT bound"));
+	}
 	
 	BoxComponent->SetupAttachment(RootComponent);
 	//BoxComponent->SetBoxExtent(FVector(32, 32, 32));
@@ -63,7 +67,7 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		EnemyCharacter->SetIsDamaged(true);
 
 		FDamageEvent DamageEvent;
-		EnemyCharacter->TakeDamage(AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), this);
+		EnemyCharacter->TakeDamage(AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
 
 		AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
 		if (ensure(PlayerController)) return;
