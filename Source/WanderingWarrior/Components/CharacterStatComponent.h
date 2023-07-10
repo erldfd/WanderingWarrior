@@ -31,6 +31,9 @@ public:
 	float GetAttackDamage();
 	void SetAttackDamage(float Damage);
 
+	float GetMaxHP();
+	void SetMaxHP(float NewMaxHP);
+
 public:
 
 	FOnHPChangedDelegate OnHPChangedDelegate;

@@ -92,8 +92,9 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		MoveDir.Z = 0;
 		//GetMovementComponent()->AddInputVector(MoveDir * 5);
 		//SetActorLocation(GetActorLocation() + MoveDir * 200);
-		AddActorWorldTransform(FTransform(MoveDir * 100));
+		/*AddActorWorldTransform(FTransform(MoveDir * 100));*/
 		//AddActorWorldOffset(MoveDir * 5);
+		StartKnockback(MoveDir, 1000, 0.1);
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamage, Damage : %f, ActorHP : %f, Actor : %s"), Damage, HPAfterDamage, *GetName());
@@ -133,6 +134,18 @@ void AWWCharacter::Tick(float DeltaTime)
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		//GetCharacterMovement()->SetDefaultMovementMode();
+	}
+
+	if (bIsKnockbackStarted)
+	{
+		FVector NewLocation = FMath::VInterpTo(GetActorLocation(), GetActorLocation() + KnockbackDirection * KnockbackStrength, DeltaTime, 1.0f);
+		FHitResult Hit;
+		SetActorLocation(NewLocation, true, &Hit);
+
+		if (Hit.IsValidBlockingHit())
+		{
+			bIsKnockbackStarted = false;
+		}
 	}
 }
 
@@ -328,6 +341,22 @@ void AWWCharacter::EquipWeapon(AWeapon* Weapon)
 		Weapon->SetOwner(this);
 		CurrentWeapon = Weapon;
 	}
+}
+
+void AWWCharacter::StartKnockback(FVector Direction, float Strength, float Duration)
+{
+	bIsKnockbackStarted = true;
+	KnockbackDirection = Direction;
+	KnockbackStrength = Strength;
+
+	GetWorldTimerManager().SetTimer(KnockbackTimerHandle, this, &AWWCharacter::StopKnockback, Duration, false);
+}
+
+void AWWCharacter::StopKnockback()
+{
+	bIsKnockbackStarted = false;
+	KnockbackDirection = FVector::Zero();
+	KnockbackStrength = 0;
 }
 
 void AWWCharacter::OnAnimMoveStart()

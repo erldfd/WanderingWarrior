@@ -11,7 +11,7 @@
 
 UBTDecorator_IsInAttackRange::UBTDecorator_IsInAttackRange()
 {
-
+	AttackRange = 300;
 }
 
 bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
@@ -36,7 +36,7 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 		return false;
 	}
 
-	bResult = (Target->GetDistanceTo(&ThisCharacter) <= 200);
+	bResult = (Target->GetDistanceTo(&ThisCharacter) <= AttackRange);
 
 	return bResult;
 }

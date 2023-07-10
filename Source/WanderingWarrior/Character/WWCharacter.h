@@ -54,6 +54,9 @@ protected:
 
 	void TestAction();
 
+	void StartKnockback(FVector Direction, float Strength, float Duration);
+	void StopKnockback();
+
 protected:
 
 	UPROPERTY()
@@ -88,4 +91,9 @@ private:
 	uint8 bIsAnimMoveStart : 1;
 
 	float AttackMoveSpeed;
+
+	uint8 bIsKnockbackStarted : 1;
+	FVector KnockbackDirection;
+	float KnockbackStrength;
+	FTimerHandle KnockbackTimerHandle;
 };

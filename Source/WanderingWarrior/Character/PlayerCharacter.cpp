@@ -11,6 +11,7 @@
 #include "Item/Weapon.h"
 #include "Item/MiscItem.h"
 #include "Components/PlayerSkillComponent.h"
+#include "Components/CharacterStatComponent.h"
 #include "Inventory/InventorySlotWidget.h"
 #include "Inventory/InventoryWidget.h"
 #include "Inventory/InventoryTabData.h"
@@ -70,6 +71,9 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
+
+	Super::CharacterStatComponent->SetMaxHP(100);
+	Super::CharacterStatComponent->SetHP(100);
 }
 
 // Called when the game starts or when spawned

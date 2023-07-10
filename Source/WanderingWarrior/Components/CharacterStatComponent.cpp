@@ -65,3 +65,12 @@ void UCharacterStatComponent::SetAttackDamage(float Damage)
 	AttackDamage = Damage;
 }
 
+float UCharacterStatComponent::GetMaxHP()
+{
+	return MaxHP;
+}
+
+void UCharacterStatComponent::SetMaxHP(float NewMaxHP)
+{
+	MaxHP = NewMaxHP;
+}
