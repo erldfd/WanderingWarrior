@@ -30,4 +30,8 @@ public:
 	virtual bool UseSlotItemFromSlot(class UInventorySlotData& Slot) override;
 
 	virtual void ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType) override;
+
+protected:
+
+	virtual void InitializeComponent() override;
 };

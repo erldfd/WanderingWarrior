@@ -45,7 +45,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	float HPBeforeDamage = CharacterStatComponent->GetHP();
 	float HPAfterDamage = HPBeforeDamage - Damage;
 
-	if (HPAfterDamage <= 0)
+	if (Super::AnimInstance->GetIsDead())
 	{
 		//TODO : 확률에 따라 아이템 드롭
 		int RandomInt = FMath::RandRange(0, 3);

@@ -21,38 +21,51 @@
 
 UCharacterInventory::UCharacterInventory()
 {
-	InventoryType = EInventory::CharacterInventory;
-	TempSwapSlot = NewObject<UInventorySlotData>();
-
-	InventoryComponent->InitTabArray(TabCount::INVENTORY_TAB_COUNT);
-
-	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
-
-	TabArray[0] = CreateDefaultSubobject<UInventoryTabData>(TEXT("WeaponTab"));
-
-	check(TabArray[0] != nullptr);
-	TabArray[0]->InitSlots(SlotCount::WEAPON_TAB_SLOT_COUNT);
-	TabArray[0]->SetTabType(ETabType::WeaponTab);
-
-	TabArray[1] = CreateDefaultSubobject<UInventoryTabData>(TEXT("MiscTab"));
-	check(TabArray[1] != nullptr);
-	TabArray[1]->InitSlots(SlotCount::MISC_TAB_SLOT_COUNT);
-	TabArray[1]->SetTabType(ETabType::MiscTab);
-
-	InventoryComponent->SetCurrentActivatedTab(TabArray[0]);
+	bWantsInitializeComponent = true;
 }
 
 void UCharacterInventory::OnComponentCreated()
 {
 	Super::OnComponentCreated();
+}
+
+void UCharacterInventory::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	InventoryType = EInventory::CharacterInventory;
+	TempSwapSlot = NewObject<UInventorySlotData>(this);
+
+	InventoryComponent->InitTabArray(TabCount::INVENTORY_TAB_COUNT);
+
+	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
+
+	TabArray[0] = NewObject<UInventoryTabData>(this);
+
+	check(TabArray[0] != nullptr);
+	TabArray[0]->InitSlots(SlotCount::WEAPON_TAB_SLOT_COUNT);
+	TabArray[0]->SetTabType(ETabType::WeaponTab);
+
+	TabArray[1] = NewObject<UInventoryTabData>(this);
+	check(TabArray[1] != nullptr);
+	TabArray[1]->InitSlots(SlotCount::MISC_TAB_SLOT_COUNT);
+	TabArray[1]->SetTabType(ETabType::MiscTab);
+
+	InventoryComponent->SetCurrentActivatedTab(TabArray[0]);
 
 	UWorld& World = *GetWorld();
 	check(&World);
 
 	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(&World));
-	if (ensure(&GameInstance) == false) return;
 
-	GameInstance.GetInventoryManager().AddToInventoryArray(InventoryType, this);
+	if (&GameInstance)
+	{
+		GameInstance.GetInventoryManager().AddToInventoryArray(InventoryType, this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UCharacterInventory::OnComponentCreated, GameInstance is NOT Available."));
+	}
 }
 
 void UCharacterInventory::BeginPlay()

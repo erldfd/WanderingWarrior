@@ -19,15 +19,23 @@
 
 UCharacterQuickSlot::UCharacterQuickSlot()
 {
+	bWantsInitializeComponent = true;
+}
+
+void UCharacterQuickSlot::InitializeComponent()
+{
+	Super::InitializeComponent();
+
 	InventoryType = EInventory::CharacterQuickSlot;
-	TempSwapSlot = NewObject<UInventorySlotData>();
+	TempSwapSlot = NewObject<UInventorySlotData>(this);
 
 	InventoryComponent->InitTabArray(TabCount::QUICKSLOT_TAB_COUNT);
 
 	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
 
-	TabArray[0] = CreateDefaultSubobject<UInventoryTabData>(TEXT("QuickSlotTab"));
+	TabArray[0] = NewObject<UInventoryTabData>(this);
 	check(TabArray[0]);
+
 	TabArray[0]->InitSlots(SlotCount::QUICK_SLOT_COUNT);
 	TabArray[0]->SetTabType(ETabType::QuickSlotTab);
 

@@ -16,14 +16,22 @@
 
 UMarchantInventory::UMarchantInventory()
 {
+	bWantsInitializeComponent = true;
+}
+
+void UMarchantInventory::InitializeComponent()
+{
+	Super::InitializeComponent();
+
 	InventoryType = EInventory::MarchantInventory;
 
 	InventoryComponent->InitTabArray(TabCount::QUICKSLOT_TAB_COUNT);
 
 	TArray<UInventoryTabData*>& TabArray = InventoryComponent->GetTabArray();
 
-	TabArray[0] = CreateDefaultSubobject<UInventoryTabData>(TEXT("AllTab"));
+	TabArray[0] = NewObject<UInventoryTabData>(this);
 	check(TabArray[0]);
+
 	TabArray[0]->InitSlots(SlotCount::MARCHANT_SLOT_COUNT);
 	TabArray[0]->SetTabType(ETabType::AllTab);
 

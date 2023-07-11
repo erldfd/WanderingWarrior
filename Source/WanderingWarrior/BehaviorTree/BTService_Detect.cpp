@@ -15,6 +15,8 @@ UBTService_Detect::UBTService_Detect()
 {
 	NodeName = TEXT("Detect");
 	Interval = 1;
+
+	DetectRadius = 1000;
 }
 
 void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -35,7 +37,6 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	UWorld& World = *ThisCharacter.GetWorld();
 	const FVector& Center = ThisCharacter.GetActorLocation();
-	float DetectRadius = 1000;
 
 	if (&World == nullptr)
 	{

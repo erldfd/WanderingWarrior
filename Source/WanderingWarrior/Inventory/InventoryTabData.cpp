@@ -24,16 +24,15 @@ void UInventoryTabData::InitSlots(int32 NewSlotCount)
 
 	InventorySlotArray.Init(nullptr, SlotCount);
 
-	FString SlotNameString("Slot");
-
 	for (int i = 0; i < SlotCount; ++i)
 	{
 		if (InventorySlotArray.IsValidIndex(i))
 		{
+			FString SlotNameString("Slot");
 			SlotNameString.Append(FString::FromInt(i));
 			FName SlotName(*SlotNameString);
 
-			InventorySlotArray[i] = NewObject<UInventorySlotData>();
+			InventorySlotArray[i] = NewObject<UInventorySlotData>(this);
 			InventorySlotArray[i]->SetSlotIndex(i);
 		}
 	}

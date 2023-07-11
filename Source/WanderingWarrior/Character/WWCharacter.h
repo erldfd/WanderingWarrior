@@ -74,6 +74,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CharacterName;
 
+	UPROPERTY(EditAnywhere)
+	float AttackDamageWithoutWeapon;
+
 private:
 
 	void AttackCheck();

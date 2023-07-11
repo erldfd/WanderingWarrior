@@ -15,7 +15,8 @@
 
 // Sets default values
 // 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
-AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false), ComboCount(0), bIsAnimMoveStart(false), AttackMoveSpeed(5)
+AWWCharacter::AWWCharacter() : AttackDamageWithoutWeapon(0.2), InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false),
+								ComboCount(0), bIsAnimMoveStart(false), AttackMoveSpeed(5)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -271,7 +272,7 @@ void AWWCharacter::AttackCheck()
 			UE_LOG(LogTemp, Warning, TEXT("Hit Actor Name : %s"), *HitResult.GetActor()->GetName());
 
 			FDamageEvent DamageEvent;
-			HitResult.GetActor()->TakeDamage(0.2, DamageEvent, GetController(), this);
+			HitResult.GetActor()->TakeDamage(AttackDamageWithoutWeapon, DamageEvent, GetController(), this);
 		}
 		else
 		{

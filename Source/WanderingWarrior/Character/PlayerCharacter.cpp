@@ -60,8 +60,6 @@ APlayerCharacter::APlayerCharacter()
 
 	Tags.Init("Player", 1);
 
-	TempSwapSlot = NewObject<UInventorySlotData>();
-
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(TEXT("NewInventory"));
 	QuickSlot = CreateDefaultSubobject<UCharacterQuickSlot>(TEXT("NewQuickSlot"));
 }
@@ -70,10 +68,9 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
+	TempSwapSlot = NewObject<UInventorySlotData>(this);
 
-	Super::CharacterStatComponent->SetMaxHP(100);
-	Super::CharacterStatComponent->SetHP(100);
+	Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
 }
 
 // Called when the game starts or when spawned

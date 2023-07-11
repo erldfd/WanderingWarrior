@@ -36,6 +36,8 @@ public:
 	virtual void ExchangeOrMoveSlotItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, ETabType DragSlotTabType) override;
 
 protected:
+
+	virtual void InitializeComponent() override;
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
