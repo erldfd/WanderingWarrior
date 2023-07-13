@@ -15,7 +15,7 @@
 
 // Sets default values
 // 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
-AWWCharacter::AWWCharacter() : AttackDamageWithoutWeapon(0.2), InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false),
+AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false), AttackDamageWithoutWeapon(0.2),
 								ComboCount(0), bIsAnimMoveStart(false), AttackMoveSpeed(5)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -157,19 +157,19 @@ void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("AttackHold", this, &AWWCharacter::Attack);
+	/*PlayerInputComponent->BindAxis("AttackHold", this, &AWWCharacter::Attack);*/
 
-	PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AWWCharacter::InputMoveForward);
-	PlayerInputComponent->BindAxis("Move Right / Left", this, &AWWCharacter::InputMoveRight);
+	/*PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AWWCharacter::InputMoveForward);
+	PlayerInputComponent->BindAxis("Move Right / Left", this, &AWWCharacter::InputMoveRight);*/
 
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
+	/*PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);*/
 
 	PlayerInputComponent->BindAction("Test", IE_Pressed, this, &AWWCharacter::TestAction);
 }
@@ -292,6 +292,29 @@ void AWWCharacter::Attack(float Value)
 		return;
 	}
 
+	bool bIsAttacking = AnimInstance->GetIsAttacking();
+	bool bCanCombo = AnimInstance->GetCanCombo();
+	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
+	bool bIsDead = AnimInstance->GetIsDead();
+	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingJumpToGroundSkillAnim();
+
+	if (bIsDead || bIsPlayingJumpToGroundSkill)
+	{
+		return;
+	}
+
+	if (bIsAttacking == false)
+	{
+		AnimInstance->PlayAttackMontage();
+	}
+	else if (bCanCombo && bWillPlayNextCombo == false)
+	{
+		AnimInstance->SetWillPlayNextCombo(true);
+	}
+}
+
+void AWWCharacter::Attack()
+{
 	bool bIsAttacking = AnimInstance->GetIsAttacking();
 	bool bCanCombo = AnimInstance->GetCanCombo();
 	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();

@@ -31,7 +31,7 @@ public:
 	class UWWAnimInstance& GetAnimInstance();
 
 	virtual void Attack(float Value);
-
+	virtual void Attack();
 	class UCharacterStatComponent& GetCharacterStatComponent();
 
 	const FName& GetCharacterName() const;

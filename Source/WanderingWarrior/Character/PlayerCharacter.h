@@ -44,6 +44,9 @@ private:
 
 	void OnStartNextCombo();
 
+	void Move(const struct FInputActionValue& Value);
+	void Look(const struct FInputActionValue& Value);
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -63,4 +66,19 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UCharacterQuickSlot> QuickSlot;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> JumpAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> MoveAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> LookAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputMappingContext> CharacterInput;
 };

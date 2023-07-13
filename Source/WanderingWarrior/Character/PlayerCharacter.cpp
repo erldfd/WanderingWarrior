@@ -23,6 +23,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -78,6 +82,14 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+
+	if (SubSystem && CharacterInput)
+	{
+		SubSystem->AddMappingContext(CharacterInput, 0);
+	}
+
 	for (int i = 0; i < SlotCount::WEAPON_TAB_SLOT_COUNT; ++i)
 	{
 		Inventory->RemoveAllItem(i);
@@ -104,6 +116,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* EnhancedInputComponenet = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+
+	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+	EnhancedInputComponenet->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+
+	EnhancedInputComponenet->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AWWCharacter::Attack);
+
+	EnhancedInputComponenet->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -154,4 +177,31 @@ void APlayerCharacter::OnStartNextCombo()
 	}
 
 	SetActorRotation(FRotationMatrix::MakeFromX(LookVector).Rotator());
+}
+
+void APlayerCharacter::Move(const FInputActionValue& Value)
+{
+	if (Super::AnimInstance->IsPlayingSomething())
+	{
+		return;
+	}
+
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	AddMovementInput(ForwardDirection, MovementVector.X);
+	AddMovementInput(RightDirection, MovementVector.Y);
+}
+
+void APlayerCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	AddControllerYawInput(LookAxisVector.X);
+	AddControllerPitchInput(LookAxisVector.Y);
 }

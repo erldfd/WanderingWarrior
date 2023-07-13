@@ -66,10 +66,10 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		EnemyCharacter->SetIsDamaged(true);
 
-		static AActor& WeaponOwner = *GetOwner();
+		AActor& WeaponOwner = *GetOwner();
 		if (ensure(&WeaponOwner) == false) return;
 
-		static AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(WeaponOwner.GetInstigatorController());
+		AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(WeaponOwner.GetInstigatorController());
 		if (ensure(&PlayerController) == false) return;
 
 		FDamageEvent DamageEvent;
