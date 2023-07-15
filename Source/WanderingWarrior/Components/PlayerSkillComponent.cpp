@@ -41,6 +41,9 @@ UPlayerSkillComponent::UPlayerSkillComponent()
 	KickAttackDamage = 100;
 	KickAttackExtent  = 500;
 	KickAttackRange = 260;
+
+	Melee360AttackDamage = 200;
+	Melee360AttackRadius = 400;
 }
 
 
@@ -58,14 +61,21 @@ void UPlayerSkillComponent::BeginPlay()
 	AnimInstance.OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
 	AnimInstance.OnJumpToGroundAnimEndDelegate.AddLambda([&]()-> void {
 
-		AnimInstance.SetIsPlayingJumpToGroundSkillAnim(false);
+		AnimInstance.SetIsPlayingChargeAttack1Anim(false);
 	});
 
 	AnimInstance.OnKickDamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageKickAttack);
 	AnimInstance.OnKickEndDelegate.AddLambda([&]()-> void {
 
-		AnimInstance.SetIsPlayingKickAttackAnim(false);
-		AnimInstance.SetWillPlayingKickAttackAnim(false);
+		AnimInstance.SetIsPlayingChargeAttack2Anim(false);
+		AnimInstance.SetWillPlayChargeAttack2Anim(false);
+	});
+
+	AnimInstance.OnChargeAttack3DamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMelee360Attack);
+	AnimInstance.OnChargeAttack3EndDelegate.AddLambda([&]()-> void {
+
+		AnimInstance.SetIsPlayingChargeAttack3Anim(false);
+		AnimInstance.SetWillPlayChargeAttack3Anim(false);
 	});
 }
 
@@ -267,4 +277,81 @@ void UPlayerSkillComponent::DamageKickAttack()
 	}
 
 	DrawDebugBox(&World, SkillLocation, FVector(Extent * 0.5f), PlayerCharacter.GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
+}
+
+void UPlayerSkillComponent::DamageMelee360Attack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::DamageMelee360Attack"));
+
+	UWorld& World = *GetWorld();
+	const FVector& Center = GetOwner()->GetActorLocation();
+	float Radius = Melee360AttackRadius;
+
+	if (&World == nullptr)
+	{
+		return;
+	}
+
+	const FRotator Rotation = GetOwner()->GetActorRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	// get forward vector
+	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	//UGameplayStatics::SpawnEmitterAtLocation(&World, PS_RockBurst0, Center, Rotation, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, Center);
+
+	World.GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
+
+		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
+	}), 1, false, 0.3);
+
+	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::MoveForward), 0.01, true);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World.OverlapMultiByChannel(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel7,
+		FCollisionShape::MakeSphere(Radius),
+		CollisionQueryParam
+	);
+
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+
+			if (&Character == nullptr || &Character == GetOwner())
+			{
+				continue;
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+
+			FDamageEvent DamageEvent;
+			Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+
+			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (ensure(&PlayerController) == false) return;
+
+			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			if (ensure(&PlayerInGameWidget) == false) return;
+
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+
+			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+		}
+
+		DrawDebugSphere(&World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
+
+		return;
+	}
+
+	DrawDebugSphere(&World, Center, Radius, 16, FColor::Red, false, 1, 0, 1);
 }

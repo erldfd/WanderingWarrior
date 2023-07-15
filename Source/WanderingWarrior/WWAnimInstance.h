@@ -19,7 +19,9 @@ DECLARE_MULTICAST_DELEGATE(FOnAttackHitCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnJumpToGroundAnimEndDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnKickDamageDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnKickEndDelegate);
-
+DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3DamageDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3ComboStartDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3EndDelegate);
 /**
  * 
  */
@@ -53,8 +55,8 @@ public:
 
 	bool IsPlayingSomething();
 
-	bool GetIsPlayingJumpToGroundSkillAnim();
-	void SetIsPlayingJumpToGroundSkillAnim(bool bIsPlaying);
+	bool GetIsPlayingChargeAttack1Anim();
+	void SetIsPlayingChargeAttack1Anim(bool bIsPlaying);
 
 	void PlayCharacterHitMontage();
 
@@ -66,14 +68,22 @@ public:
 	bool GetHitAndFly();
 	void SetHitAndFly(bool NewHitAndFly);
 
-	bool GetIsPlayingKickAttackAnim();
-	void SetIsPlayingKickAttackAnim(bool NewIsPlayingKickAttackAnim);
+	bool GetIsPlayingChargeAttack2Anim();
+	void SetIsPlayingChargeAttack2Anim(bool NewIsPlayingChargeAttack2Anim);
 
-	bool GetWillPlayingKickAttackAnim();
-	void SetWillPlayingKickAttackAnim(bool NewWillPlayingKickAttackAnim);
+	bool GetWillPlayChargeAttack2Anim();
+	void SetWillPlayChargeAttack2Anim(bool NewWillPlayChargeAttack2Anim);
 
 	void PlayKickAttackMongate();
 		
+	bool GetIsPlayingChargeAttack3Anim();
+	void SetIsPlayingChargeAttack3Anim(bool NewIsPlayingChargeAttack3Anim);
+
+	bool GetWillPlayChargeAttack3Anim();
+	void SetWillPlayChargeAttack3Anim(bool NewWillPlayChargeAttack3Anim);
+
+	void PlayChargeAttack3Montage();
+
 public:
 
 	FOnAttackStartDelegate OnAttackStartDelegate;
@@ -88,6 +98,10 @@ public:
 
 	FOnKickDamageDelegate OnKickDamageDelegate;
 	FOnKickEndDelegate OnKickEndDelegate;
+
+	FOnChargeAttack3DamageDelegate OnChargeAttack3DamageDelegate;
+	FOnChargeAttack3ComboStartDelegate OnChargeAttack3ComboStartDelegate;
+	FOnChargeAttack3EndDelegate OnChargeAttack3EndDelegate;
 
 private:
 
@@ -121,6 +135,15 @@ private:
 	UFUNCTION()
 	void AnimNotify_KickEnd();
 
+	UFUNCTION()
+	void AnimNotify_Melee360AttackDamage();
+
+	UFUNCTION()
+	void AnimNotify_Melee360AttackComboStart();
+
+	UFUNCTION()
+	void AnimNotify_Melee360AttackEnd();
+
 	void InitBoolCondition();
 
 private:
@@ -140,11 +163,14 @@ private:
 	uint8 bIsAttacking : 1;
 	uint8 bCanComboAttack : 1;
 	uint8 bWillPlayNextCombo : 1;
-	uint8 bIsPlayingJumpToGroundSkillAnim : 1;
+	uint8 bIsPlayingChargeAttack1Anim : 1;
 	uint8 bIsPlayingCharacterHitMontage : 1;
 
-	uint8 bIsPlayingKickAttackAnim : 1;
-	uint8 bWillPlayingKickAttackAnim : 1;
+	uint8 bIsPlayingChargeAttack2Anim : 1;
+	uint8 bWillPlayChargeAttack2Anim : 1;
+
+	uint8 bIsPlayingChargeAttack3Anim : 1;
+	uint8 bWillPlayChargeAttack3Anim : 1;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> AttackMontage;
@@ -158,7 +184,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> ChargeAttack2;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> ChargeAttack3;
+
+
 	int32 ComboCount;
+
+	int32 ChargeAttack3ComboCount;
+
+	UPROPERTY(EditAnywhere, Category = Anim, meta = (AllowPrivateAccess = true))
+	int32 ChargeAttack3MaxComboCount;
 
 	UPROPERTY(EditAnywhere, Category = Anim, meta = (PrivateAccess = true))
 	float HitAnimRate;

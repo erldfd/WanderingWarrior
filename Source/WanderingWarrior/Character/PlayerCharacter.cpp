@@ -175,21 +175,32 @@ void APlayerCharacter::DoChargeAttack()
 	bool bCanCombo = AnimInstance->GetCanCombo();
 	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
 	bool bIsDead = AnimInstance->GetIsDead();
-	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingJumpToGroundSkillAnim();
-	bool bIsPlayingKickAttackAnim = AnimInstance->GetIsPlayingKickAttackAnim();
-	bool bWillPlayingKickAttackAnim = AnimInstance->GetWillPlayingKickAttackAnim();
 
-	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingKickAttackAnim || bIsAttacking == false)
+	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingChargeAttack1Anim();
+
+	bool bIsPlayingChargeAttack2Anim = AnimInstance->GetIsPlayingChargeAttack2Anim();
+	bool bWillPlayChargeAttack2Anim = AnimInstance->GetWillPlayChargeAttack2Anim();
+
+	bool bIsPlayingChargeAttack3Anim = AnimInstance->GetIsPlayingChargeAttack3Anim();
+	bool bWillPlayChargeAttack3Anim = AnimInstance->GetWillPlayChargeAttack3Anim();
+
+	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim ||
+		bIsAttacking == false || bCanCombo == false || bWillPlayNextCombo)
 	{
 		return;
 	}
 
 	int ComboCount = AnimInstance->GetComboCount();
 
-	if (bCanCombo && bWillPlayNextCombo == false && bWillPlayingKickAttackAnim == false && ComboCount == 1)
+	if (bWillPlayChargeAttack2Anim == false && ComboCount == 1)
 	{
 
-		AnimInstance->SetWillPlayingKickAttackAnim(true);
+		AnimInstance->SetWillPlayChargeAttack2Anim(true);
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, SetWillKick"));
+	}
+	else if (bWillPlayChargeAttack3Anim == false && ComboCount == 2)
+	{
+		AnimInstance->SetWillPlayChargeAttack3Anim(true);
 		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, SetWillKick"));
 	}
 }

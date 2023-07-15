@@ -10,7 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Actor.h"
 
-UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0)
+UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0)
 {
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ATTACK_MONTAGE(TEXT("/Game/Animations/WarriorAttackMontage"));
 	if (ATTACK_MONTAGE.Succeeded())
@@ -29,6 +29,8 @@ UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0)
 	{
 		CharacterHitMongtage = CHARACTER_HIT_MONTAGE.Object;
 	}
+
+	ChargeAttack3MaxComboCount = 4;
 }
 
 void UWWAnimInstance::NativeInitializeAnimation()
@@ -137,23 +139,24 @@ void UWWAnimInstance::SetWillPlayNextCombo(bool bWillPlayNextComboNow)
 void UWWAnimInstance::PlayJumpToGrundAnim()
 {
 	Montage_Play(ChargeAttack1);
-	bIsPlayingJumpToGroundSkillAnim = true;
+	bIsPlayingChargeAttack1Anim = true;
 }
 
 bool UWWAnimInstance::IsPlayingSomething()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::IsPlayingSomething, %d %d %d %d %d "), bIsAttacking, bIsDead, bIsPlayingJumpToGroundSkillAnim, bIsPlayingCharacterHitMontage, bIsPlayingKickAttackAnim);
-	return (bIsAttacking || bIsDead || bIsPlayingJumpToGroundSkillAnim || bIsPlayingCharacterHitMontage || bIsPlayingKickAttackAnim);
+	bool IsPlayingSomething = (bIsAttacking || bIsDead ||
+		bIsPlayingChargeAttack1Anim || bIsPlayingCharacterHitMontage || bIsPlayingChargeAttack2Anim);
+	return IsPlayingSomething;
 }
 
-bool UWWAnimInstance::GetIsPlayingJumpToGroundSkillAnim()
+bool UWWAnimInstance::GetIsPlayingChargeAttack1Anim()
 {
-	return bIsPlayingJumpToGroundSkillAnim;
+	return bIsPlayingChargeAttack1Anim;
 }
 
-void UWWAnimInstance::SetIsPlayingJumpToGroundSkillAnim(bool bIsPlaying)
+void UWWAnimInstance::SetIsPlayingChargeAttack1Anim(bool bIsPlaying)
 {
-	bIsPlayingJumpToGroundSkillAnim = bIsPlaying;
+	bIsPlayingChargeAttack1Anim = bIsPlaying;
 }
 
 int32 UWWAnimInstance::GetComboCount()
@@ -171,30 +174,66 @@ void UWWAnimInstance::SetHitAndFly(bool NewHitAndFly)
 	bIsHitAndFly = NewHitAndFly;
 }
 
-bool UWWAnimInstance::GetIsPlayingKickAttackAnim()
+bool UWWAnimInstance::GetIsPlayingChargeAttack2Anim()
 {
-	return bIsPlayingKickAttackAnim;
+	return bIsPlayingChargeAttack2Anim;
 }
 
-void UWWAnimInstance::SetIsPlayingKickAttackAnim(bool NewIsPlayingKickAttackAnim)
+void UWWAnimInstance::SetIsPlayingChargeAttack2Anim(bool NewIsPlayingChargeAttack2Anim)
 {
-	bIsPlayingKickAttackAnim = NewIsPlayingKickAttackAnim;
+	bIsPlayingChargeAttack2Anim = NewIsPlayingChargeAttack2Anim;
 }
 
-bool UWWAnimInstance::GetWillPlayingKickAttackAnim()
+bool UWWAnimInstance::GetWillPlayChargeAttack2Anim()
 {
-	return bWillPlayingKickAttackAnim;
+	return bWillPlayChargeAttack2Anim;
 }
 
-void UWWAnimInstance::SetWillPlayingKickAttackAnim(bool NewWillPlayingKickAttackAnim)
+void UWWAnimInstance::SetWillPlayChargeAttack2Anim(bool NewWillPlayChargeAttack2Anim)
 {
-	bWillPlayingKickAttackAnim = NewWillPlayingKickAttackAnim;
+	bWillPlayChargeAttack2Anim = NewWillPlayChargeAttack2Anim;
 }
 
 void UWWAnimInstance::PlayKickAttackMongate()
 {
 	Montage_Play(ChargeAttack2);
-	bIsPlayingKickAttackAnim = true;
+	bIsPlayingChargeAttack2Anim = true;
+}
+
+bool UWWAnimInstance::GetIsPlayingChargeAttack3Anim()
+{
+	return bIsPlayingChargeAttack3Anim;
+}
+
+void UWWAnimInstance::SetIsPlayingChargeAttack3Anim(bool NewIsPlayingChargeAttack3Anim)
+{
+	bIsPlayingChargeAttack3Anim = NewIsPlayingChargeAttack3Anim;
+}
+
+bool UWWAnimInstance::GetWillPlayChargeAttack3Anim()
+{
+	return bWillPlayChargeAttack3Anim;
+}
+
+void UWWAnimInstance::SetWillPlayChargeAttack3Anim(bool NewWillPlayChargeAttack3Anim)
+{
+	bWillPlayChargeAttack3Anim = NewWillPlayChargeAttack3Anim;
+}
+
+void UWWAnimInstance::PlayChargeAttack3Montage()
+{
+	if (ChargeAttack3ComboCount == ChargeAttack3MaxComboCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayChargeAttack3Montage, %d"), ChargeAttack3ComboCount);
+		ChargeAttack3ComboCount = 0;
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayChargeAttack3Montage, In"));
+	Montage_Play(ChargeAttack3);
+	bIsPlayingChargeAttack3Anim = true;
+
+	ChargeAttack3ComboCount++;
 }
 
 void UWWAnimInstance::PlayCharacterHitMontage()
@@ -231,9 +270,13 @@ void UWWAnimInstance::AnimNotify_StartNextComboNotify()
 	{
 		JumpToAttackMontageSection(ComboCount);
 	}
-	else if (bWillPlayingKickAttackAnim && ComboCount == 1)
+	else if (bWillPlayChargeAttack2Anim && ComboCount == 1)
 	{
 		PlayKickAttackMongate();
+	}
+	else if (bWillPlayChargeAttack3Anim && ComboCount == 2)
+	{
+		PlayChargeAttack3Montage();
 	}
 
 	OnStartNextComboDelegate.Broadcast();
@@ -285,18 +328,48 @@ void UWWAnimInstance::AnimNotify_KickEnd()
 	OnKickEndDelegate.Broadcast();
 }
 
+void UWWAnimInstance::AnimNotify_Melee360AttackDamage()
+{
+	OnChargeAttack3DamageDelegate.Broadcast();
+}
+
+void UWWAnimInstance::AnimNotify_Melee360AttackComboStart()
+{
+	OnChargeAttack3ComboStartDelegate.Broadcast();
+
+	if (ChargeAttack3ComboCount == ChargeAttack3MaxComboCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_Melee360AttackComboStart, %d"), ChargeAttack3ComboCount);
+		ChargeAttack3ComboCount = 0;
+		return;
+	}
+
+	PlayChargeAttack3Montage();
+}
+
+void UWWAnimInstance::AnimNotify_Melee360AttackEnd()
+{
+	bIsAttacking = false;
+	OnChargeAttack3EndDelegate.Broadcast();
+}
+
 void UWWAnimInstance::InitBoolCondition()
 {
 	bIsAttacking = false;
 	bCanComboAttack = false;
 	bWillPlayNextCombo = false;
-	bIsPlayingJumpToGroundSkillAnim = false;
+	bIsPlayingChargeAttack1Anim = false;
 	bIsPlayingCharacterHitMontage = false;
 
-	bWillPlayingKickAttackAnim = false;
-	bIsPlayingKickAttackAnim = false;
+	bWillPlayChargeAttack2Anim = false;
+	bIsPlayingChargeAttack2Anim = false;
+
+	bWillPlayChargeAttack3Anim = false;
+	bIsPlayingChargeAttack3Anim = false;
+	ChargeAttack3ComboCount = 0;
 
 	Montage_Stop(0, AttackMontage);
 	Montage_Stop(0, ChargeAttack1);
 	Montage_Stop(0, ChargeAttack2);
+	Montage_Stop(0, ChargeAttack3);
 }

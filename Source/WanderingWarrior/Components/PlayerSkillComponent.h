@@ -36,6 +36,8 @@ private:
 
 	void DamageKickAttack();
 
+	void DamageMelee360Attack();
+
 private:
 
 	FTimerHandle RepeatSometingTimerHandle;
@@ -51,6 +53,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Skill)
 	float KickAttackDamage;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float Melee360AttackRadius;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float Melee360AttackDamage;
 
 	UPROPERTY()
 	TObjectPtr<UParticleSystem> PS_RockBurst0;

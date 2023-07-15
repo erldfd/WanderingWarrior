@@ -302,7 +302,7 @@ void AWWCharacter::Attack(float Value)
 	bool bCanCombo = AnimInstance->GetCanCombo();
 	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
 	bool bIsDead = AnimInstance->GetIsDead();
-	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingJumpToGroundSkillAnim();
+	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingChargeAttack1Anim();
 
 	if (bIsDead || bIsPlayingJumpToGroundSkill)
 	{
@@ -325,14 +325,18 @@ void AWWCharacter::Attack()
 	bool bCanCombo = AnimInstance->GetCanCombo();
 	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
 	bool bIsDead = AnimInstance->GetIsDead();
-	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingJumpToGroundSkillAnim();
+	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingChargeAttack1Anim();
 
-	bool bIsPlayingKickAttackAnim = AnimInstance->GetIsPlayingKickAttackAnim();
-	bool bWillPlayingKickAttackAnim = AnimInstance->GetWillPlayingKickAttackAnim();
+	bool bIsPlayingChargeAttack2Anim = AnimInstance->GetIsPlayingChargeAttack2Anim();
+	bool bWillPlayChargeAttack2Anim = AnimInstance->GetWillPlayChargeAttack2Anim();
 
-	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingKickAttackAnim || bWillPlayingKickAttackAnim)
+	bool bIsPlayingChargeAttack3Anim = AnimInstance->GetIsPlayingChargeAttack3Anim();
+	bool bWillPlayChargeAttack3Anim = AnimInstance->GetWillPlayChargeAttack3Anim();
+
+	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingChargeAttack2Anim || bWillPlayChargeAttack2Anim ||
+		bIsPlayingChargeAttack3Anim || bWillPlayChargeAttack3Anim)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, %d, %d, %d, %d"), bIsDead, bIsPlayingJumpToGroundSkill, bIsPlayingKickAttackAnim, bWillPlayingKickAttackAnim);
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, %d, %d, %d, %d"), bIsDead, bIsPlayingJumpToGroundSkill, bIsPlayingChargeAttack2Anim, bWillPlayChargeAttack2Anim);
 		return;
 	}
 
