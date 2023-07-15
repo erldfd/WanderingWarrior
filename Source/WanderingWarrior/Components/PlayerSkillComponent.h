@@ -34,12 +34,23 @@ private:
 
 	void MoveForward();
 
+	void DamageKickAttack();
+
 private:
 
 	FTimerHandle RepeatSometingTimerHandle;
 	FTimerHandle CoolDownTimerHandle;
 
 	int32 MoveCount;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float KickAttackRange;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float KickAttackExtent;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float KickAttackDamage;
 
 	UPROPERTY()
 	TObjectPtr<UParticleSystem> PS_RockBurst0;

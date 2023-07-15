@@ -35,6 +35,8 @@ public:
 
 	virtual void Attack(float Value) override;
 
+	void DoChargeAttack();
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -55,7 +57,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UCameraComponent> Camera;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
 
 	UPROPERTY()
@@ -78,6 +80,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
 	TObjectPtr<class UInputAction> LookAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> ChargeAttackAction;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
 	TObjectPtr<class UInputMappingContext> CharacterInput;

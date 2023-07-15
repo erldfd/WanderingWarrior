@@ -89,8 +89,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<class AWeapon> CurrentWeapon;
 
-	int32 ComboCount;
-
 	uint8 bIsAnimMoveStart : 1;
 
 	float AttackMoveSpeed;

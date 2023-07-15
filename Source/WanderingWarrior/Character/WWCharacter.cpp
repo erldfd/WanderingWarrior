@@ -16,7 +16,7 @@
 // Sets default values
 // 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
 AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false), AttackDamageWithoutWeapon(0.2),
-								ComboCount(0), bIsAnimMoveStart(false), AttackMoveSpeed(5)
+								bIsAnimMoveStart(false), AttackMoveSpeed(5)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -77,26 +77,32 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	CharacterStatComponent->SetHP(HPAfterDamage);
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	if (HPAfterDamage <= 0)
 	{
 		AnimInstance->SetIsDead(true);
 		SetActorEnableCollision(false);
 	}
+	
+	bIsAnimMoveStart = false;
+	FVector MoveDir = GetActorLocation() - DamageCauser->GetActorLocation();
+	MoveDir.Normalize();
+
+	AWWCharacter* DamageCauserCharacter = Cast<AWWCharacter>(DamageCauser);
+	
+	if (DamageCauserCharacter && DamageCauserCharacter->GetAnimInstance().GetComboCount() == 3)
+	{
+		GetAnimInstance().SetHitAndFly(true);
+		MoveDir.Z = 1;
+	}
 	else
 	{
 		AnimInstance->PlayCharacterHitMontage();
-		bIsAnimMoveStart = false;
-		FVector MoveDir = GetActorLocation() - DamageCauser->GetActorLocation();
-		MoveDir.Normalize();
 		MoveDir.Z = 0;
-		//GetMovementComponent()->AddInputVector(MoveDir * 5);
-		//SetActorLocation(GetActorLocation() + MoveDir * 200);
-		/*AddActorWorldTransform(FTransform(MoveDir * 100));*/
-		//AddActorWorldOffset(MoveDir * 5);
-		StartKnockback(MoveDir, 1000, 0.1);
 	}
+
+	StartKnockback(MoveDir, 1000, 0.1);
 
 	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamage, Damage : %f, ActorHP : %f, Actor : %s"), Damage, HPAfterDamage, *GetName());
 	return Damage;
@@ -321,8 +327,12 @@ void AWWCharacter::Attack()
 	bool bIsDead = AnimInstance->GetIsDead();
 	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingJumpToGroundSkillAnim();
 
-	if (bIsDead || bIsPlayingJumpToGroundSkill)
+	bool bIsPlayingKickAttackAnim = AnimInstance->GetIsPlayingKickAttackAnim();
+	bool bWillPlayingKickAttackAnim = AnimInstance->GetWillPlayingKickAttackAnim();
+
+	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingKickAttackAnim || bWillPlayingKickAttackAnim)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, %d, %d, %d, %d"), bIsDead, bIsPlayingJumpToGroundSkill, bIsPlayingKickAttackAnim, bWillPlayingKickAttackAnim);
 		return;
 	}
 

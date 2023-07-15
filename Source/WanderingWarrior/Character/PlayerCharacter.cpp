@@ -127,6 +127,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	EnhancedInputComponenet->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AWWCharacter::Attack);
 
 	EnhancedInputComponenet->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+
+	EnhancedInputComponenet->BindAction(ChargeAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoChargeAttack);
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -163,6 +165,33 @@ void APlayerCharacter::Attack(float Value)
 	}
 
 	Super::Attack(Value);
+}
+
+void APlayerCharacter::DoChargeAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack"));
+
+	bool bIsAttacking = AnimInstance->GetIsAttacking();
+	bool bCanCombo = AnimInstance->GetCanCombo();
+	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
+	bool bIsDead = AnimInstance->GetIsDead();
+	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingJumpToGroundSkillAnim();
+	bool bIsPlayingKickAttackAnim = AnimInstance->GetIsPlayingKickAttackAnim();
+	bool bWillPlayingKickAttackAnim = AnimInstance->GetWillPlayingKickAttackAnim();
+
+	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingKickAttackAnim || bIsAttacking == false)
+	{
+		return;
+	}
+
+	int ComboCount = AnimInstance->GetComboCount();
+
+	if (bCanCombo && bWillPlayNextCombo == false && bWillPlayingKickAttackAnim == false && ComboCount == 1)
+	{
+
+		AnimInstance->SetWillPlayingKickAttackAnim(true);
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, SetWillKick"));
+	}
 }
 
 void APlayerCharacter::OnStartNextCombo()

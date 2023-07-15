@@ -37,6 +37,10 @@ UPlayerSkillComponent::UPlayerSkillComponent()
 	{
 		SW_RockBurst0_1 = SW_ROCKBURST0_1.Object;
 	}
+
+	KickAttackDamage = 100;
+	KickAttackExtent  = 500;
+	KickAttackRange = 260;
 }
 
 
@@ -52,18 +56,17 @@ void UPlayerSkillComponent::BeginPlay()
 	check(&AnimInstance);
 
 	AnimInstance.OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
-	AnimInstance.OnJumpToGroundAnimEndDelegate.AddLambda([this]()-> void {
-
-		APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
-		check(&PlayerCharacter);
-
-		UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
-		check(&AnimInstance);
+	AnimInstance.OnJumpToGroundAnimEndDelegate.AddLambda([&]()-> void {
 
 		AnimInstance.SetIsPlayingJumpToGroundSkillAnim(false);
 	});
-	// ...
-	
+
+	AnimInstance.OnKickDamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageKickAttack);
+	AnimInstance.OnKickEndDelegate.AddLambda([&]()-> void {
+
+		AnimInstance.SetIsPlayingKickAttackAnim(false);
+		AnimInstance.SetWillPlayingKickAttackAnim(false);
+	});
 }
 
 
@@ -95,7 +98,7 @@ void UPlayerSkillComponent::JumpToGroundSkillImplement()
 
 void UPlayerSkillComponent::DamageJumpToGrundSkill()
 {
-	UE_LOG(LogTemp, Warning, TEXT("DamageJumpToGround"));
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::DamageJumpToGrundSkill"));
 
 	UWorld& World = *GetWorld();
 	const FVector& Center = GetOwner()->GetActorLocation();
@@ -185,4 +188,83 @@ void UPlayerSkillComponent::MoveForward()
 		GetWorld()->GetTimerManager().ClearTimer(RepeatSometingTimerHandle);
 		MoveCount = 0;
 	}
+}
+
+void UPlayerSkillComponent::DamageKickAttack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::DamageKickAttack"));
+
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
+
+	UWorld& World = *GetWorld();
+
+	const FVector& Center = PlayerCharacter.GetActorLocation();
+	float Extent = KickAttackExtent;
+
+	if (&World == nullptr)
+	{
+		return;
+	}
+
+	const FRotator Rotation = GetOwner()->GetActorRotation();
+	//const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	// get forward vector
+	const FVector Direction = PlayerCharacter.GetActorForwardVector();
+	const FVector SkillLocation = Center + Direction * KickAttackRange;
+
+	UGameplayStatics::SpawnEmitterAtLocation(&World, PS_RockBurst0, SkillLocation, Rotation, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, SkillLocation);
+
+	World.GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
+
+		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
+	}), 1, false, 0.3);
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World.OverlapMultiByChannel(
+		OverlapResults,
+		SkillLocation,
+		PlayerCharacter.GetActorRotation().Quaternion(),
+		ECollisionChannel::ECC_GameTraceChannel7,
+		FCollisionShape::MakeBox(FVector(Extent * 0.5f)),
+		CollisionQueryParam
+	);
+
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+
+			if (&Character == nullptr || &Character == GetOwner())
+			{
+				continue;
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+
+			FDamageEvent DamageEvent;
+			Character.TakeDamage(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+
+			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (ensure(&PlayerController) == false) return;
+
+			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			if (ensure(&PlayerInGameWidget) == false) return;
+
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+
+			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+		}
+
+		DrawDebugBox(GetWorld(), SkillLocation, FVector(Extent * 0.5f), PlayerCharacter.GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
+
+		return;
+	}
+
+	DrawDebugBox(&World, SkillLocation, FVector(Extent * 0.5f), PlayerCharacter.GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
 }

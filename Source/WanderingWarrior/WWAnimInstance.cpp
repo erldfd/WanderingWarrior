@@ -21,7 +21,7 @@ UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> JUMP_TPGROUND_MOTAGE(TEXT("/Game/Animations/JumpToGround_Montage.JumpToGround_Montage"));
 	if (JUMP_TPGROUND_MOTAGE.Succeeded())
 	{
-		JumpToGrundAnim = JUMP_TPGROUND_MOTAGE.Object;
+		ChargeAttack1 = JUMP_TPGROUND_MOTAGE.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_HIT_MONTAGE(TEXT("/Game/Animations/CharacterHitMontage.CharacterHitMontage"));
@@ -136,13 +136,14 @@ void UWWAnimInstance::SetWillPlayNextCombo(bool bWillPlayNextComboNow)
 
 void UWWAnimInstance::PlayJumpToGrundAnim()
 {
-	Montage_Play(JumpToGrundAnim);
+	Montage_Play(ChargeAttack1);
 	bIsPlayingJumpToGroundSkillAnim = true;
 }
 
 bool UWWAnimInstance::IsPlayingSomething()
 {
-	return (bIsAttacking || bIsDead || bIsPlayingJumpToGroundSkillAnim || bIsPlayingCharacterHitMontage);
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::IsPlayingSomething, %d %d %d %d %d "), bIsAttacking, bIsDead, bIsPlayingJumpToGroundSkillAnim, bIsPlayingCharacterHitMontage, bIsPlayingKickAttackAnim);
+	return (bIsAttacking || bIsDead || bIsPlayingJumpToGroundSkillAnim || bIsPlayingCharacterHitMontage || bIsPlayingKickAttackAnim);
 }
 
 bool UWWAnimInstance::GetIsPlayingJumpToGroundSkillAnim()
@@ -153,6 +154,47 @@ bool UWWAnimInstance::GetIsPlayingJumpToGroundSkillAnim()
 void UWWAnimInstance::SetIsPlayingJumpToGroundSkillAnim(bool bIsPlaying)
 {
 	bIsPlayingJumpToGroundSkillAnim = bIsPlaying;
+}
+
+int32 UWWAnimInstance::GetComboCount()
+{
+	return ComboCount;
+}
+
+bool UWWAnimInstance::GetHitAndFly()
+{
+	return bIsHitAndFly;
+}
+
+void UWWAnimInstance::SetHitAndFly(bool NewHitAndFly)
+{
+	bIsHitAndFly = NewHitAndFly;
+}
+
+bool UWWAnimInstance::GetIsPlayingKickAttackAnim()
+{
+	return bIsPlayingKickAttackAnim;
+}
+
+void UWWAnimInstance::SetIsPlayingKickAttackAnim(bool NewIsPlayingKickAttackAnim)
+{
+	bIsPlayingKickAttackAnim = NewIsPlayingKickAttackAnim;
+}
+
+bool UWWAnimInstance::GetWillPlayingKickAttackAnim()
+{
+	return bWillPlayingKickAttackAnim;
+}
+
+void UWWAnimInstance::SetWillPlayingKickAttackAnim(bool NewWillPlayingKickAttackAnim)
+{
+	bWillPlayingKickAttackAnim = NewWillPlayingKickAttackAnim;
+}
+
+void UWWAnimInstance::PlayKickAttackMongate()
+{
+	Montage_Play(ChargeAttack2);
+	bIsPlayingKickAttackAnim = true;
 }
 
 void UWWAnimInstance::PlayCharacterHitMontage()
@@ -185,15 +227,16 @@ void UWWAnimInstance::AnimNotify_StartNextComboNotify()
 {
 	bCanComboAttack = false;
 
-	if (bWillPlayNextCombo == false)
+	if (bWillPlayNextCombo)
 	{
-		return;
+		JumpToAttackMontageSection(ComboCount);
+	}
+	else if (bWillPlayingKickAttackAnim && ComboCount == 1)
+	{
+		PlayKickAttackMongate();
 	}
 
 	OnStartNextComboDelegate.Broadcast();
-
-	JumpToAttackMontageSection(ComboCount);
-	UE_LOG(LogTemp, Warning, TEXT("WWAnimInstasnce StartNextCombo, Character : %s"), *GetOwningActor()->GetName());
 }
 
 void UWWAnimInstance::AnimNotify_AttackEndNotify()
@@ -204,7 +247,6 @@ void UWWAnimInstance::AnimNotify_AttackEndNotify()
 	ComboCount = 0;
 
 	OnAttackEndDelegate.Broadcast();
-	UE_LOG(LogTemp, Warning, TEXT("WWAnimInstasnce AttackEnd"));
 }
 
 void UWWAnimInstance::AnimNotify_AnimMoveStartNotify()
@@ -232,6 +274,17 @@ void UWWAnimInstance::AnimNotify_CharacterHitAnimEndNotify()
 	bIsPlayingCharacterHitMontage = false;
 }
 
+void UWWAnimInstance::AnimNotify_KickDamage()
+{
+	OnKickDamageDelegate.Broadcast();
+}
+
+void UWWAnimInstance::AnimNotify_KickEnd()
+{
+	bIsAttacking = false;
+	OnKickEndDelegate.Broadcast();
+}
+
 void UWWAnimInstance::InitBoolCondition()
 {
 	bIsAttacking = false;
@@ -240,6 +293,10 @@ void UWWAnimInstance::InitBoolCondition()
 	bIsPlayingJumpToGroundSkillAnim = false;
 	bIsPlayingCharacterHitMontage = false;
 
+	bWillPlayingKickAttackAnim = false;
+	bIsPlayingKickAttackAnim = false;
+
 	Montage_Stop(0, AttackMontage);
-	Montage_Stop(0, JumpToGrundAnim);
+	Montage_Stop(0, ChargeAttack1);
+	Montage_Stop(0, ChargeAttack2);
 }
