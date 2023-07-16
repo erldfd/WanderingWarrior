@@ -144,6 +144,15 @@ private:
 	UFUNCTION()
 	void AnimNotify_Melee360AttackEnd();
 
+	UFUNCTION()
+	void AnimNotify_FallingStart();
+
+	UFUNCTION()
+	void AnimNotify_FallingEnd();
+
+	UFUNCTION()
+	void AnimNotify_StandUpEnd();
+
 	void InitBoolCondition();
 
 private:
@@ -157,8 +166,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	uint8 bIsDead : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	uint8 bIsHitAndFly : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
+	uint8 bIsFallen : 1;
 
 	uint8 bIsAttacking : 1;
 	uint8 bCanComboAttack : 1;

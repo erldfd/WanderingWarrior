@@ -32,11 +32,13 @@ private:
 
 	void DamageJumpToGrundSkill();
 
-	void MoveForward();
+	void JumpToGroundMoveForward();
 
 	void DamageKickAttack();
 
 	void DamageMelee360Attack();
+
+	void Melee360AttackMoveForward();
 
 private:
 
@@ -60,6 +62,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = Skill)
 	float Melee360AttackDamage;
 
+	UPROPERTY(EditAnywhere, Category = Skill)
+	int32 Melee360AttackMaxMoveCount;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	int32 JumpToGroundSkillMaxMoveCount;
+
+	int32 Melee360AttackComboCount;
+
 	UPROPERTY()
 	TObjectPtr<UParticleSystem> PS_RockBurst0;
 
@@ -68,4 +78,16 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USoundBase> SW_RockBurst0_1;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	TObjectPtr<UParticleSystem> PS_CircleAttack;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	TObjectPtr<USoundBase> SB_CircleAttack;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	TObjectPtr<UParticleSystem> PS_KickAttack;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	TObjectPtr<USoundBase> SB_KickAttack;
 };

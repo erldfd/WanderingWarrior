@@ -44,6 +44,10 @@ UPlayerSkillComponent::UPlayerSkillComponent()
 
 	Melee360AttackDamage = 200;
 	Melee360AttackRadius = 400;
+
+	Melee360AttackMaxMoveCount = 30;
+
+	JumpToGroundSkillMaxMoveCount = 70;
 }
 
 
@@ -102,7 +106,7 @@ void UPlayerSkillComponent::JumpToGroundSkillImplement()
 		return;
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::MoveForward), 0.01, true);
+	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::JumpToGroundMoveForward), 0.01, true);
 	AnimInstance.PlayJumpToGrundAnim();
 }
 
@@ -133,7 +137,7 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
 	}), 1, false, 0.3);
 
-	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::MoveForward), 0.01, true);
+	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::JumpToGroundMoveForward), 0.01, true);
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
@@ -183,7 +187,7 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 	DrawDebugSphere(&World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Red, false, 1, 0, 1);
 }
 
-void UPlayerSkillComponent::MoveForward()
+void UPlayerSkillComponent::JumpToGroundMoveForward()
 {
 	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
 	check(&PlayerCharacter);
@@ -193,7 +197,7 @@ void UPlayerSkillComponent::MoveForward()
 
 	MoveCount++;
 
-	if (MoveCount > 70) 
+	if (MoveCount > JumpToGroundSkillMaxMoveCount) 
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RepeatSometingTimerHandle);
 		MoveCount = 0;
@@ -222,15 +226,17 @@ void UPlayerSkillComponent::DamageKickAttack()
 
 	// get forward vector
 	const FVector Direction = PlayerCharacter.GetActorForwardVector();
-	const FVector SkillLocation = Center + Direction * KickAttackRange;
+	FVector SkillLocation = Center + Direction * KickAttackRange * 0.3f;
 
-	UGameplayStatics::SpawnEmitterAtLocation(&World, PS_RockBurst0, SkillLocation, Rotation, true, EPSCPoolMethod::AutoRelease);
+	UGameplayStatics::SpawnEmitterAtLocation(&World, PS_KickAttack, SkillLocation, Rotation, true, EPSCPoolMethod::AutoRelease);
 	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, SkillLocation);
 
 	World.GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
 
 		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
 	}), 1, false, 0.3);
+
+	SkillLocation = Center + Direction * KickAttackRange;
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
@@ -300,13 +306,14 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 
 	//UGameplayStatics::SpawnEmitterAtLocation(&World, PS_RockBurst0, Center, Rotation, true, EPSCPoolMethod::AutoRelease);
 	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, Center);
+	UGameplayStatics::SpawnEmitterAtLocation(&World, PS_CircleAttack, Center, Rotation, true, EPSCPoolMethod::AutoRelease);
 
 	World.GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateLambda([this]()->void {
 
 		UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_1, GetOwner()->GetActorLocation());
 	}), 1, false, 0.3);
 
-	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::MoveForward), 0.01, true);
+	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::Melee360AttackMoveForward), 0.01, true);
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
@@ -354,4 +361,29 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 	}
 
 	DrawDebugSphere(&World, Center, Radius, 16, FColor::Red, false, 1, 0, 1);
+}
+
+void UPlayerSkillComponent::Melee360AttackMoveForward()
+{
+	Melee360AttackComboCount++;
+
+	if (Melee360AttackComboCount > 2)
+	{
+		Melee360AttackComboCount = 0;
+		return;
+	}
+
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
+
+	FHitResult Hit;
+	PlayerCharacter.AddActorWorldOffset(PlayerCharacter.GetActorForwardVector() * 5, true, &Hit);
+
+	MoveCount++;
+
+	if (MoveCount > Melee360AttackMaxMoveCount)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RepeatSometingTimerHandle);
+		MoveCount = 0;
+	}
 }

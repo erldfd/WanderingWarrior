@@ -148,11 +148,27 @@ void AWWCharacter::Tick(float DeltaTime)
 		FVector NewLocation = FMath::VInterpTo(GetActorLocation(), GetActorLocation() + KnockbackDirection * KnockbackStrength, DeltaTime, 1.0f);
 		FHitResult Hit;
 		SetActorLocation(NewLocation, true, &Hit);
+		if (KnockbackDirection.Z > 0)
+		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		}
 
 		if (Hit.IsValidBlockingHit())
 		{
 			bIsKnockbackStarted = false;
 		}
+	}
+	else if (GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_Flying)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+	}
+	else if (AnimInstance->GetHitAndFly() && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_Walking)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	}
+	else if (AnimInstance->GetHitAndFly() == false && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_None)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	}
 }
 

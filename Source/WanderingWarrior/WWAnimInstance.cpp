@@ -230,7 +230,15 @@ void UWWAnimInstance::PlayChargeAttack3Montage()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayChargeAttack3Montage, In"));
-	Montage_Play(ChargeAttack3);
+	if (ChargeAttack3ComboCount > 0)
+	{
+		Montage_Play(ChargeAttack3, 1, EMontagePlayReturnType::MontageLength, 0.3f);
+	}
+	else
+	{
+		Montage_Play(ChargeAttack3);
+	}
+	
 	bIsPlayingChargeAttack3Anim = true;
 
 	ChargeAttack3ComboCount++;
@@ -238,6 +246,11 @@ void UWWAnimInstance::PlayChargeAttack3Montage()
 
 void UWWAnimInstance::PlayCharacterHitMontage()
 {
+	if (ComboCount == 3 || bIsPlayingChargeAttack1Anim || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim || bIsInAir)
+	{
+		return;
+	}
+
 	InitBoolCondition();
 	bIsPlayingCharacterHitMontage = true;
 
@@ -351,6 +364,33 @@ void UWWAnimInstance::AnimNotify_Melee360AttackEnd()
 {
 	bIsAttacking = false;
 	OnChargeAttack3EndDelegate.Broadcast();
+}
+
+void UWWAnimInstance::AnimNotify_FallingStart()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+}
+
+void UWWAnimInstance::AnimNotify_FallingEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_FallingEnd"));
+
+	if (bIsDead)
+	{
+		return;
+	}
+
+	bIsFallen = true;
+}
+
+void UWWAnimInstance::AnimNotify_StandUpEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_StandUpEnd"));
+	bIsFallen = false;
+	bIsHitAndFly = false;
 }
 
 void UWWAnimInstance::InitBoolCondition()
