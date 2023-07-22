@@ -37,6 +37,8 @@ public:
 
 	void DoChargeAttack();
 
+	class UCameraComponent& GetCamera();
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -48,6 +50,15 @@ private:
 
 	void Move(const struct FInputActionValue& Value);
 	void Look(const struct FInputActionValue& Value);
+
+	UFUNCTION()
+	void OnHitToSomething(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit );
+
+	UFUNCTION()
+	void OnBeginOverlapWithSomething(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlapWithSomething(AActor* OverlappedActor, AActor* OtherActor);
 
 private:
 
@@ -86,4 +97,15 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
 	TObjectPtr<class UInputMappingContext> CharacterInput;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Footprint)
+	TObjectPtr<class UMaterialInstance> LeftFootprintMaterialInstance;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Footprint)
+	TObjectPtr<class UMaterialInstance> RightFootprintMaterialInstance;
+
+	uint8 bIsWet;
+	uint8 bIsMoved;
+	uint8 bIsReadyToLeftFootprint;
+	float FootprintDelay;
 };

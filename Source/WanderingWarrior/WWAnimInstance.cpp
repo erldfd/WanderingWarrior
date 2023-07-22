@@ -31,13 +31,14 @@ UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0
 	}
 
 	ChargeAttack3MaxComboCount = 4;
+	HitAnimRate = 1.0f;
 }
 
 void UWWAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	APawn& Pawn = *TryGetPawnOwner();
+	/*APawn& Pawn = *TryGetPawnOwner();
 
 	if (IsValid(&Pawn) == false)
 	{
@@ -57,7 +58,7 @@ void UWWAnimInstance::NativeInitializeAnimation()
 	if (&Player)
 	{
 		HitAnimRate = 1.5f;
-	}
+	}*/
 }
 
 void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -244,6 +245,16 @@ void UWWAnimInstance::PlayChargeAttack3Montage()
 	ChargeAttack3ComboCount++;
 }
 
+bool UWWAnimInstance::GetIsHit()
+{
+	return bIsHit;
+}
+
+void UWWAnimInstance::SetIsHit(bool NewIsHit)
+{
+	bIsHit = NewIsHit;
+}
+
 void UWWAnimInstance::PlayCharacterHitMontage()
 {
 	if (ComboCount == 3 || bIsPlayingChargeAttack1Anim || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim || bIsInAir)
@@ -257,6 +268,11 @@ void UWWAnimInstance::PlayCharacterHitMontage()
 	if (ensure(CharacterHitMongtage) == false) return;
 
 	Montage_Play(CharacterHitMongtage, HitAnimRate);
+}
+
+void UWWAnimInstance::StopCharacterHitMontage()
+{
+	Montage_Stop(0, CharacterHitMongtage);
 }
 
 bool UWWAnimInstance::GetIsPlayingCharacterHitMontage()
@@ -372,6 +388,9 @@ void UWWAnimInstance::AnimNotify_FallingStart()
 	{
 		return;
 	}
+
+	StopAllMontages(0);
+	InitBoolCondition();
 }
 
 void UWWAnimInstance::AnimNotify_FallingEnd()
@@ -386,11 +405,31 @@ void UWWAnimInstance::AnimNotify_FallingEnd()
 	bIsFallen = true;
 }
 
+void UWWAnimInstance::AnimNotify_StandUpStart()
+{
+	
+}
+
 void UWWAnimInstance::AnimNotify_StandUpEnd()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_StandUpEnd"));
 	bIsFallen = false;
 	bIsHitAndFly = false;
+}
+
+void UWWAnimInstance::AnimNotify_HitStart()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitStart"));
+}
+
+void UWWAnimInstance::AnimNotify_HitEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitEnd"));
+}
+
+void UWWAnimInstance::AnimNotify_HitAndFlyStart()
+{
+	Montage_Stop(0, CharacterHitMongtage);
 }
 
 void UWWAnimInstance::InitBoolCondition()

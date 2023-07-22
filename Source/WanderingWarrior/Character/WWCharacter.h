@@ -57,6 +57,9 @@ protected:
 	void StartKnockback(FVector Direction, float Strength, float Duration);
 	void StopKnockback();
 
+	void StartHitFly(FVector Direction, float NewFlyingTime, float NewFlyingHeight, float NewAcceleration, float NewFlyingDistance);
+	void StopHitFly();
+
 protected:
 
 	UPROPERTY()
@@ -97,4 +100,20 @@ private:
 	FVector KnockbackDirection;
 	float KnockbackStrength;
 	FTimerHandle KnockbackTimerHandle;
+
+	FVector FlyingOrigin;
+	FVector FlyingDestination;
+
+	float FlyingTime;
+	float FlyingHeight;
+	float FlyingAcceleration;
+
+	//UPROPERTY(EditAnywhere, Category = FlyingProperties, meta = (AllowPrivateAccess = true))
+	float FlyingDistance;
+
+	FVector HeightVelocity;
+
+	float ElapsedTime;
+
+	uint8 bIsStartedHitFly;
 };

@@ -59,6 +59,7 @@ public:
 	void SetIsPlayingChargeAttack1Anim(bool bIsPlaying);
 
 	void PlayCharacterHitMontage();
+	void StopCharacterHitMontage();
 
 	bool GetIsPlayingCharacterHitMontage();
 	void SetIsPlayingCharacterHitMontage(bool bIsPlaying);
@@ -83,6 +84,10 @@ public:
 	void SetWillPlayChargeAttack3Anim(bool NewWillPlayChargeAttack3Anim);
 
 	void PlayChargeAttack3Montage();
+
+	bool GetIsHit();
+	void SetIsHit(bool NewIsHit);
+
 
 public:
 
@@ -151,7 +156,19 @@ private:
 	void AnimNotify_FallingEnd();
 
 	UFUNCTION()
+	void AnimNotify_StandUpStart();
+
+	UFUNCTION()
 	void AnimNotify_StandUpEnd();
+
+	UFUNCTION()
+	void AnimNotify_HitStart();
+
+	UFUNCTION()
+	void AnimNotify_HitEnd();
+
+	UFUNCTION()
+	void AnimNotify_HitAndFlyStart();
 
 	void InitBoolCondition();
 
@@ -171,6 +188,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	uint8 bIsFallen : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
+	uint8 bIsHit : 1;
 
 	uint8 bIsAttacking : 1;
 	uint8 bCanComboAttack : 1;
@@ -199,7 +219,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> ChargeAttack3;
 
-
 	int32 ComboCount;
 
 	int32 ChargeAttack3ComboCount;
@@ -207,6 +226,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = Anim, meta = (AllowPrivateAccess = true))
 	int32 ChargeAttack3MaxComboCount;
 
-	UPROPERTY(EditAnywhere, Category = Anim, meta = (PrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float HitAnimRate;
 };

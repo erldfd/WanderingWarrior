@@ -12,13 +12,14 @@
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values for this component's properties
 UPlayerSkillComponent::UPlayerSkillComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS_ROCKBURST0(TEXT("/Game/FX/PS_RockBurst0.PS_RockBurst0"));
 	if (PS_ROCKBURST0.Succeeded())
@@ -88,9 +89,57 @@ void UPlayerSkillComponent::BeginPlay()
 void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	//GetWorld()->GetTimerManager().SetTimer(, FTimerDelegate::CreateUObject(this, &UInGameWidget::HideEnemyHPAndNameWidget), 3, false);
-	
-	// ...
+
+	//UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::TickComponent %f"), FMath::Lerp(80.0f, 90.0f, FOVAlpha));
+
+	float FOVChangeGoal = 87;
+	float FOVOrigin = 90;
+
+	if (bIsStartedShake)
+	{
+		FOVAlpha += 1 * DeltaTime * 5.0f;
+
+		APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+		check(&PlayerCharacter);
+
+		UCameraComponent& Camera = PlayerCharacter.GetCamera();
+		check(&Camera);
+
+		float NewFOV = -1;
+		float CurrentFOV = Camera.FieldOfView;
+
+		if (bIsDecreaseingFOV && CurrentFOV > FOVChangeGoal)
+		{
+			NewFOV = FMath::Lerp(90.0f, 80.0f, FOVAlpha);
+			//NewFOV = FOVChangeGoal;
+		}
+		else if (bIsDecreaseingFOV == false && Camera.FieldOfView < FOVOrigin)
+		{ 
+			//NewFOV = FMath::Lerp(FOVChangeGoal, FOVOrigin, FOVAlpha);
+			NewFOV = FOVOrigin;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::TickComponent NewFOV : %f, Decreasing : %d"), NewFOV, bIsDecreaseingFOV);
+
+		if (bIsDecreaseingFOV && CurrentFOV <= FOVChangeGoal)
+		{
+			bIsDecreaseingFOV = false;
+			FOVAlpha = 0;
+		}
+
+		if (bIsDecreaseingFOV == false && CurrentFOV >= FOVOrigin && bIsStartedShake)
+		{
+			bIsStartedShake = false;
+			UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::TickComponent, Finished"));
+		}
+
+		if (NewFOV == -1)
+		{
+			return;
+		}
+
+		SetPlayerCameraFOV(NewFOV);
+	}
 }
 
 void UPlayerSkillComponent::JumpToGroundSkillImplement()
@@ -178,6 +227,7 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
+		ShakeWithCameraFOV(80, 0.3);
 		DrawDebugSphere(&World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
 
@@ -277,6 +327,7 @@ void UPlayerSkillComponent::DamageKickAttack()
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
+		ShakeWithCameraFOV(80, 0.5);
 		DrawDebugBox(GetWorld(), SkillLocation, FVector(Extent * 0.5f), PlayerCharacter.GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
 
 		return;
@@ -354,6 +405,7 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
+		ShakeWithCameraFOV(80, 0.3);
 		DrawDebugSphere(&World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
 
@@ -386,4 +438,36 @@ void UPlayerSkillComponent::Melee360AttackMoveForward()
 		GetWorld()->GetTimerManager().ClearTimer(RepeatSometingTimerHandle);
 		MoveCount = 0;
 	}
+}
+
+void UPlayerSkillComponent::SetPlayerCameraFOV(float FOV)
+{
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
+
+	UCameraComponent& Camera = PlayerCharacter.GetCamera();
+	check(&Camera);
+
+	Camera.SetFieldOfView(FOV);
+}
+
+void UPlayerSkillComponent::ShakeWithCameraFOV(float FOV, float Duration)
+{
+	bIsStartedShake = true;
+	bIsDecreaseingFOV = true;
+	FOVAlpha = 0;
+
+	/*UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::ShakeWithCameraFOV"));
+
+	SetPlayerCameraFOV(FOV);
+
+	ShakeCameraTimerHandle.Invalidate();
+
+	GetWorld()->GetTimerManager().SetTimer(ShakeCameraTimerHandle, FTimerDelegate::CreateLambda([&]()->void {
+
+		SetPlayerCameraFOV(90.0f);
+		UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::ShakeWithCameraFOV, Set to 90"));
+	}), 1, false, Duration);*/
+
+	
 }

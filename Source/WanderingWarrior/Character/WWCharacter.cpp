@@ -77,8 +77,7 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	CharacterStatComponent->SetHP(HPAfterDamage);
 
-	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-
+	//AnimInstance->SetIsHit(true);
 	if (HPAfterDamage <= 0)
 	{
 		AnimInstance->SetIsDead(true);
@@ -94,15 +93,17 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (DamageCauserCharacter && DamageCauserCharacter->GetAnimInstance().GetComboCount() == 3)
 	{
 		GetAnimInstance().SetHitAndFly(true);
-		MoveDir.Z = 1;
+		AnimInstance->StopAllMontages(0);
+		MoveDir.Z = 1.1;
+		//StartHitFly(MoveDir, 1, 200, 1, 200);
+		StartKnockback(MoveDir, 500, 0.2);
 	}
 	else
 	{
 		AnimInstance->PlayCharacterHitMontage();
 		MoveDir.Z = 0;
+		StartKnockback(MoveDir, 1000, 0.1);
 	}
-
-	StartKnockback(MoveDir, 1000, 0.1);
 
 	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamage, Damage : %f, ActorHP : %f, Actor : %s"), Damage, HPAfterDamage, *GetName());
 	return Damage;
@@ -117,6 +118,35 @@ UWWAnimInstance& AWWCharacter::GetAnimInstance()
 void AWWCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bIsStartedHitFly)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		ElapsedTime += 1 * DeltaTime;
+
+		FVector FrontVelocity = (FlyingDestination - FlyingOrigin) / FlyingTime;
+
+		HeightVelocity.Z -= (FlyingHeight / FlyingTime + FlyingAcceleration * FlyingTime / 4) * DeltaTime;
+
+		FVector Velocity = FrontVelocity + HeightVelocity;
+
+		FHitResult Hit;
+		AddActorWorldOffset(Velocity * DeltaTime, true, &Hit);
+
+		if (ElapsedTime >= FlyingTime)
+		{
+			StopHitFly();
+		}
+
+		if (Hit.IsValidBlockingHit())
+		{
+			AWWCharacter* Character = Cast<AWWCharacter>(Hit.GetActor());
+			if (Character == nullptr)
+			{
+				StopHitFly();
+			}
+		}
+	}
 
 	if (bIsAnimMoveStart)
 	{
@@ -133,14 +163,26 @@ void AWWCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (AnimInstance->GetIsPlayingCharacterHitMontage())
+	bool bIsPlayingHitMontage = AnimInstance->GetIsPlayingCharacterHitMontage();
+	bool bIsHitAndFly = AnimInstance->GetHitAndFly();
+	bool bIsInAir = GetMovementComponent()->IsFalling();
+	EMovementMode MovementMode = GetCharacterMovement()->MovementMode.GetValue();
+
+	if (bIsPlayingHitMontage)
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Tick, %s, Set To None"), *GetName());
 	}
-	else if(GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_None)
+	else if(MovementMode == EMovementMode::MOVE_None && bIsHitAndFly == false)
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		//GetCharacterMovement()->SetDefaultMovementMode();
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Tick, %s, Set To Walking"), *GetName());
+	}
+	else if (bIsHitAndFly)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Tick, %s, Set To Falling"), *GetName());
 	}
 
 	if (bIsKnockbackStarted)
@@ -150,26 +192,42 @@ void AWWCharacter::Tick(float DeltaTime)
 		SetActorLocation(NewLocation, true, &Hit);
 		if (KnockbackDirection.Z > 0)
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 		}
 
 		if (Hit.IsValidBlockingHit())
 		{
-			bIsKnockbackStarted = false;
+			AWWCharacter* Character = Cast<AWWCharacter>(Hit.GetActor());
+			if (Character == nullptr)
+			{
+				bIsKnockbackStarted = false;
+			}
 		}
 	}
-	else if (GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_Flying)
-	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
-	}
-	else if (AnimInstance->GetHitAndFly() && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_Walking)
+	//else if (MovementMode == EMovementMode::MOVE_Falling && bIsHitAndFly)
+	//{
+	//	FHitResult Hit;
+	//	AddActorWorldOffset(-GetActorForwardVector() * AttackMoveSpeed, true, &Hit);
+
+	//	if (Hit.bBlockingHit)
+	//	{
+	//		AttackMoveSpeed = 0;
+	//	}
+	//	else
+	//	{
+	//		AttackMoveSpeed = 5;
+	//	}
+	//}
+	/*else if (AnimInstance->GetHitAndFly() && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_Walking)
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	}
 	else if (AnimInstance->GetHitAndFly() == false && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_None)
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	}
+	}*/
+
+	//UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Tick, %s MovemetMode : %d, Air? : %d"), *GetName(), GetCharacterMovement()->MovementMode.GetValue(), bIsInAir);
 }
 
 // Called to bind functionality to input
@@ -411,6 +469,27 @@ void AWWCharacter::StopKnockback()
 	bIsKnockbackStarted = false;
 	KnockbackDirection = FVector::Zero();
 	KnockbackStrength = 0;
+}
+
+void AWWCharacter::StartHitFly(FVector Direction, float NewFlyingTime, float NewFlyingHeight, float NewAcceleration, float NewFlyingDistance)
+{
+	bIsStartedHitFly = true;
+
+	ElapsedTime = 0;
+	FlyingTime = NewFlyingTime;
+	FlyingHeight = NewFlyingHeight;
+	FlyingAcceleration = NewAcceleration;
+	FlyingDistance = NewFlyingDistance;
+
+	FlyingOrigin = GetActorLocation();
+	FlyingDestination = FlyingOrigin + Direction.Normalize() * FlyingDistance;
+	HeightVelocity = FVector(0, 0, 2 * FlyingHeight / FlyingTime + FlyingAcceleration * FlyingTime / 2);
+}
+
+void AWWCharacter::StopHitFly()
+{
+	bIsStartedHitFly = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 }
 
 void AWWCharacter::OnAnimMoveStart()

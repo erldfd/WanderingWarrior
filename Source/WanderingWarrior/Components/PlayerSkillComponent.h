@@ -40,11 +40,15 @@ private:
 
 	void Melee360AttackMoveForward();
 
+	void SetPlayerCameraFOV(float FOV);
+
+	void ShakeWithCameraFOV(float FOV, float Duration);
+
 private:
 
 	FTimerHandle RepeatSometingTimerHandle;
 	FTimerHandle CoolDownTimerHandle;
-
+	FTimerHandle ShakeCameraTimerHandle;
 	int32 MoveCount;
 
 	UPROPERTY(EditAnywhere, Category = Skill)
@@ -90,4 +94,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Skill)
 	TObjectPtr<USoundBase> SB_KickAttack;
+
+	uint8 bIsStartedShake;
+	uint8 bIsDecreaseingFOV;
+	float FOVAlpha = 0;
 };

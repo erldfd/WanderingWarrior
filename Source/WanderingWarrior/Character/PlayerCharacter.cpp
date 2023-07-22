@@ -26,6 +26,9 @@
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Engine/DecalActor.h"
+#include "Components/DecalComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -66,6 +69,28 @@ APlayerCharacter::APlayerCharacter()
 
 	Inventory = CreateDefaultSubobject<UCharacterInventory>(TEXT("NewInventory"));
 	QuickSlot = CreateDefaultSubobject<UCharacterQuickSlot>(TEXT("NewQuickSlot"));
+
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnHitToSomething);
+	if (GetCapsuleComponent()->OnComponentHit.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::APlayerCharacter, GetCapsuleComponent()->OnComponentHit is NOT bound"));
+	}
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APlayerCharacter::OnBeginOverlapWithSomething);
+	if (GetCapsuleComponent()->OnComponentBeginOverlap.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::APlayerCharacter, GetCapsuleComponent()->OnComponentBeginOverlap is NOT bound"));
+	}
+
+	OnActorEndOverlap.AddDynamic(this, &APlayerCharacter::OnEndOverlapWithSomething);
+	if (OnActorEndOverlap.IsBound() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::APlayerCharacter, OnActorEndOverlap is NOT bound"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::APlayerCharacter, OnActorEndOverlap is bound"));
+	}
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -110,6 +135,62 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (bIsWet)
+	{
+		if (FootprintDelay > 0)
+		{
+			FootprintDelay += 1 * DeltaTime;
+
+			if (FootprintDelay >= 0.25)
+			{
+				FootprintDelay = 0;
+			}
+
+			return;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::Tick, bIsReadyToLeftFootprint : %d, bIsMoved : %d "), bIsReadyToLeftFootprint, bIsMoved);
+		if (bIsMoved == false || GetMovementComponent()->IsFalling())
+		{
+			return;
+		}
+
+		FootprintDelay += 1 * DeltaTime;
+		FVector DecalLocation = GetActorLocation();
+		DecalLocation.Z -= 90.0;
+
+		if (bIsReadyToLeftFootprint)
+		{
+			DecalLocation -= GetActorRightVector() * 20;
+		}
+		else
+		{
+			DecalLocation += GetActorRightVector() * 20;
+		}
+
+		ADecalActor* FootprintDecal = GetWorld()->SpawnActor<ADecalActor>(DecalLocation, GetActorRotation());
+		if (FootprintDecal == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::Tick, No decal spawned"));
+			return;
+		}
+
+		if (bIsReadyToLeftFootprint)
+		{
+			FootprintDecal->SetDecalMaterial(LeftFootprintMaterialInstance);
+			bIsReadyToLeftFootprint = false;
+		}
+		else
+		{
+			FootprintDecal->SetDecalMaterial(RightFootprintMaterialInstance);
+			bIsReadyToLeftFootprint = true;
+		}
+
+		FootprintDecal->SetLifeSpan(2.0f);
+		FootprintDecal->GetDecal()->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+		bIsMoved = false;
+	}
 }
 
 // Called to bind functionality to input
@@ -205,6 +286,12 @@ void APlayerCharacter::DoChargeAttack()
 	}
 }
 
+UCameraComponent& APlayerCharacter::GetCamera()
+{
+	check(Camera);
+	return *Camera;
+}
+
 void APlayerCharacter::OnStartNextCombo()
 {
 	FRotator Rotation = Controller->GetControlRotation();
@@ -236,6 +323,8 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 
 	AddMovementInput(ForwardDirection, MovementVector.X);
 	AddMovementInput(RightDirection, MovementVector.Y);
+
+	bIsMoved = true;
 }
 
 void APlayerCharacter::Look(const FInputActionValue& Value)
@@ -245,3 +334,40 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
 }
+
+void APlayerCharacter::OnHitToSomething(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
+	{
+		return;
+	}
+
+	if (OtherActor->Tags[0] == "Water")
+	{
+		
+	}
+}
+
+void APlayerCharacter::OnBeginOverlapWithSomething(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
+	{
+		return;
+	}
+
+	if (OtherActor->Tags[0] == "Water" && bIsWet == false)
+	{
+		bIsWet = true;
+	}
+}
+
+void APlayerCharacter::OnEndOverlapWithSomething(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (OtherActor->Tags.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, Empty"))
+	}
+	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, OtherActor Name : %s"), *OtherActor->Tags[0].ToString());
+}
+
