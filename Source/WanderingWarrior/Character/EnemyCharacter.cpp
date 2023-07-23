@@ -34,8 +34,7 @@ void AEnemyCharacter::BeginPlay()
 	UWWAnimInstance& PlayerAnimInstance = *Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->GetPlayerAnimInstance();
 	if (ensure(&PlayerAnimInstance) == false) return;
 
-	PlayerAnimInstance.OnStartNextComboDelegate.AddLambda([this]()->void {SetIsDamaged(false); });
-	PlayerAnimInstance.OnAttackEndDelegate.AddLambda([this]()->void {SetIsDamaged(false); });
+	PlayerAnimInstance.OnInitIsDamaged.AddLambda([this]()->void {SetIsDamaged(false); });
 }
 
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

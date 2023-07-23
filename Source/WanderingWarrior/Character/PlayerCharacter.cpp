@@ -136,7 +136,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	if (bIsWet)
+	/*if (bIsWet)
 	{
 		if (FootprintDelay > 0)
 		{
@@ -190,7 +190,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		FootprintDecal->SetLifeSpan(2.0f);
 		FootprintDecal->GetDecal()->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 		bIsMoved = false;
-	}
+	}*/
 }
 
 // Called to bind functionality to input
@@ -292,6 +292,16 @@ UCameraComponent& APlayerCharacter::GetCamera()
 	return *Camera;
 }
 
+bool APlayerCharacter::GetIsInWater()
+{
+	return bIsInWater;
+}
+
+bool APlayerCharacter::GetIsWet()
+{
+	return bIsWet;
+}
+
 void APlayerCharacter::OnStartNextCombo()
 {
 	FRotator Rotation = Controller->GetControlRotation();
@@ -359,6 +369,7 @@ void APlayerCharacter::OnBeginOverlapWithSomething(UPrimitiveComponent* Overlapp
 	if (OtherActor->Tags[0] == "Water" && bIsWet == false)
 	{
 		bIsWet = true;
+		bIsInWater = true;
 	}
 }
 

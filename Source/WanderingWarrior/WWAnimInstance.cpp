@@ -9,6 +9,10 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Engine/DecalActor.h"
+#include "Components/DecalComponent.h"
 
 UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0)
 {
@@ -268,6 +272,9 @@ void UWWAnimInstance::PlayCharacterHitMontage()
 	if (ensure(CharacterHitMongtage) == false) return;
 
 	Montage_Play(CharacterHitMongtage, HitAnimRate);
+
+	OnHitByEnemyDelegate.Broadcast();
+	OnInitIsDamaged.Broadcast();
 }
 
 void UWWAnimInstance::StopCharacterHitMontage()
@@ -309,6 +316,7 @@ void UWWAnimInstance::AnimNotify_StartNextComboNotify()
 	}
 
 	OnStartNextComboDelegate.Broadcast();
+	OnInitIsDamaged.Broadcast();
 }
 
 void UWWAnimInstance::AnimNotify_AttackEndNotify()
@@ -355,6 +363,7 @@ void UWWAnimInstance::AnimNotify_KickEnd()
 {
 	bIsAttacking = false;
 	OnKickEndDelegate.Broadcast();
+	OnInitIsDamaged.Broadcast();
 }
 
 void UWWAnimInstance::AnimNotify_Melee360AttackDamage()
@@ -380,6 +389,7 @@ void UWWAnimInstance::AnimNotify_Melee360AttackEnd()
 {
 	bIsAttacking = false;
 	OnChargeAttack3EndDelegate.Broadcast();
+	OnInitIsDamaged.Broadcast();
 }
 
 void UWWAnimInstance::AnimNotify_FallingStart()
@@ -430,6 +440,80 @@ void UWWAnimInstance::AnimNotify_HitEnd()
 void UWWAnimInstance::AnimNotify_HitAndFlyStart()
 {
 	Montage_Stop(0, CharacterHitMongtage);
+}
+
+void UWWAnimInstance::AnimNotify_RunRightFoot()
+{
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (&PlayerCharacter == nullptr)
+	{
+		return;
+	}
+
+	if (PlayerCharacter.GetIsWet())
+	{
+		FVector DecalLocation = PlayerCharacter.GetActorLocation();
+		DecalLocation.Z -= 90.0;
+
+		DecalLocation += PlayerCharacter.GetActorRightVector() * 20;
+		
+		ADecalActor* FootprintDecal = GetWorld()->SpawnActor<ADecalActor>(DecalLocation, PlayerCharacter.GetActorRotation());
+		if (FootprintDecal == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_RunRightFoot, No decal spawned"));
+			return;
+		}
+
+		FootprintDecal->SetDecalMaterial(RightFootprintMaterialInstance);
+		FootprintDecal->SetLifeSpan(2.0f);
+		FootprintDecal->GetDecal()->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	}
+
+	if (PlayerCharacter.GetIsInWater())
+	{
+		FVector ParticleLocation = PlayerCharacter.GetActorLocation();
+		ParticleLocation.Z -= 70.0;
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), PS_WaterSplash, ParticleLocation, PlayerCharacter.GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
+	}
+}
+
+void UWWAnimInstance::AnimNotify_RunLeftFoot()
+{
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (&PlayerCharacter == nullptr)
+	{
+		return;
+	}
+
+	if (PlayerCharacter.GetIsWet())
+	{
+		FVector DecalLocation = PlayerCharacter.GetActorLocation();
+		DecalLocation.Z -= 90.0;
+
+		DecalLocation -= PlayerCharacter.GetActorRightVector() * 20;
+
+		ADecalActor* FootprintDecal = GetWorld()->SpawnActor<ADecalActor>(DecalLocation, PlayerCharacter.GetActorRotation());
+		if (FootprintDecal == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_RunLeftFoot, No decal spawned"));
+			return;
+		}
+
+		FootprintDecal->SetDecalMaterial(LeftFootprintMaterialInstance);
+		FootprintDecal->SetLifeSpan(2.0f);
+		FootprintDecal->GetDecal()->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	}
+
+	if (PlayerCharacter.GetIsInWater())
+	{
+		FVector ParticleLocation = PlayerCharacter.GetActorLocation();
+		ParticleLocation.Z -= 70.0;
+
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), PS_WaterSplash, ParticleLocation, PlayerCharacter.GetActorRotation(), true, EPSCPoolMethod::AutoRelease);
+	}
 }
 
 void UWWAnimInstance::InitBoolCondition()

@@ -39,6 +39,9 @@ public:
 
 	class UCameraComponent& GetCamera();
 
+	bool GetIsInWater();
+	bool GetIsWet();
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -104,8 +107,10 @@ private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Footprint)
 	TObjectPtr<class UMaterialInstance> RightFootprintMaterialInstance;
 
-	uint8 bIsWet;
-	uint8 bIsMoved;
-	uint8 bIsReadyToLeftFootprint;
+	uint8 bIsWet : 1;
+	uint8 bIsMoved : 1;
+	uint8 bIsReadyToLeftFootprint : 1;
+	uint8 bIsInWater : 1;
+
 	float FootprintDelay;
 };

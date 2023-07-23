@@ -11,6 +11,7 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnAttackStartDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnHitByEnemyDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnCanInputNextComboDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnStartNextComboDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAnimMoveStartDelegate);
@@ -22,6 +23,7 @@ DECLARE_MULTICAST_DELEGATE(FOnKickEndDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3DamageDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3ComboStartDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3EndDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnInitIsDamaged);
 /**
  * 
  */
@@ -93,6 +95,7 @@ public:
 
 	FOnAttackStartDelegate OnAttackStartDelegate;
 	FOnAttackEndDelegate OnAttackEndDelegate;
+	FOnHitByEnemyDelegate OnHitByEnemyDelegate;
 	FOnCanInputNextComboDelegate OnCanInputNextComboDelegate;
 	FOnStartNextComboDelegate OnStartNextComboDelegate;
 	FOnAnimMoveStartDelegate OnAnimMoveStartDelegate;
@@ -107,6 +110,8 @@ public:
 	FOnChargeAttack3DamageDelegate OnChargeAttack3DamageDelegate;
 	FOnChargeAttack3ComboStartDelegate OnChargeAttack3ComboStartDelegate;
 	FOnChargeAttack3EndDelegate OnChargeAttack3EndDelegate;
+
+	FOnInitIsDamaged OnInitIsDamaged;
 
 private:
 
@@ -170,6 +175,12 @@ private:
 	UFUNCTION()
 	void AnimNotify_HitAndFlyStart();
 
+	UFUNCTION()
+	void AnimNotify_RunRightFoot();
+
+	UFUNCTION()
+	void AnimNotify_RunLeftFoot();
+
 	void InitBoolCondition();
 
 private:
@@ -228,4 +239,13 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	float HitAnimRate;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = VisualEffect)
+	TObjectPtr<class UMaterialInstance> LeftFootprintMaterialInstance;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = VisualEffect)
+	TObjectPtr<class UMaterialInstance> RightFootprintMaterialInstance;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = VisualEffect)
+	TObjectPtr<UParticleSystem> PS_WaterSplash;
 };
