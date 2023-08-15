@@ -132,7 +132,6 @@ void AWWPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("InventoryOpenAndClose", EInputEvent::IE_Released, this, &AWWPlayerController::OpenAndCloseInventory);
-	//InputComponent->BindAction("MouseRightClick", EInputEvent::IE_Released, this, &AWWPlayerController::OnMouseRightButtonClicked);
 
 	InputComponent->BindAction("Number1", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot0);
 	InputComponent->BindAction("Number2", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot1);

@@ -12,10 +12,9 @@ class WANDERINGWARRIOR_API AWeapon : public AAItem
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+
 	AWeapon();
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void SetAttackDamage(float NewDamage);
@@ -23,7 +22,7 @@ public:
 	virtual void Use(const UWorld& World) override;
 
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 	
 protected:

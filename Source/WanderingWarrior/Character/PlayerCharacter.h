@@ -14,15 +14,13 @@ class WANDERINGWARRIOR_API APlayerCharacter : public AWWCharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+
 	APlayerCharacter();
 
 	virtual void PostInitializeComponents() override;
 
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void PossessedBy(AController* NewController) override;
@@ -37,7 +35,6 @@ public:
 
 	class UCharacterInventory& GetInventory() const;
 
-	virtual void Attack(float Value) override;
 	virtual void Attack() override;
 
 	void DoChargeAttack();
@@ -66,9 +63,7 @@ public:
 
 protected:
 
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 private:
 

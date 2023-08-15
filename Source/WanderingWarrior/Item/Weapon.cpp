@@ -14,10 +14,8 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 AWeapon::AWeapon() : AttackDamage(1)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	ItemSkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMeshComponent"));
@@ -39,7 +37,6 @@ AWeapon::AWeapon() : AttackDamage(1)
 	//BoxComponent->SetRelativeLocation(FVector(0, 14, 43));
 }
 
-// Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
@@ -91,7 +88,6 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
-// Called every frame
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

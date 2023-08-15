@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	Character.Attack(1);
+	Character.Attack();
 
 	return EBTNodeResult::InProgress;
 }

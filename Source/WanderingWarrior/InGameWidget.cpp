@@ -116,8 +116,6 @@ void UInGameWidget::NativeOnInitialized()
 	Transform.Translation = FVector2D(100, 100);
 	check(InventoryItemInfoWidget);
 	InventoryItemInfoWidget->SetRenderTransform(Transform);
-
-	//InventoryWidget->GetTabButtonArray()[0]->GetSlotWidgetArray();
 }
 
 void UInGameWidget::HideEnemyHPAndNameWidget()

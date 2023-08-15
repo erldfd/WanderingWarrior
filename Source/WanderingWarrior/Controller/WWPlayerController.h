@@ -46,8 +46,6 @@ private:
 
 	void OpenAndCloseInventory();
 
-	/*void OnMouseRightButtonClicked();*/
-
 	void UseQuickSlot0();
 	void UseQuickSlot1();
 	void UseQuickSlot2();

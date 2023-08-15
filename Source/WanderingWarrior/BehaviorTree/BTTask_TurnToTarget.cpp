@@ -39,7 +39,7 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	FVector LookVector = Target.GetActorLocation() - Character.GetActorLocation();
 	LookVector.Z = 0.0f;
 	const FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
-	//Character->SetActorRotation(TargetRot);//¹Ù·ÎÃÄ´Ùº½
+	//Character->SetActorRotation(TargetRot);// Look Directly
 	Character.SetActorRotation(FMath::RInterpTo(Character.GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 2.0f));
 
 	return EBTNodeResult::Succeeded;

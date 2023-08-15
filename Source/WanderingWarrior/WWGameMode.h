@@ -22,7 +22,6 @@ public:
 
 	AWWGameMode();
 
-	//void GetPlayerAnimInstance(class UWWAnimInstance* NewAnimInstance);
 	UWWAnimInstance* GetPlayerAnimInstance();
 	void SetPlayerAnimInstance(class UWWAnimInstance* NewAnimInstance);
 

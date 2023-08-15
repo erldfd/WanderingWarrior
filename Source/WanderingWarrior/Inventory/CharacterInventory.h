@@ -48,7 +48,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 	virtual void InitializeComponent() override;
-	// Called when the game starts
+
 	virtual void BeginPlay() override;
 
 private:

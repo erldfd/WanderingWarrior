@@ -12,19 +12,15 @@ enum class EWeaponName : uint8;
 enum class EMiscItemName : uint8;
 enum class ETabType : uint8;
 
-//param : is inventory opened?
-//DECLARE_DELEGATE_OneParam(FOnOpenAndCloseInventoryDelegate, bool);
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WANDERINGWARRIOR_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
 	UInventoryComponent();
 	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	class UInventoryTabData& GetCurrentActivatedTab();
@@ -37,7 +33,7 @@ public:
 	void InitTabArray(int32 TabCount);
 
 protected:
-	// Called when the game starts
+
 	virtual void BeginPlay() override;
 
 private:

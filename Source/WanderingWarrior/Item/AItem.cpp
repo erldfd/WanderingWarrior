@@ -5,22 +5,18 @@
 
 #include "WWGameInstance.h"
 
-//#include "Engine/DataTable.h"
 #include "Engine/Texture2D.h"
-// Sets default values
+
 AAItem::AAItem() : MaxItemCount(1)
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void AAItem::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// Called every frame
 void AAItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

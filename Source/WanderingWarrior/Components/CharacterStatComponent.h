@@ -17,10 +17,9 @@ class WANDERINGWARRIOR_API UCharacterStatComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
 	UCharacterStatComponent();
 
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	float GetHP();
@@ -50,7 +49,7 @@ public:
 	FOnMPChangedDelegate OnMPChangedDelegate;
 
 protected:
-	// Called when the game starts
+
 	virtual void BeginPlay() override;
 
 protected:

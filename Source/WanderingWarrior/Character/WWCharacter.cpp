@@ -14,12 +14,10 @@
 #include "Engine/EngineTypes.h"
 #include "DrawDebugHelpers.h"
 
-// Sets default values
 // 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
 AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false), AttackDamageWithoutWeapon(0.2),
 								bIsAnimMoveStart(false), AttackMoveSpeed(5), AttackAnimRate(1), MaxHeightInAir(300)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CharacterStatComponent = CreateDefaultSubobject<UCharacterStatComponent>(TEXT("CharacterStat"));
@@ -67,7 +65,6 @@ void AWWCharacter::PostInitializeComponents()
 	//GetCharacterMovement()->GravityScale = 0;
 }
 
-// Called when the game starts or when spawned
 void AWWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -82,7 +79,6 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	CharacterStatComponent->SetHP(HPAfterDamage);
 
-	//AnimInstance->SetIsHit(true);
 	if (HPAfterDamage <= 0)
 	{
 		AnimInstance->SetIsDead(true);
@@ -170,35 +166,6 @@ void AWWCharacter::Tick(float DeltaTime)
 		GetCharacterMovement()->Velocity.Z = -10;
 	}
 
-	if (bIsStartedHitFly)
-	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-		ElapsedTime += 1 * DeltaTime;
-
-		FVector FrontVelocity = (FlyingDestination - FlyingOrigin) / FlyingTime;
-
-		//HeightVelocity.Z -= (FlyingHeight / FlyingTime + FlyingAcceleration * FlyingTime / 4) * DeltaTime;
-		HeightVelocity.Z -= (4 * FlyingDistance * FMath::Tan(FlyingAngle) / FlyingTime) * DeltaTime;
-		FVector Velocity = FrontVelocity + HeightVelocity;
-
-		FHitResult Hit;
-		AddActorWorldOffset(Velocity * DeltaTime, true, &Hit);
-
-		if (ElapsedTime >= FlyingTime)
-		{
-			StopHitFly();
-		}
-
-		if (Hit.IsValidBlockingHit())
-		{
-			AWWCharacter* Character = Cast<AWWCharacter>(Hit.GetActor());
-			if (Character == nullptr)
-			{
-				StopHitFly();
-			}
-		}
-	}
-
 	if (bIsAnimMoveStart)
 	{
 		FHitResult Hit;
@@ -243,52 +210,15 @@ void AWWCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
-	//else if (MovementMode == EMovementMode::MOVE_Falling && bIsHitAndFly)
-	//{
-	//	FHitResult Hit;
-	//	AddActorWorldOffset(-GetActorForwardVector() * AttackMoveSpeed, true, &Hit);
-
-	//	if (Hit.bBlockingHit)
-	//	{
-	//		AttackMoveSpeed = 0;
-	//	}
-	//	else
-	//	{
-	//		AttackMoveSpeed = 5;
-	//	}
-	//}
-	/*else if (AnimInstance->GetHitAndFly() && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_Walking)
-	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	}
-	else if (AnimInstance->GetHitAndFly() == false && GetCharacterMovement()->MovementMode.GetValue() == EMovementMode::MOVE_None)
-	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	}*/
-
-	//UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Tick, %s MovemetMode : %d, Air? : %d"), *GetName(), GetCharacterMovement()->MovementMode.GetValue(), bIsInAir);
 }
 
-// Called to bind functionality to input
 void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	/*PlayerInputComponent->BindAxis("AttackHold", this, &AWWCharacter::Attack);*/
-
-	/*PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AWWCharacter::InputMoveForward);
-	PlayerInputComponent->BindAxis("Move Right / Left", this, &AWWCharacter::InputMoveRight);*/
-
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	/*PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);*/
 
 	PlayerInputComponent->BindAction("Test", IE_Pressed, this, &AWWCharacter::TestAction);
 }
@@ -384,11 +314,6 @@ void AWWCharacter::AttackCheck()
 	{
 		if (HitResult.GetActor()->IsValidLowLevel())
 		{
-			/*if (Tags[0] == "Enemy" && HitResult.GetActor()->Tags[0] == "Enemy")
-			{
-				return;
-			}*/
-
 			FDamageEvent DamageEvent;
 			HitResult.GetActor()->TakeDamage(AttackDamageWithoutWeapon, DamageEvent, GetController(), this);
 		}
@@ -400,34 +325,6 @@ void AWWCharacter::AttackCheck()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("bResult == false"));
-	}
-}
-
-void AWWCharacter::Attack(float Value)
-{
-	if (Value != 1)
-	{
-		return;
-	}
-
-	bool bIsAttacking = AnimInstance->GetIsAttacking();
-	bool bCanCombo = AnimInstance->GetCanCombo();
-	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
-	bool bIsDead = AnimInstance->GetIsDead();
-	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingChargeAttack1Anim();
-
-	if (bIsDead || bIsPlayingJumpToGroundSkill)
-	{
-		return;
-	}
-
-	if (bIsAttacking == false)
-	{
-		AnimInstance->PlayAttackMontage();
-	}
-	else if (bCanCombo && bWillPlayNextCombo == false)
-	{
-		AnimInstance->SetWillPlayNextCombo(true);
 	}
 }
 
@@ -462,6 +359,7 @@ void AWWCharacter::Attack()
 		return;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack"));
 	if (bIsAttacking == false)
 	{
 		AnimInstance->PlayAttackMontage();
@@ -533,34 +431,6 @@ void AWWCharacter::StopKnockback()
 	bIsKnockbackStarted = false;
 	KnockbackDirection = FVector::Zero();
 	KnockbackStrength = 0;
-}
-
-void AWWCharacter::StartHitFly(FVector Direction, float NewFlyingTime, float NewFlyingHeight, float NewFlyingDistance, float NewFlyingAngle)
-{
-	bIsStartedHitFly = true;
-
-	FlyingAngle = FMath::Atan(NewFlyingHeight / (NewFlyingDistance - 2 * NewFlyingDistance * NewFlyingTime));
-	FlyingHeight = FMath::Tan(FMath::DegreesToRadians(NewFlyingAngle)) * (NewFlyingDistance - 2 * NewFlyingDistance * FlyingTime);
-	UE_LOG(LogTemp, Warning, TEXT(" FlyingAngle : %f, FlyingHeight : %f"), FMath::RadiansToDegrees(FlyingAngle), FlyingHeight);
-
-	ElapsedTime = 0;
-	FlyingTime = NewFlyingTime;
-	FlyingHeight = NewFlyingHeight;
-	//FlyingAcceleration = 
-	FlyingDistance = NewFlyingDistance;
-	
-	FlyingAngle = FMath::DegreesToRadians(NewFlyingAngle);
-
-	FlyingOrigin = GetActorLocation();
-	FlyingDestination = FlyingOrigin + Direction.Normalize() * FlyingDistance;
-	//HeightVelocity = FVector(0, 0, 2 * FlyingHeight / FlyingTime + FlyingAcceleration * FlyingTime / 2);
-	HeightVelocity = FVector(0, 0, FlyingDistance * FMath::Tan(FlyingAngle) / FlyingTime);
-}
-
-void AWWCharacter::StopHitFly()
-{
-	bIsStartedHitFly = false;
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 }
 
 void AWWCharacter::OnAnimMoveStart()

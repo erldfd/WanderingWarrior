@@ -16,11 +16,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 
-// Sets default values for this component's properties
 UPlayerSkillComponent::UPlayerSkillComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS_ROCKBURST0(TEXT("/Game/FX/PS_RockBurst0.PS_RockBurst0"));
@@ -53,7 +50,6 @@ UPlayerSkillComponent::UPlayerSkillComponent()
 	JumpToGroundSkillMaxMoveCount = 70;
 }
 
-// Called when the game starts
 void UPlayerSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -91,13 +87,9 @@ void UPlayerSkillComponent::BeginPlay()
 	AnimInstance.OnParryAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageParryAttack);
 }
 
-
-// Called every frame
 void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	//UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::TickComponent %f"), FMath::Lerp(80.0f, 90.0f, FOVAlpha));
 
 	float FOVChangeGoal = 87;
 	float FOVOrigin = 90;
@@ -179,8 +171,6 @@ void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	{
 		ActionCameraTransformAlpha = 0;
 	}
-
-	//if(AnimInstance)
 }
 
 void UPlayerSkillComponent::JumpToGroundSkillImplement()
@@ -406,7 +396,6 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 	// get forward vector
 	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-	//UGameplayStatics::SpawnEmitterAtLocation(&World, PS_RockBurst0, Center, Rotation, true, EPSCPoolMethod::AutoRelease);
 	UGameplayStatics::SpawnSoundAtLocation(this, SW_RockBurst0_0, Center);
 	UGameplayStatics::SpawnEmitterAtLocation(&World, PS_CircleAttack, Center, Rotation, true, EPSCPoolMethod::AutoRelease);
 
@@ -464,8 +453,7 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 			float EnemyPositionAdjustmentFactor = 100;
 			FVector TargetLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
 			FVector Dir = TargetLocation - Character.GetActorLocation();
-			//	float VelocitySize = Dir.Size();
-			//	Dir.Normalize();
+
 			float DirectionVectorMultiplier = 2;
 			Dir = Dir * DirectionVectorMultiplier;
 
@@ -588,8 +576,7 @@ void UPlayerSkillComponent::DamageMusouAttack()
 			float EnemyPositionAdjustmentFactor = 100;
 			FVector TargetLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
 			FVector Dir = TargetLocation - Character.GetActorLocation();
-			//	float VelocitySize = Dir.Size();
-			//	Dir.Normalize();
+
 			float DirectionVectorMultiplier = 2;
 			Dir = Dir * DirectionVectorMultiplier;
 
@@ -669,8 +656,7 @@ void UPlayerSkillComponent::DamageMusouFinishAttack()
 			float EnemyPositionAdjustmentFactor = 100;
 			FVector TargetLocation = Player->GetActorLocation();
 			FVector Dir = Character.GetActorLocation() - TargetLocation;
-			//	float VelocitySize = Dir.Size();
-			//	Dir.Normalize();
+
 			float DirectionVectorMultiplier = 3;
 			Dir = Dir * DirectionVectorMultiplier;
 

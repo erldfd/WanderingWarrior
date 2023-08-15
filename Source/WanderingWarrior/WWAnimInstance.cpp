@@ -65,8 +65,6 @@ void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			{
 				return;
 			}
-
-			//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::NativeUpdateAnimation, %s IsInAir : %d"), *Character->GetName(), bIsInAir);
 		}
 	}
 }
@@ -244,16 +242,6 @@ void UWWAnimInstance::PlayChargeAttack3Montage()
 	ChargeAttack3ComboCount++;
 }
 
-//bool UWWAnimInstance::GetIsHit()
-//{
-//	return bIsHit;
-//}
-//
-//void UWWAnimInstance::SetIsHit(bool NewIsHit)
-//{
-//	bIsHit = NewIsHit;
-//}
-
 void UWWAnimInstance::SetAttackAnimRate(float NewAttackAnimRate)
 {
 	AttackAnimRate = NewAttackAnimRate;
@@ -271,9 +259,7 @@ void UWWAnimInstance::SetDetectedAttack(bool NewDetectedAttack)
 
 void UWWAnimInstance::PlayMusouAnim()
 {
-	//Montage_JumpToSection
 	Montage_Play(MusouAttack);
-	
 }
 
 bool UWWAnimInstance::GetIsIdleOrRun()
@@ -308,14 +294,6 @@ void UWWAnimInstance::SetIsGuardHitStart(bool NewIsGuardHitStart)
 
 void UWWAnimInstance::PlayGuardHitAnim()
 {
-	//APlayerCharacter& Player = *Cast<APlayerCharacter>(TryGetPawnOwner());
-	//if (&Player == nullptr || IsValid(&Player) == false)
-	//{
-	//	return;
-	//}
-
-	//Player.GetMesh()->PlayAnimation(GuardHitReaction, false);
-
 	Montage_Play(GuardHitReaction);
 }
 
@@ -366,7 +344,7 @@ void UWWAnimInstance::SetIsActionCameraMoving(bool NewIsActionCameraMoving)
 
 void UWWAnimInstance::PlayCharacterHitMontage()
 {
-	if (/*ComboCount == 3 ||*/ bIsPlayingChargeAttack1Anim || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim || bIsInAir)
+	if (bIsPlayingChargeAttack1Anim || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim || bIsInAir)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayCharacterHitMontage, %d, %d, %d, %d"), bIsPlayingChargeAttack1Anim, bIsPlayingChargeAttack2Anim, bIsPlayingChargeAttack3Anim, bIsInAir);
 		return;
@@ -551,19 +529,17 @@ void UWWAnimInstance::AnimNotify_StandUpStart()
 
 void UWWAnimInstance::AnimNotify_StandUpEnd()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_StandUpEnd"));
-
 	SetHitAndFly(false);
 }
 
 void UWWAnimInstance::AnimNotify_HitStart()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitStart"));
+
 }
 
 void UWWAnimInstance::AnimNotify_HitEnd()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitEnd"));
+
 }
 
 void UWWAnimInstance::AnimNotify_HitAndFlyStart()
@@ -764,7 +740,6 @@ void UWWAnimInstance::AnimNotify_MusouAttackEnd()
 		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_MusouAttackEnd, Consistent == false"));
 		Montage_JumpToSection(TEXT("MusouFinish"), MusouAttack);
 
-		//Montage_Stop(0, MusouAttack);
 		Player.LaunchCharacter(FVector(0, 0, 500), false, false);
 
 		FAnimMontageInstance* MontageInstance = GetActiveMontageInstance();
@@ -812,8 +787,6 @@ void UWWAnimInstance::AnimNotify_WarriorRunStart()
 
 void UWWAnimInstance::AnimNotify_GuardHit()
 {
-	/*SetBeingGuardHit(false);
-	SetIsGuardHitStart(false);*/
 }
 
 void UWWAnimInstance::AnimNotify_GuardHitStart()

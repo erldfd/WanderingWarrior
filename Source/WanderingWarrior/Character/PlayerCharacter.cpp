@@ -33,11 +33,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MotionWarpingComponent.h"
 
-
-// Sets default values
 APlayerCharacter::APlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Super::bWIllSweepAttack = true;
 
@@ -113,7 +110,6 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
 }
 
-// Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -144,7 +140,6 @@ void APlayerCharacter::BeginPlay()
 	CharacterStatComponent->SetMP(CharacterStatComponent->GetMaxMP());
 }
 
-// Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -164,14 +159,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 }
 
-// Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UEnhancedInputComponent* EnhancedInputComponenet = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Jump);
 	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 	EnhancedInputComponenet->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
@@ -193,7 +187,6 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter PossessedBy"));
 
 	Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->SetPlayerAnimInstance(AnimInstance);
-	//Super::EquipWeapon(Cast<UWWGameInstance>(GetGameInstance())->GetWeapon(EWeaponName::BlackSword));
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -207,9 +200,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	{
 		bIsParrySucceeded = true;
 		AnimInstance->PlayParryAttackAnim();
-
-		//parry succeeded
-		// parry anim
 
 		return 0.0f;
 	}
@@ -244,6 +234,7 @@ void APlayerCharacter::Jump()
 	}
 
 	Super::Jump();
+ 	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::Jump"));
 }
 
 UPlayerSkillComponent& APlayerCharacter::GetPlayerSkillComponenet()
@@ -263,16 +254,6 @@ UCharacterInventory& APlayerCharacter::GetInventory() const
 	return *Inventory;
 }
 
-void APlayerCharacter::Attack(float Value)
-{
-	if (Inventory->IsInventoryVisible())
-	{
-		return;
-	}
-
-	Super::Attack(Value);
-}
-
 void APlayerCharacter::Attack()
 {
 	if (bIsPlayingMusou)
@@ -285,8 +266,6 @@ void APlayerCharacter::Attack()
 
 void APlayerCharacter::DoChargeAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack"));
-
 	bool bIsAttacking = AnimInstance->GetIsAttacking();
 	bool bCanCombo = AnimInstance->GetCanCombo();
 	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();

@@ -14,17 +14,7 @@ ANPCCharacter::ANPCCharacter()
 
 void ANPCCharacter::BeginPlay()
 {
-	/*Inventory->ObtainItem(EWeaponName::BlackSword);
-	Inventory->ObtainItem(EWeaponName::WhiteSword);
 
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);*/
 }
 
 int32 ANPCCharacter::GetConversationIndex() const

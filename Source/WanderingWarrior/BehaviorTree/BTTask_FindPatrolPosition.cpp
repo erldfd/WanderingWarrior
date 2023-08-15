@@ -10,8 +10,6 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
 
-//#include "BehaviorTree/BehaviorTreeTypes.h"
-
 UBTTask_FindPatrolPosition::UBTTask_FindPatrolPosition()
 {
 	NodeName = TEXT("FindPatrolPosition");

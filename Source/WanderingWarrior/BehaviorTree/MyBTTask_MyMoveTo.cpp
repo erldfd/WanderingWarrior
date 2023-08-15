@@ -23,16 +23,7 @@ UMyBTTask_MyMoveTo::UMyBTTask_MyMoveTo()
 
 EBTNodeResult::Type UMyBTTask_MyMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	
 	EBTNodeResult::Type NodeResult = Super::ExecuteTask(OwnerComp, NodeMemory);
-	UE_LOG(LogTemp, Warning, TEXT("UMyBTTask_MyMoveTo::ExecuteTask, NodeResult : %d"), NodeResult);
-	//Succeeded,
-		// finished as failure
-	//	Failed,
-		// finished aborting = failure
-	//	Aborted,
-		// not finished yet
-	//	InProgress,
 
 	return NodeResult;
 }
@@ -40,8 +31,6 @@ EBTNodeResult::Type UMyBTTask_MyMoveTo::ExecuteTask(UBehaviorTreeComponent& Owne
 void UMyBTTask_MyMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-
-	UE_LOG(LogTemp, Warning, TEXT("UMyBTTask_MyMoveTo::TickTask,"));
 
 	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (&ThisCharacter == nullptr)
@@ -69,5 +58,4 @@ void UMyBTTask_MyMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
-	
 }

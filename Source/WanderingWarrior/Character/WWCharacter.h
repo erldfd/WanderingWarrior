@@ -16,21 +16,19 @@ class WANDERINGWARRIOR_API AWWCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+
 	AWWCharacter();
 
 	virtual void PostInitializeComponents() override;
-	// Called every frame
+
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	class UWWAnimInstance& GetAnimInstance();
 
-	virtual void Attack(float Value);
 	virtual void Attack();
 	class UCharacterStatComponent& GetCharacterStatComponent();
 
@@ -49,7 +47,7 @@ public:
 	FOnAttackStartDelegate OnAttackStartDelegate;
 
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 
 	void InputMoveForward(float Value);
@@ -62,9 +60,6 @@ protected:
 
 	void StartKnockback(FVector Direction, float Strength, float Duration);
 	void StopKnockback();
-
-	void StartHitFly(FVector Direction, float NewFlyingTime, float NewFlyingHeight, float NewFlyingDistance, float NewFlyingAngle);
-	void StopHitFly();
 
 protected:
 
@@ -106,23 +101,6 @@ private:
 	FVector KnockbackDirection;
 	float KnockbackStrength;
 	FTimerHandle KnockbackTimerHandle;
-
-	FVector FlyingOrigin;
-	FVector FlyingDestination;
-
-	float FlyingTime;
-	float FlyingHeight;
-	float FlyingAcceleration;
-	float FlyingAngle;
-
-	//UPROPERTY(EditAnywhere, Category = FlyingProperties, meta = (AllowPrivateAccess = true))
-	float FlyingDistance;
-
-	FVector HeightVelocity;
-
-	float ElapsedTime;
-
-	uint8 bIsStartedHitFly;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = AttackProperty)
 	float AttackAnimRate;

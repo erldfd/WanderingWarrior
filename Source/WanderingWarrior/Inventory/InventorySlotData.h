@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 
-//#include "WWGameInstance.h"
 #include "ItemData.h"
 
 #include "UObject/NoExportTypes.h"

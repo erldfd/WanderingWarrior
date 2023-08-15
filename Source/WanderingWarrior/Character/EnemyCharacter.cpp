@@ -15,10 +15,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-// Sets default values
 AEnemyCharacter::AEnemyCharacter() : bIsDamaged(false)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Super::bWIllSweepAttack = true;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("EnemyProfile"));
@@ -27,7 +25,6 @@ AEnemyCharacter::AEnemyCharacter() : bIsDamaged(false)
 	Tags[0] = TEXT("Enemy");
 }
 
-// Called when the game starts or when spawned
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -52,7 +49,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	if (Super::AnimInstance->GetIsDead())
 	{
-		//TODO : 확률에 따라 아이템 드롭
+		//TODO : drop item randomly
 		int RandomInt = FMath::RandRange(0, 3);
 		UE_LOG(LogTemp, Warning, TEXT("RandomInt : %d"), RandomInt);
 
@@ -108,10 +105,10 @@ void AEnemyCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 }
 
-void AEnemyCharacter::Attack(float Value)
-{
-	Super::Attack(Value);
-}
+//void AEnemyCharacter::Attack(float Value)
+//{
+//	Super::Attack(Value);
+//}
 
 bool AEnemyCharacter::GetIsDamaged()
 {

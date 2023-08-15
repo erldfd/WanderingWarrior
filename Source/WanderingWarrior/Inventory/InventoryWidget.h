@@ -58,7 +58,7 @@ public:
 
 public:
 
-	////param : SlotIndex
+	//param : SlotIndex
 	FOnSlotImageWigetClickedDelegate OnSlotImageWidgetClickedDelegate;
 	FOnConvertTabDelegate OnConvertTabDelegate;
 

@@ -19,10 +19,9 @@ class WANDERINGWARRIOR_API UAInventory : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
 	UAInventory();
 
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual class UInventoryWidget& GetInventoryWidget();
@@ -44,7 +43,6 @@ public:
 
 protected:
 
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 protected:
