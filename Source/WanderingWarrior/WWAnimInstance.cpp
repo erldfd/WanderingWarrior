@@ -13,6 +13,8 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Engine/DecalActor.h"
 #include "Components/DecalComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Camera/CameraComponent.h"
 
 UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0)
 {
@@ -35,34 +37,12 @@ UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0
 	}
 
 	ChargeAttack3MaxComboCount = 4;
-	HitAnimRate = 1.0f;
+	AttackAnimRate = 1.0f;
 }
 
 void UWWAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-
-	/*APawn& Pawn = *TryGetPawnOwner();
-
-	if (IsValid(&Pawn) == false)
-	{
-		return;
-	}
-
-	AEnemyCharacter& Enemy = *Cast<AEnemyCharacter>(&Pawn);
-
-	if (&Enemy)
-	{
-		HitAnimRate = 0.8f;
-		return;
-	}
-	
-	APlayerCharacter& Player = *Cast<APlayerCharacter>(&Pawn);
-
-	if (&Player)
-	{
-		HitAnimRate = 1.5f;
-	}*/
 }
 
 void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -80,6 +60,13 @@ void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		if (Character)
 		{
 			bIsInAir = Character->GetMovementComponent()->IsFalling();
+
+			if (Cast<AEnemyCharacter>(Character) == nullptr)
+			{
+				return;
+			}
+
+			//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::NativeUpdateAnimation, %s IsInAir : %d"), *Character->GetName(), bIsInAir);
 		}
 	}
 }
@@ -88,7 +75,7 @@ void UWWAnimInstance::PlayAttackMontage()
 {
 	if (Montage_IsPlaying(AttackMontage) == false && bIsPlayingCharacterHitMontage == false)
 	{
-		Montage_Play(AttackMontage, 1);
+		Montage_Play(AttackMontage, AttackAnimRate);
 		bIsAttacking = true;
 		ComboCount = 1;
 		bWillPlayNextCombo = false;
@@ -102,6 +89,7 @@ void UWWAnimInstance::JumpToAttackMontageSection(int32 SectionIndex)
 		return;
 	}
 
+	bIsAttacking = true;
 	bWillPlayNextCombo = false;
 
 	SectionIndex = FMath::Clamp(SectionIndex, 0, 2);
@@ -124,6 +112,11 @@ void UWWAnimInstance::SetIsDead(bool IsDead)
 bool UWWAnimInstance::GetIsAttacking()
 {
 	return bIsAttacking;
+}
+
+void UWWAnimInstance::SetIsAttacking(bool NewIsAttacking)
+{
+	bIsAttacking = NewIsAttacking;
 }
 
 bool UWWAnimInstance::GetCanCombo()
@@ -149,8 +142,10 @@ void UWWAnimInstance::PlayJumpToGrundAnim()
 
 bool UWWAnimInstance::IsPlayingSomething()
 {
-	bool IsPlayingSomething = (bIsAttacking || bIsDead ||
-		bIsPlayingChargeAttack1Anim || bIsPlayingCharacterHitMontage || bIsPlayingChargeAttack2Anim);
+	bool IsPlayingSomething = (bIsAttacking || bIsDead || bIsPlayingChargeAttack1Anim ||
+		bIsPlayingCharacterHitMontage || bIsPlayingChargeAttack2Anim || bIsGuarding ||
+		bIsGuardHitStart || bIsParrying /* || bIsActingMusou */ );
+	
 	return IsPlayingSomething;
 }
 
@@ -249,30 +244,143 @@ void UWWAnimInstance::PlayChargeAttack3Montage()
 	ChargeAttack3ComboCount++;
 }
 
-bool UWWAnimInstance::GetIsHit()
+//bool UWWAnimInstance::GetIsHit()
+//{
+//	return bIsHit;
+//}
+//
+//void UWWAnimInstance::SetIsHit(bool NewIsHit)
+//{
+//	bIsHit = NewIsHit;
+//}
+
+void UWWAnimInstance::SetAttackAnimRate(float NewAttackAnimRate)
 {
-	return bIsHit;
+	AttackAnimRate = NewAttackAnimRate;
 }
 
-void UWWAnimInstance::SetIsHit(bool NewIsHit)
+bool UWWAnimInstance::GetDetectedAttack()
 {
-	bIsHit = NewIsHit;
+	return bIsDetectedAttack;
+}
+
+void UWWAnimInstance::SetDetectedAttack(bool NewDetectedAttack)
+{
+	bIsDetectedAttack = NewDetectedAttack;
+}
+
+void UWWAnimInstance::PlayMusouAnim()
+{
+	//Montage_JumpToSection
+	Montage_Play(MusouAttack);
+	
+}
+
+bool UWWAnimInstance::GetIsIdleOrRun()
+{
+	return bIsIdleOrRun;
+}
+
+void UWWAnimInstance::SetIsIdleOrRun(bool NewIsIdleOrWalk)
+{
+	bIsIdleOrRun = NewIsIdleOrWalk;
+}
+
+bool UWWAnimInstance::GetIsGuarding()
+{
+	return bIsGuarding;
+}
+
+void UWWAnimInstance::SetIsGuarding(bool NewIsGuarding)
+{
+	bIsGuarding = NewIsGuarding;
+}
+
+bool UWWAnimInstance::GetIsGuardHitStart()
+{
+	return bIsGuardHitStart;
+}
+
+void UWWAnimInstance::SetIsGuardHitStart(bool NewIsGuardHitStart)
+{
+	bIsGuardHitStart = NewIsGuardHitStart;
+}
+
+void UWWAnimInstance::PlayGuardHitAnim()
+{
+	//APlayerCharacter& Player = *Cast<APlayerCharacter>(TryGetPawnOwner());
+	//if (&Player == nullptr || IsValid(&Player) == false)
+	//{
+	//	return;
+	//}
+
+	//Player.GetMesh()->PlayAnimation(GuardHitReaction, false);
+
+	Montage_Play(GuardHitReaction);
+}
+
+bool UWWAnimInstance::GetBeingStunned()
+{
+	return bBeingStunned;
+}
+
+void UWWAnimInstance::SetBeingStunned(bool NewBeingStunned)
+{
+	bBeingStunned = NewBeingStunned;
+}
+
+void UWWAnimInstance::PlayParryAttackAnim()
+{
+	Montage_Play(ParryAttack);
+}
+
+bool UWWAnimInstance::GetIsParrying()
+{
+	return bIsParrying;
+}
+
+void UWWAnimInstance::SetIsParrying(bool NewIsParrying)
+{
+	bIsParrying = NewIsParrying;
+}
+
+bool UWWAnimInstance::GetIsActingMusou()
+{
+	return bIsActingMusou;
+}
+
+void UWWAnimInstance::SetIsActingMusou(bool NewIsActingMusou)
+{
+	bIsActingMusou = NewIsActingMusou;
+}
+
+bool UWWAnimInstance::GetIsActionCameraMoving()
+{
+	return bIsActionCameraMoving;
+}
+
+void UWWAnimInstance::SetIsActionCameraMoving(bool NewIsActionCameraMoving)
+{
+	bIsActionCameraMoving = NewIsActionCameraMoving;
 }
 
 void UWWAnimInstance::PlayCharacterHitMontage()
 {
-	if (ComboCount == 3 || bIsPlayingChargeAttack1Anim || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim || bIsInAir)
+	if (/*ComboCount == 3 ||*/ bIsPlayingChargeAttack1Anim || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim || bIsInAir)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayCharacterHitMontage, %d, %d, %d, %d"), bIsPlayingChargeAttack1Anim, bIsPlayingChargeAttack2Anim, bIsPlayingChargeAttack3Anim, bIsInAir);
 		return;
 	}
+
+	StopAllMontages(0);
 
 	InitBoolCondition();
 	bIsPlayingCharacterHitMontage = true;
 
 	if (ensure(CharacterHitMongtage) == false) return;
 
-	Montage_Play(CharacterHitMongtage, HitAnimRate);
-
+	Montage_Play(CharacterHitMongtage, 1);
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayCharacterHitMontage, HitMontage"));
 	OnHitByEnemyDelegate.Broadcast();
 	OnInitIsDamaged.Broadcast();
 }
@@ -290,6 +398,17 @@ bool UWWAnimInstance::GetIsPlayingCharacterHitMontage()
 void UWWAnimInstance::SetIsPlayingCharacterHitMontage(bool bIsPlaying)
 {
 	bIsPlayingCharacterHitMontage = bIsPlaying;
+}
+
+void UWWAnimInstance::AnimNotify_AttackDetectStart()
+{
+	bIsDetectedAttack = true;
+}
+
+void UWWAnimInstance::AnimNotify_AttackDetectEnd()
+{
+	bIsDetectedAttack = false;
+	OnInitIsDamaged.Broadcast();
 }
 
 void UWWAnimInstance::AnimNotify_CanComboNotify()
@@ -313,6 +432,10 @@ void UWWAnimInstance::AnimNotify_StartNextComboNotify()
 	else if (bWillPlayChargeAttack3Anim && ComboCount == 2)
 	{
 		PlayChargeAttack3Montage();
+	}
+	else
+	{
+		return;
 	}
 
 	OnStartNextComboDelegate.Broadcast();
@@ -362,6 +485,9 @@ void UWWAnimInstance::AnimNotify_KickDamage()
 void UWWAnimInstance::AnimNotify_KickEnd()
 {
 	bIsAttacking = false;
+
+	SetIsPlayingChargeAttack2Anim(false);
+	InitBoolCondition();
 	OnKickEndDelegate.Broadcast();
 	OnInitIsDamaged.Broadcast();
 }
@@ -388,6 +514,8 @@ void UWWAnimInstance::AnimNotify_Melee360AttackComboStart()
 void UWWAnimInstance::AnimNotify_Melee360AttackEnd()
 {
 	bIsAttacking = false;
+	SetIsPlayingChargeAttack3Anim(false);
+	InitBoolCondition();
 	OnChargeAttack3EndDelegate.Broadcast();
 	OnInitIsDamaged.Broadcast();
 }
@@ -398,9 +526,10 @@ void UWWAnimInstance::AnimNotify_FallingStart()
 	{
 		return;
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_FallingStart, IsInAir : %d"), bIsInAir);
 	StopAllMontages(0);
 	InitBoolCondition();
+	SetIsIdleOrRun(false);
 }
 
 void UWWAnimInstance::AnimNotify_FallingEnd()
@@ -411,35 +540,38 @@ void UWWAnimInstance::AnimNotify_FallingEnd()
 	{
 		return;
 	}
-
-	bIsFallen = true;
+	
+	SetIsIdleOrRun(false);
 }
 
 void UWWAnimInstance::AnimNotify_StandUpStart()
 {
-	
+	SetIsIdleOrRun(false);
 }
 
 void UWWAnimInstance::AnimNotify_StandUpEnd()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_StandUpEnd"));
-	bIsFallen = false;
-	bIsHitAndFly = false;
+	//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_StandUpEnd"));
+
+	SetHitAndFly(false);
 }
 
 void UWWAnimInstance::AnimNotify_HitStart()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitStart"));
+	//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitStart"));
 }
 
 void UWWAnimInstance::AnimNotify_HitEnd()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitEnd"));
+	//UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitEnd"));
 }
 
 void UWWAnimInstance::AnimNotify_HitAndFlyStart()
 {
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_HitAndFlyStart, IsInAir %d"), bIsInAir);
 	Montage_Stop(0, CharacterHitMongtage);
+
+	SetIsIdleOrRun(false);
 }
 
 void UWWAnimInstance::AnimNotify_RunRightFoot()
@@ -516,9 +648,209 @@ void UWWAnimInstance::AnimNotify_RunLeftFoot()
 	}
 }
 
+void UWWAnimInstance::AnimNotify_MusouReadyStart()
+{
+	SetIsActingMusou(true);
+	SetIsActionCameraMoving(true);
+
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (&Player == nullptr)
+	{
+		return;
+	}
+
+	Player.CustomTimeDilation = 10;
+	UGameplayStatics::SetGlobalTimeDilation(this, 0.1f);
+
+	UCameraComponent& Camera = Player.GetCamera();
+	UCameraComponent& ActionCamera = Player.GetActionCamera();
+
+	if (&Camera == nullptr || &ActionCamera == nullptr)
+	{
+		return;
+	}
+
+	if ((Camera.IsActive()))
+	{
+		Camera.Deactivate();
+		ActionCamera.Activate();
+	}
+	else
+	{
+		ActionCamera.Deactivate();
+		Camera.Activate();
+	}
+}
+
+void UWWAnimInstance::AnimNotify_ActionCameraMoveEnd()
+{
+	SetIsActionCameraMoving(false);
+
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (&Player == nullptr)
+	{
+		return;
+	}
+
+	UCameraComponent& Camera = Player.GetCamera();
+	UCameraComponent& ActionCamera = Player.GetActionCamera();
+
+	if (&Camera == nullptr || &ActionCamera == nullptr)
+	{
+		return;
+	}
+
+	if ((Camera.IsActive()))
+	{
+		Camera.Deactivate();
+		ActionCamera.Activate();
+	}
+	else
+	{
+		ActionCamera.Deactivate();
+		Camera.Activate();
+	}
+}
+
+void UWWAnimInstance::AnimNotify_MusouReadyEnd()
+{
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(TryGetPawnOwner());
+	if (&Player)
+	{
+		Player.CustomTimeDilation = 1;
+		UGameplayStatics::SetGlobalTimeDilation(this, 1.0f);
+	}
+
+	Montage_JumpToSection(TEXT("Musou"), MusouAttack);
+	Montage_SetNextSection(TEXT("Musou"), TEXT("Musou"), MusouAttack);
+
+	FAnimMontageInstance* MontageInstance = GetActiveMontageInstance();
+	MontageInstance->PushDisableRootMotion();
+	/*MusouAttack->EnableRootMotionSettingFromMontage(false, ERootMotionRootLock::RefPose);
+	MusouAttack->bEnableRootMotionTranslation = false;
+	MusouAttack->bEnableRootMotionRotation = false;*/
+}
+
+void UWWAnimInstance::AnimNotify_MusouAttackCheck()
+{
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(GetOwningActor());
+	if (&Player == nullptr)
+	{
+		return;
+	}
+
+	Player.SetConsistentMusou(false);
+
+	OnMusouAttackCheckDelegate.Broadcast();
+	//MusouAttack->EnableRootMotionSettingFromMontage(true, ERootMotionRootLock::RefPose);
+	//MusouAttack->bEnableRootMotionTranslation = true;
+	//MusouAttack->bEnableRootMotionRotation = true;
+}
+
+void UWWAnimInstance::AnimNotify_MusouAttackEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_MusouAttackEnd"));
+
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(GetOwningActor());
+	if (&Player == nullptr)
+	{
+		return;
+	}
+
+	if (Player.GetConsistentMusou() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_MusouAttackEnd, Consistent == false"));
+		Montage_JumpToSection(TEXT("MusouFinish"), MusouAttack);
+
+		//Montage_Stop(0, MusouAttack);
+		Player.LaunchCharacter(FVector(0, 0, 500), false, false);
+
+		FAnimMontageInstance* MontageInstance = GetActiveMontageInstance();
+		MontageInstance->PopDisableRootMotion();
+	}
+}
+
+void UWWAnimInstance::AnimNotify_MusouFinishDown()
+{
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(GetOwningActor());
+	if (&Player == nullptr)
+	{
+		return;
+	}
+
+	Player.LaunchCharacter(FVector(0, 0, -500), false, false);
+}
+
+void UWWAnimInstance::AnimNotify_MusouFinishAttackCheck()
+{
+	OnMusouFinishAttackCheckDelegate.Broadcast();
+}
+
+void UWWAnimInstance::AnimNotify_MusouFinishAttackEnd()
+{
+	APlayerCharacter& Player = *Cast<APlayerCharacter>(GetOwningActor());
+	if (&Player == nullptr)
+	{
+		return;
+	}
+
+	Player.SetPlayingMusou(false);
+	SetIsActingMusou(false);
+}
+
+void UWWAnimInstance::AnimNotify_WarriorIdleStart()
+{
+	SetIsIdleOrRun(true);
+}
+
+void UWWAnimInstance::AnimNotify_WarriorRunStart()
+{
+	SetIsIdleOrRun(true);
+}
+
+void UWWAnimInstance::AnimNotify_GuardHit()
+{
+	/*SetBeingGuardHit(false);
+	SetIsGuardHitStart(false);*/
+}
+
+void UWWAnimInstance::AnimNotify_GuardHitStart()
+{
+	SetIsGuardHitStart(true);
+}
+
+void UWWAnimInstance::AnimNotify_GuardHitEnd()
+{
+	SetIsGuardHitStart(false);
+}
+
+void UWWAnimInstance::AnimNotify_ParryAttackCheck()
+{
+	OnParryAttackCheckDelegate.Broadcast();
+}
+
+void UWWAnimInstance::AnimNotify_ParryAttackStart()
+{
+	SetIsParrying(true);
+
+	float GamePlayRate = 0.5f;
+	UGameplayStatics::SetGlobalTimeDilation(this, GamePlayRate);
+
+	OnParryAttackStartDelegate.Broadcast();
+}
+
+void UWWAnimInstance::AnimNotify_ParryAttackEnd()
+{
+	SetIsParrying(false);
+	SetIsGuardHitStart(false);
+}
+
 void UWWAnimInstance::InitBoolCondition()
 {
 	bIsAttacking = false;
+	bIsDetectedAttack = false;
 	bCanComboAttack = false;
 	bWillPlayNextCombo = false;
 	bIsPlayingChargeAttack1Anim = false;
@@ -530,6 +862,7 @@ void UWWAnimInstance::InitBoolCondition()
 	bWillPlayChargeAttack3Anim = false;
 	bIsPlayingChargeAttack3Anim = false;
 	ChargeAttack3ComboCount = 0;
+	ComboCount = 0;
 
 	Montage_Stop(0, AttackMontage);
 	Montage_Stop(0, ChargeAttack1);

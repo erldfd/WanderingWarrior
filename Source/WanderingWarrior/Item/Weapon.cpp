@@ -12,6 +12,7 @@
 #include "Components/CharacterStatComponent.h"
 
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AWeapon::AWeapon() : AttackDamage(1)
@@ -52,7 +53,10 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 	
 	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(OtherActor);
-	if(ensure(EnemyCharacter) == false) return;
+	if (EnemyCharacter == nullptr)
+	{
+		return;
+	}
 
 	AWWGameMode* GameMode = Cast<AWWGameMode>(GetWorld()->GetAuthGameMode());
 	if(ensure(GameMode) == false) return;
@@ -61,9 +65,13 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	if(ensure(PlayerAnimInstance) == false) return;
 
 	bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
+	
+	bool IsDetectedAttack = PlayerAnimInstance->GetDetectedAttack();
+	UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Damaged : %d, DetectedAttack : %d"), EnemyCharacter->GetIsDamaged(), IsDetectedAttack);
 
-	if (EnemyCharacter->GetIsDamaged() == false && IsAttacking)
+	if (EnemyCharacter->GetIsDamaged() == false && /*IsAttacking*/IsDetectedAttack)
 	{
+		//UGameplayStatics::SetGlobalTimeDilation(this, 0.5f);
 		EnemyCharacter->SetIsDamaged(true);
 
 		AActor& WeaponOwner = *GetOwner();

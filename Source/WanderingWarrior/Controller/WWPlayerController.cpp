@@ -54,13 +54,14 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	PlayerInventory.SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
 	TempMarchantCharacter = Cast<ANPCCharacter>(UGameplayStatics::GetActorOfClass(this, ANPCCharacter::StaticClass()));
-	ensure(TempMarchantCharacter);
-
-	UMarchantInventory* MarchantInventory = &TempMarchantCharacter->GetInventory();
-	check(MarchantInventory);
-
-	MarchantInventory->SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
-	
+	if (TempMarchantCharacter)
+	{
+		UMarchantInventory* MarchantInventory = &TempMarchantCharacter->GetInventory();
+		if (MarchantInventory)
+		{
+			MarchantInventory->SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
+		}
+	}
 
 	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
 	GameInstance.GetConversationManager().SetConversationWidget(*InGameWidget->GetConversationWidget());
@@ -123,6 +124,7 @@ void AWWPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	CharacterStat->OnHPChangedDelegate.AddUObject(this, &AWWPlayerController::OnHPChanged);
+	CharacterStat->OnMPChangedDelegate.AddUObject(this, &AWWPlayerController::OnMPChanged);
 }
 
 void AWWPlayerController::SetupInputComponent()
@@ -130,7 +132,7 @@ void AWWPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("InventoryOpenAndClose", EInputEvent::IE_Released, this, &AWWPlayerController::OpenAndCloseInventory);
-	InputComponent->BindAction("MouseRightClick", EInputEvent::IE_Released, this, &AWWPlayerController::OnMouseRightButtonClicked);
+	//InputComponent->BindAction("MouseRightClick", EInputEvent::IE_Released, this, &AWWPlayerController::OnMouseRightButtonClicked);
 
 	InputComponent->BindAction("Number1", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot0);
 	InputComponent->BindAction("Number2", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot1);
@@ -150,6 +152,14 @@ void AWWPlayerController::OnHPChanged()
 	check(CharacterStat);
 
 	InGameWidget->SetMyHPBarPercent(CharacterStat->GetHPRatio());
+}
+
+void AWWPlayerController::OnMPChanged()
+{
+	check(InGameWidget);
+	check(CharacterStat);
+	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnMPChanged, MPRatio : %f"), CharacterStat->GetMPRatio());
+	InGameWidget->SetMyMPBarPercent(CharacterStat->GetMPRatio());
 }
 
 void AWWPlayerController::OpenAndCloseInventory()
@@ -180,11 +190,11 @@ void AWWPlayerController::OpenAndCloseInventory()
 	}
 }
 
-void AWWPlayerController::OnMouseRightButtonClicked()
-{
-	UPlayerSkillComponent& PlayerSkill = PlayerCharacter->GetPlayerSkillComponenet();
-	PlayerSkill.JumpToGroundSkillImplement();
-}
+//void AWWPlayerController::OnMouseRightButtonClicked()
+//{
+//	UPlayerSkillComponent& PlayerSkill = PlayerCharacter->GetPlayerSkillComponenet();
+//	PlayerSkill.JumpToGroundSkillImplement();
+//}
 
 void AWWPlayerController::UseQuickSlot0()
 {

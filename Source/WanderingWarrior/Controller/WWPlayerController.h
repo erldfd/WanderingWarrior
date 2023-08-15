@@ -42,10 +42,11 @@ protected:
 private:
 
 	void OnHPChanged();
+	void OnMPChanged();
 
 	void OpenAndCloseInventory();
 
-	void OnMouseRightButtonClicked();
+	/*void OnMouseRightButtonClicked();*/
 
 	void UseQuickSlot0();
 	void UseQuickSlot1();

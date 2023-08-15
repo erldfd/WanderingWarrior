@@ -27,6 +27,10 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void Jump() override;
+
 	class UPlayerSkillComponent& GetPlayerSkillComponenet();
 
 	class UCharacterQuickSlot& GetQuickSlot();
@@ -34,18 +38,37 @@ public:
 	class UCharacterInventory& GetInventory() const;
 
 	virtual void Attack(float Value) override;
+	virtual void Attack() override;
 
 	void DoChargeAttack();
 
 	class UCameraComponent& GetCamera();
+	class UCameraComponent& GetActionCamera();
 
 	bool GetIsInWater();
 	bool GetIsWet();
+
+	void DoMusouAttack();
+
+	void DoGuard(const struct FInputActionValue& Value);
+
+	bool GetPlayingMusou();
+	void SetPlayingMusou(bool NewPlayingMusou);
+
+	bool GetConsistentMusou();
+	void SetConsistentMusou(bool NewConsistentMusou);
+
+	class UArrowComponent& GetCameraTransformArrowOrigin();
+	class UArrowComponent& GetCameraTransformArrowTarget();
+
+	bool GetIsParrySucceeded();
+	void SetIsParrySucceeded(bool NewIsParrySucceeded);
 
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 private:
 
@@ -71,6 +94,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UCameraComponent> Camera;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UCameraComponent> ActionCamera;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
 
@@ -99,6 +125,12 @@ private:
 	TObjectPtr<class UInputAction> ChargeAttackAction;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> MusouAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> GuardAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
 	TObjectPtr<class UInputMappingContext> CharacterInput;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Footprint)
@@ -107,10 +139,29 @@ private:
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Footprint)
 	TObjectPtr<class UMaterialInstance> RightFootprintMaterialInstance;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UArrowComponent> CameraTransformArrowOrigin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UArrowComponent> CameraTransformArrowTarget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UStaticMeshComponent> TestStaticMeshComp;
+
 	uint8 bIsWet : 1;
 	uint8 bIsMoved : 1;
 	uint8 bIsReadyToLeftFootprint : 1;
 	uint8 bIsInWater : 1;
+	uint8 bIsPlayingMusou : 1;
+	uint8 bIsConsistentMusou : 1;
 
-	float FootprintDelay;
+	uint8 bIsParryWindow : 1;
+	uint8 bIsParrySucceeded : 1;
+	uint8 bAllowParryTime : 1;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Time)
+	float ParryWindow;
+
+	float ParryElapsedTime;
+
 };

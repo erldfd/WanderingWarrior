@@ -74,3 +74,38 @@ void UCharacterStatComponent::SetMaxHP(float NewMaxHP)
 {
 	MaxHP = NewMaxHP;
 }
+
+float UCharacterStatComponent::GetMP()
+{
+	return MP;
+}
+
+void UCharacterStatComponent::SetMP(float CharacterMP)
+{
+	MP = FMath::Clamp(CharacterMP, 0.0f, MaxMP);
+
+	float NewMPRatio = MP / MaxMP;
+	SetMPRatio(NewMPRatio);
+
+	OnMPChangedDelegate.Broadcast();
+}
+
+float UCharacterStatComponent::GetMPRatio()
+{
+	return MPRatio;
+}
+
+void UCharacterStatComponent::SetMPRatio(float NewMPRatio)
+{
+	MPRatio = NewMPRatio;
+}
+
+float UCharacterStatComponent::GetMaxMP()
+{
+	return MaxMP;
+}
+
+void UCharacterStatComponent::SetMaxMP(float NewMaxMP)
+{
+	MaxMP = NewMaxMP;
+}

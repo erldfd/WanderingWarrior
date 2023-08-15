@@ -9,6 +9,7 @@
 #include "CharacterStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHPChangedDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnMPChangedDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WANDERINGWARRIOR_API UCharacterStatComponent : public UActorComponent
@@ -34,9 +35,19 @@ public:
 	float GetMaxHP();
 	void SetMaxHP(float NewMaxHP);
 
+	float GetMP();
+	void SetMP(float CharacterMP);
+
+	float GetMPRatio();
+	void SetMPRatio(float NewMPRatio);
+
+	float GetMaxMP();
+	void SetMaxMP(float NewMaxMP);
+
 public:
 
 	FOnHPChangedDelegate OnHPChangedDelegate;
+	FOnMPChangedDelegate OnMPChangedDelegate;
 
 protected:
 	// Called when the game starts
@@ -52,6 +63,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MaxHP = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float MP = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float MPRatio = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float MaxMP = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float AttackDamage = 1;

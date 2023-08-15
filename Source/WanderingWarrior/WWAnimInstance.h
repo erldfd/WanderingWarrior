@@ -24,6 +24,10 @@ DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3DamageDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3ComboStartDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3EndDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnInitIsDamaged);
+DECLARE_MULTICAST_DELEGATE(FOnMusouAttackCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnMusouFinishAttackCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnParryAttackCheckDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnParryAttackStartDelegate);
 /**
  * 
  */
@@ -47,7 +51,8 @@ public:
 	void SetIsDead(bool IsDead);
 
 	bool GetIsAttacking();
-	
+	void SetIsAttacking(bool NewIsAttacking);
+
 	bool GetCanCombo();
 
 	bool GetWillPlayNextCombo();
@@ -87,9 +92,39 @@ public:
 
 	void PlayChargeAttack3Montage();
 
-	bool GetIsHit();
-	void SetIsHit(bool NewIsHit);
+	void SetAttackAnimRate(float NewAttackAnimRate);
 
+	bool GetDetectedAttack();
+	void SetDetectedAttack(bool NewDetectedAttack);
+
+	void PlayMusouAnim();
+
+	bool GetIsIdleOrRun();
+	void SetIsIdleOrRun(bool NewIsIdleOrWalk);
+
+	bool GetIsGuarding();
+	void SetIsGuarding(bool NewIsGuarding);
+
+	bool GetIsGuardHitStart();
+	void SetIsGuardHitStart(bool NewIsGuardHitStart);
+
+	void PlayGuardHitAnim();
+
+	bool GetBeingStunned();
+	void SetBeingStunned(bool NewBeingStunned);
+
+	void PlayParryAttackAnim();
+
+	bool GetIsParrying();
+	void SetIsParrying(bool NewIsParrying);
+
+	bool GetIsActingMusou();
+	void SetIsActingMusou(bool NewIsActingMusou);
+
+	bool GetIsActionCameraMoving();
+	void SetIsActionCameraMoving(bool NewIsActionCameraMoving);
+
+	void InitBoolCondition();
 
 public:
 
@@ -113,7 +148,19 @@ public:
 
 	FOnInitIsDamaged OnInitIsDamaged;
 
+	FOnMusouAttackCheckDelegate OnMusouAttackCheckDelegate;
+	FOnMusouFinishAttackCheckDelegate OnMusouFinishAttackCheckDelegate;
+
+	FOnParryAttackCheckDelegate OnParryAttackCheckDelegate;
+	FOnParryAttackStartDelegate OnParryAttackStartDelegate;
+
 private:
+
+	UFUNCTION()
+	void AnimNotify_AttackDetectStart();
+
+	UFUNCTION()
+	void AnimNotify_AttackDetectEnd();
 
 	UFUNCTION()
 	void AnimNotify_CanComboNotify();
@@ -181,7 +228,53 @@ private:
 	UFUNCTION()
 	void AnimNotify_RunLeftFoot();
 
-	void InitBoolCondition();
+	UFUNCTION()
+	void AnimNotify_MusouReadyStart();
+
+	UFUNCTION()
+	void AnimNotify_ActionCameraMoveEnd();
+
+	UFUNCTION()
+	void AnimNotify_MusouReadyEnd();
+
+	UFUNCTION()
+	void AnimNotify_MusouAttackCheck();
+
+	UFUNCTION()
+	void AnimNotify_MusouAttackEnd();
+
+	UFUNCTION()
+	void AnimNotify_MusouFinishDown();
+
+	UFUNCTION()
+	void AnimNotify_MusouFinishAttackCheck();
+
+	UFUNCTION()
+	void AnimNotify_MusouFinishAttackEnd();
+
+	UFUNCTION()
+	void AnimNotify_WarriorIdleStart();
+
+	UFUNCTION()
+	void AnimNotify_WarriorRunStart();
+
+	UFUNCTION()
+	void AnimNotify_GuardHit();
+
+	UFUNCTION()
+	void AnimNotify_GuardHitStart();
+
+	UFUNCTION()
+	void AnimNotify_GuardHitEnd();
+
+	UFUNCTION()
+	void AnimNotify_ParryAttackCheck();
+
+	UFUNCTION()
+	void AnimNotify_ParryAttackStart();
+
+	UFUNCTION()
+	void AnimNotify_ParryAttackEnd();
 
 private:
 
@@ -198,12 +291,20 @@ private:
 	uint8 bIsHitAndFly : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
-	uint8 bIsFallen : 1;
+	uint8 bIsGuarding : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
-	uint8 bIsHit : 1;
+	uint8 bIsGuardHitStart : 1;
 
-	uint8 bIsAttacking : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
+	uint8 bBeingStunned : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
+	uint8 bIsActingMusou : 1;
+
+	uint8 bIsDetectedAttack : 1;
+	uint8 bIsAttacking : 1; // about attack anim
+
 	uint8 bCanComboAttack : 1;
 	uint8 bWillPlayNextCombo : 1;
 	uint8 bIsPlayingChargeAttack1Anim : 1;
@@ -214,6 +315,12 @@ private:
 
 	uint8 bIsPlayingChargeAttack3Anim : 1;
 	uint8 bWillPlayChargeAttack3Anim : 1;
+
+	uint8 bIsIdleOrRun : 1;
+
+	uint8 bIsParrying : 1;
+
+	uint8 bIsActionCameraMoving : 1;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> AttackMontage;
@@ -230,6 +337,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> ChargeAttack3;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> MusouAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> GuardHitReaction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> ParryAttack;
+
 	int32 ComboCount;
 
 	int32 ChargeAttack3ComboCount;
@@ -237,8 +353,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = Anim, meta = (AllowPrivateAccess = true))
 	int32 ChargeAttack3MaxComboCount;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = true))
-	float HitAnimRate;
+	float AttackAnimRate;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = VisualEffect)
 	TObjectPtr<class UMaterialInstance> LeftFootprintMaterialInstance;

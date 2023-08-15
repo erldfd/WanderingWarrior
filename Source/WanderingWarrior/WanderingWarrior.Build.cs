@@ -10,7 +10,7 @@ public class WanderingWarrior : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "WanderingWarrior" });
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "AIModule", "GameplayTasks", "NavigationSystem", "SlateCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "AIModule", "GameplayTasks", "NavigationSystem", "SlateCore", "EnhancedInput", "MotionWarping" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "WanderingWarriorSettings" });
     }

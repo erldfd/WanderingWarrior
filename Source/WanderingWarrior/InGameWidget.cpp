@@ -37,6 +37,12 @@ void UInGameWidget::SetMyHPBarPercent(float Percent)
 	MyHPBar->SetPercent(Percent);
 }
 
+void UInGameWidget::SetMyMPBarPercent(float Percent)
+{
+	check(MyMPBar != nullptr);
+	MyMPBar->SetPercent(Percent);
+}
+
 UInventoryWidget* UInGameWidget::GetQuickSlotWidget()
 {
 	check(QuickSlotWidget != nullptr);

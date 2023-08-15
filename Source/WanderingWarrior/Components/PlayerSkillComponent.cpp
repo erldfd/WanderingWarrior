@@ -8,11 +8,13 @@
 #include "InGameWidget.h"
 #include "Character/PlayerCharacter.h"
 #include "Controller/WWPlayerController.h"
+#include "Components/CharacterStatComponent.h"
 
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values for this component's properties
 UPlayerSkillComponent::UPlayerSkillComponent()
@@ -51,7 +53,6 @@ UPlayerSkillComponent::UPlayerSkillComponent()
 	JumpToGroundSkillMaxMoveCount = 70;
 }
 
-
 // Called when the game starts
 void UPlayerSkillComponent::BeginPlay()
 {
@@ -82,6 +83,12 @@ void UPlayerSkillComponent::BeginPlay()
 		AnimInstance.SetIsPlayingChargeAttack3Anim(false);
 		AnimInstance.SetWillPlayChargeAttack3Anim(false);
 	});
+
+	AnimInstance.OnMusouAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMusouAttack);
+
+	AnimInstance.OnMusouFinishAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMusouFinishAttack);
+
+	AnimInstance.OnParryAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageParryAttack);
 }
 
 
@@ -140,6 +147,40 @@ void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 		SetPlayerCameraFOV(NewFOV);
 	}
+
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
+
+	UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
+	check(&AnimInstance);
+	UCameraComponent& ActionCamera = PlayerCharacter.GetActionCamera();
+
+	FVector ActionCameraOriginLocation = PlayerCharacter.GetCameraTransformArrowOrigin().GetRelativeLocation();
+	FQuat ActionCameraOriginRotation = PlayerCharacter.GetCameraTransformArrowOrigin().GetComponentQuat();
+
+	FVector ActionCameraTargetLocation = PlayerCharacter.GetCameraTransformArrowTarget().GetRelativeLocation();
+	FQuat ActionCameraTargetRotation = PlayerCharacter.GetCameraTransformArrowTarget().GetComponentQuat();
+
+	if (AnimInstance.GetIsActionCameraMoving())
+	{
+		ActionCameraTransformAlpha += DeltaTime / ActionCameraTransformChangeTotalTime * ActionCameraMovingMultiplier;
+
+		if (ActionCameraTransformAlpha >= 1)
+		{
+			ActionCameraTransformAlpha = 1;
+		}
+
+		FVector ActionCameraLocaionAlpha(ActionCameraTransformAlpha, ActionCameraTransformAlpha, ActionCameraTransformAlpha);
+
+		ActionCamera.SetRelativeLocation(FMath::Lerp(ActionCameraOriginLocation, ActionCameraTargetLocation, ActionCameraLocaionAlpha));
+		ActionCamera.SetRelativeRotation(FMath::Lerp(ActionCameraOriginRotation, ActionCameraTargetRotation, ActionCameraTransformAlpha));
+	}
+	else
+	{
+		ActionCameraTransformAlpha = 0;
+	}
+
+	//if(AnimInstance)
 }
 
 void UPlayerSkillComponent::JumpToGroundSkillImplement()
@@ -148,7 +189,10 @@ void UPlayerSkillComponent::JumpToGroundSkillImplement()
 	check(&PlayerCharacter);
 
 	UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
-	check(&AnimInstance);
+	if (&AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::JumpToGroundSkillImplement, &AnimInstance == nullptr"));
+	}
 
 	if (AnimInstance.IsPlayingSomething())
 	{
@@ -225,12 +269,15 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+			
+			Character.GetAnimInstance().SetHitAndFly(true);
+			Character.Launch(Character.GetActorUpVector() * 700, 700);
 		}
 
 		ShakeWithCameraFOV(80, 0.3);
 		DrawDebugSphere(&World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
-
+		
 		return;
 	}
 
@@ -239,8 +286,14 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 
 void UPlayerSkillComponent::JumpToGroundMoveForward()
 {
+
 	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
 	check(&PlayerCharacter);
+
+	if (PlayerCharacter.GetPlayingMusou())
+	{
+		return;
+	}
 
 	FHitResult Hit;
 	PlayerCharacter.AddActorWorldOffset(PlayerCharacter.GetActorForwardVector() * 5, true, &Hit);
@@ -256,8 +309,6 @@ void UPlayerSkillComponent::JumpToGroundMoveForward()
 
 void UPlayerSkillComponent::DamageKickAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::DamageKickAttack"));
-
 	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
 	check(&PlayerCharacter);
 
@@ -402,6 +453,26 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
+			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
+
+			if (Player == nullptr)
+			{
+				return;
+			}
+
+			Character.GetAnimInstance().SetHitAndFly(true);
+			float EnemyPositionAdjustmentFactor = 100;
+			FVector TargetLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
+			FVector Dir = TargetLocation - Character.GetActorLocation();
+			//	float VelocitySize = Dir.Size();
+			//	Dir.Normalize();
+			float DirectionVectorMultiplier = 2;
+			Dir = Dir * DirectionVectorMultiplier;
+
+			float HeightLimit = 400;
+			Dir.Z = Player->GetActorLocation().Z + HeightLimit;
+			Character.Launch(Dir, HeightLimit);
+
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
@@ -456,18 +527,244 @@ void UPlayerSkillComponent::ShakeWithCameraFOV(float FOV, float Duration)
 	bIsStartedShake = true;
 	bIsDecreaseingFOV = true;
 	FOVAlpha = 0;
+}
 
-	/*UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::ShakeWithCameraFOV"));
+void UPlayerSkillComponent::DamageMusouAttack()
+{
+	UWorld& World = *GetWorld();
+	const FVector& Center = GetOwner()->GetActorLocation();
+	float MusouAttackRadius = 500;
+	float Radius = MusouAttackRadius;
 
-	SetPlayerCameraFOV(FOV);
+	if (&World == nullptr)
+	{
+		return;
+	}
 
-	ShakeCameraTimerHandle.Invalidate();
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World.OverlapMultiByChannel(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel7,
+		FCollisionShape::MakeSphere(Radius),
+		CollisionQueryParam
+	);
 
-	GetWorld()->GetTimerManager().SetTimer(ShakeCameraTimerHandle, FTimerDelegate::CreateLambda([&]()->void {
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
 
-		SetPlayerCameraFOV(90.0f);
-		UE_LOG(LogTemp, Warning, TEXT("UPlayerSkillComponent::ShakeWithCameraFOV, Set to 90"));
-	}), 1, false, Duration);*/
+			if (&Character == nullptr || &Character == GetOwner())
+			{
+				continue;
+			}
 
-	
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+
+			FDamageEvent DamageEvent;
+			Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+
+			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (ensure(&PlayerController) == false) return;
+
+			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			if (ensure(&PlayerInGameWidget) == false) return;
+
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+
+			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
+
+			if (Player == nullptr)
+			{
+				return;
+			}
+
+			Character.GetAnimInstance().SetHitAndFly(true);
+			float EnemyPositionAdjustmentFactor = 100;
+			FVector TargetLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
+			FVector Dir = TargetLocation - Character.GetActorLocation();
+			//	float VelocitySize = Dir.Size();
+			//	Dir.Normalize();
+			float DirectionVectorMultiplier = 2;
+			Dir = Dir * DirectionVectorMultiplier;
+
+			float HeightLimit = 400;
+			Dir.Z = Player->GetActorLocation().Z + HeightLimit;
+			Character.Launch(Dir, HeightLimit);
+
+			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+		}
+
+		ShakeWithCameraFOV(80, 0.3);
+		//DrawDebugSphere(&World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
+
+		return;
+	}
+
+	//DrawDebugSphere(&World, Center, Radius, 16, FColor::Red, false, 1, 0, 1);
+}
+
+void UPlayerSkillComponent::DamageMusouFinishAttack()
+{
+	UWorld& World = *GetWorld();
+	const FVector& Center = GetOwner()->GetActorLocation();
+	float MusouFinishAttackRadius = 800;
+	float Radius = MusouFinishAttackRadius;
+
+	if (&World == nullptr)
+	{
+		return;
+	}
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World.OverlapMultiByChannel(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		ECollisionChannel::ECC_GameTraceChannel7,
+		FCollisionShape::MakeSphere(Radius),
+		CollisionQueryParam
+	);
+
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+
+			if (&Character == nullptr || &Character == GetOwner())
+			{
+				continue;
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+
+			FDamageEvent DamageEvent;
+			Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+
+			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (ensure(&PlayerController) == false) return;
+
+			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			if (ensure(&PlayerInGameWidget) == false) return;
+
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+
+			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
+
+			if (Player == nullptr)
+			{
+				return;
+			}
+
+			Character.GetAnimInstance().SetHitAndFly(true);
+			float EnemyPositionAdjustmentFactor = 100;
+			FVector TargetLocation = Player->GetActorLocation();
+			FVector Dir = Character.GetActorLocation() - TargetLocation;
+			//	float VelocitySize = Dir.Size();
+			//	Dir.Normalize();
+			float DirectionVectorMultiplier = 3;
+			Dir = Dir * DirectionVectorMultiplier;
+
+			float HeightLimit = 600;
+			Dir.Z = Player->GetActorLocation().Z + HeightLimit;
+			Character.Launch(Dir, HeightLimit);
+
+			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+		}
+
+		ShakeWithCameraFOV(80, 0.3);
+		//DrawDebugSphere(&World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
+
+		return;
+	}
+
+	//DrawDebugSphere(&World, Center, Radius, 16, FColor::Red, false, 1, 0, 1);
+}
+
+void UPlayerSkillComponent::DamageParryAttack()
+{
+	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
+	check(&PlayerCharacter);
+
+	UWorld& World = *GetWorld();
+
+	const FVector& Center = PlayerCharacter.GetActorLocation();
+	float Extent = KickAttackExtent;
+
+	if (&World == nullptr)
+	{
+		return;
+	}
+
+	const FRotator Rotation = GetOwner()->GetActorRotation();
+	//const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	// get forward vector
+	float ParryRange = 200;
+	const FVector Direction = PlayerCharacter.GetActorForwardVector();
+	FVector SkillLocation = Center + Direction * ParryRange * 0.3f;
+
+	SkillLocation = Center + Direction * ParryRange;
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World.OverlapMultiByChannel(
+		OverlapResults,
+		SkillLocation,
+		PlayerCharacter.GetActorRotation().Quaternion(),
+		ECollisionChannel::ECC_GameTraceChannel7,
+		FCollisionShape::MakeBox(FVector(Extent * 0.5f)),
+		CollisionQueryParam
+	);
+
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+
+			if (&Character == nullptr || &Character == GetOwner())
+			{
+				continue;
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+
+			FDamageEvent DamageEvent;
+			float ParryDamage = 300;
+			
+			Character.TakeDamage(ParryDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+
+			float GamePlayRate = 1.0f;
+			UGameplayStatics::SetGlobalTimeDilation(this, GamePlayRate);
+
+			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (ensure(&PlayerController) == false) return;
+
+			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			if (ensure(&PlayerInGameWidget) == false) return;
+
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+
+			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+		}
+
+		ShakeWithCameraFOV(80, 0.5);
+		DrawDebugBox(GetWorld(), SkillLocation, FVector(Extent * 0.5f), PlayerCharacter.GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
+
+		return;
+	}
+
+	DrawDebugBox(&World, SkillLocation, FVector(Extent * 0.5f), PlayerCharacter.GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
 }

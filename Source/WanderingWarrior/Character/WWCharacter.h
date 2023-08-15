@@ -38,6 +38,12 @@ public:
 
 	void EquipWeapon(class AWeapon* Weapon);
 
+	void Launch(FVector Velocity, float MaxHeight);
+
+	void SetMaxHeightInAir(float NewMaxHeight);
+
+	void SetCustomTimeDilation(float NewTimeDilation);
+
 public:	
 	
 	FOnAttackStartDelegate OnAttackStartDelegate;
@@ -57,7 +63,7 @@ protected:
 	void StartKnockback(FVector Direction, float Strength, float Duration);
 	void StopKnockback();
 
-	void StartHitFly(FVector Direction, float NewFlyingTime, float NewFlyingHeight, float NewAcceleration, float NewFlyingDistance);
+	void StartHitFly(FVector Direction, float NewFlyingTime, float NewFlyingHeight, float NewFlyingDistance, float NewFlyingAngle);
 	void StopHitFly();
 
 protected:
@@ -107,6 +113,7 @@ private:
 	float FlyingTime;
 	float FlyingHeight;
 	float FlyingAcceleration;
+	float FlyingAngle;
 
 	//UPROPERTY(EditAnywhere, Category = FlyingProperties, meta = (AllowPrivateAccess = true))
 	float FlyingDistance;
@@ -116,4 +123,9 @@ private:
 	float ElapsedTime;
 
 	uint8 bIsStartedHitFly;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = AttackProperty)
+	float AttackAnimRate;
+
+	float MaxHeightInAir;
 };

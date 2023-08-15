@@ -13,6 +13,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter() : bIsDamaged(false)
@@ -34,7 +35,12 @@ void AEnemyCharacter::BeginPlay()
 	UWWAnimInstance& PlayerAnimInstance = *Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->GetPlayerAnimInstance();
 	if (ensure(&PlayerAnimInstance) == false) return;
 
-	PlayerAnimInstance.OnInitIsDamaged.AddLambda([this]()->void {SetIsDamaged(false); });
+	PlayerAnimInstance.OnInitIsDamaged.AddLambda([this]()->void {
+		
+		SetIsDamaged(false);
+		UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::BeginPlay SetIsDamage False"));
+	
+	});
 }
 
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -89,7 +95,6 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -115,6 +120,7 @@ bool AEnemyCharacter::GetIsDamaged()
 
 void AEnemyCharacter::SetIsDamaged(bool bNewIsDamaged)
 {
+	UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::SetIsDamaged %d"), bNewIsDamaged);
 	bIsDamaged = bNewIsDamaged;
 }
 

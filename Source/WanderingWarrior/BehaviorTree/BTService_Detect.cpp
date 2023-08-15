@@ -63,9 +63,9 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (&Character && Character.GetController()->IsPlayerController())
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(AEnemyAIController::TargetKey, &Character);
-				DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
-				DrawDebugPoint(&World, Character.GetActorLocation(), 10, FColor::Blue, false, 0.5);
-				DrawDebugLine(&World, ThisCharacter.GetActorLocation(), Character.GetActorLocation(), FColor::Black, false, 0.5);
+				//DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
+				//DrawDebugPoint(&World, Character.GetActorLocation(), 10, FColor::Blue, false, 0.5);
+				//DrawDebugLine(&World, ThisCharacter.GetActorLocation(), Character.GetActorLocation(), FColor::Black, false, 0.5);
 
 				return;
 			}
@@ -73,5 +73,5 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(AEnemyAIController::TargetKey, nullptr);
-	DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Red, false, 0.5);
+	//DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Red, false, 0.5);
 }

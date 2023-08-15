@@ -44,6 +44,12 @@ private:
 
 	void ShakeWithCameraFOV(float FOV, float Duration);
 
+	void DamageMusouAttack();
+
+	void DamageMusouFinishAttack();
+
+	void DamageParryAttack();
+
 private:
 
 	FTimerHandle RepeatSometingTimerHandle;
@@ -95,7 +101,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = Skill)
 	TObjectPtr<USoundBase> SB_KickAttack;
 
-	uint8 bIsStartedShake;
-	uint8 bIsDecreaseingFOV;
+	float ActionCameraTransformAlpha = 0;
+
+	UPROPERTY(EditAnywhere, Category = Time)
+	float ActionCameraTransformChangeTotalTime = 1;
+
+	UPROPERTY(EditAnywhere, Category = Time)
+	float ActionCameraMovingMultiplier = 1.2f;
+
+	uint8 bIsStartedShake : 1;
+	uint8 bIsDecreaseingFOV : 1;
 	float FOVAlpha = 0;
 };

@@ -21,6 +21,7 @@ public:
 	void SetEnemyNameTextBlock(FText NewText);
 	void SetEnemyHPBarPercent(float Percent);
 	void SetMyHPBarPercent(float Percent);
+	void SetMyMPBarPercent(float Percent);
 
 	class UInventoryWidget* GetQuickSlotWidget();
 	class UInventoryWidget* GetInventoryWidget();
