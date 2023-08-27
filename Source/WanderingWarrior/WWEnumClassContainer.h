@@ -55,3 +55,9 @@ enum class EDropItem : uint8
 	WhiteSword,
 	HPPotion
 };
+
+UENUM()
+enum class ESkillCompType : uint8
+{
+	WarriorSkillComponent,
+};

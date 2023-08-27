@@ -19,6 +19,8 @@
 #include "Inventory/CharacterInventory.h"
 #include "Inventory/CharacterQuickSlot.h"
 #include "Inventory/InventoryComponent.h"
+#include "Data/SkillDataAsset.h"
+#include "Components/WarriorSkillComponent.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -66,7 +68,8 @@ APlayerCharacter::APlayerCharacter()
 	ActionCamera->SetupAttachment((USceneComponent*)BodyCapsuleComponent);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PlayerProfile"));
 
-	PlayerSkillComponent = CreateDefaultSubobject<UPlayerSkillComponent>(TEXT("PlayerSkill"));
+	//PlayerSkillComponent = CreateDefaultSubobject<UPlayerSkillComponent>(TEXT("PlayerSkill"));
+	SkillComponent = CreateDefaultSubobject<UWarriorSkillComponent>(TEXT("Skill"));
 
 	Tags.Init("Player", 1);
 
@@ -89,10 +92,6 @@ APlayerCharacter::APlayerCharacter()
 	if (OnActorEndOverlap.IsBound() == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::APlayerCharacter, OnActorEndOverlap is NOT bound"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::APlayerCharacter, OnActorEndOverlap is bound"));
 	}
 
 	ParryWindow = 1;
@@ -144,18 +143,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bIsPlayingMusou && CharacterStatComponent->GetMP() > 0)
+	if (GetIsMusouAttackStarted() && CharacterStatComponent->GetMP() > 0)
 	{
 		CharacterStatComponent->SetMP(CharacterStatComponent->GetMP() - 1 * DeltaTime);
 	}
-	else if (bIsPlayingMusou == false && CharacterStatComponent->GetMP() < CharacterStatComponent->GetMaxMP())
+	else if (GetIsMusouAttackStarted() == false && CharacterStatComponent->GetMP() < CharacterStatComponent->GetMaxMP())
 	{
 		CharacterStatComponent->SetMP(CharacterStatComponent->GetMP() + 1 * DeltaTime);
 	}
 
-	if (ParryElapsedTime < ParryWindow)
+	if (ParryLeftTime > 0 && GetIsGuarding())
 	{
-		ParryElapsedTime += DeltaTime;
+		ParryLeftTime -= DeltaTime;
 	}
 }
 
@@ -184,7 +183,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	UE_LOG(LogTemp, Warning, TEXT("PlayerCharacter PossessedBy"));
 
 	Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->SetPlayerAnimInstance(AnimInstance);
 }
@@ -196,15 +194,16 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		return 0.0f;
 	}
 
-	if (bIsParryWindow && ParryElapsedTime <= ParryWindow)
+	if (ParryLeftTime > 0 && GetIsGuarding() && GetSkillComponent()->IsSkillStarted() == false)
 	{
-		bIsParrySucceeded = true;
-		AnimInstance->PlayParryAttackAnim();
+		SetIsParrySucceeded(true);
+		//AnimInstance->PlayParryAttackAnim();
+		PlayParryAttack();
 
 		return 0.0f;
 	}
 
-	if (AnimInstance->GetIsGuarding() || AnimInstance->GetIsGuardHitStart())
+	if (GetIsGuarding() || AnimInstance->GetIsGuardHitStart())
 	{
 		AnimInstance->PlayGuardHitAnim();
 
@@ -226,22 +225,11 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return Damage;
 }
 
-void APlayerCharacter::Jump()
-{
-	if (AnimInstance->IsPlayingSomething() || AnimInstance->GetIsActingMusou())
-	{
-		return;
-	}
-
-	Super::Jump();
- 	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::Jump"));
-}
-
-UPlayerSkillComponent& APlayerCharacter::GetPlayerSkillComponenet()
-{
-	check(PlayerSkillComponent);
-	return *PlayerSkillComponent;
-}
+//UPlayerSkillComponent& APlayerCharacter::GetPlayerSkillComponenet()
+//{
+//	check(PlayerSkillComponent);
+//	return *PlayerSkillComponent;
+//}
 
 class UCharacterQuickSlot& APlayerCharacter::GetQuickSlot()
 {
@@ -254,66 +242,24 @@ UCharacterInventory& APlayerCharacter::GetInventory() const
 	return *Inventory;
 }
 
-void APlayerCharacter::Attack()
+//void APlayerCharacter::Attack()
+//{
+//	Super::Attack();
+//}
+
+//void APlayerCharacter::DoChargeAttack()
+//{
+//	Super::DoChargeAttack();
+//}
+
+UCameraComponent* APlayerCharacter::GetCamera()
 {
-	if (bIsPlayingMusou)
+	if (Camera == nullptr)
 	{
-		return;
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::GetCamera, Camera == nullptr"));
 	}
 
-	Super::Attack();
-}
-
-void APlayerCharacter::DoChargeAttack()
-{
-	bool bIsAttacking = AnimInstance->GetIsAttacking();
-	bool bCanCombo = AnimInstance->GetCanCombo();
-	bool bWillPlayNextCombo = AnimInstance->GetWillPlayNextCombo();
-	bool bIsDead = AnimInstance->GetIsDead();
-
-	bool bIsPlayingJumpToGroundSkill = AnimInstance->GetIsPlayingChargeAttack1Anim();
-
-	bool bIsPlayingChargeAttack2Anim = AnimInstance->GetIsPlayingChargeAttack2Anim();
-	bool bWillPlayChargeAttack2Anim = AnimInstance->GetWillPlayChargeAttack2Anim();
-
-	bool bIsPlayingChargeAttack3Anim = AnimInstance->GetIsPlayingChargeAttack3Anim();
-	bool bWillPlayChargeAttack3Anim = AnimInstance->GetWillPlayChargeAttack3Anim();
-
-	//bool bIsActingMusou = AnimInstance->GetIsActingMusou();
-
-	bool bIsJumping = GetMovementComponent()->IsFalling();
-
-	if (bIsDead || bIsPlayingJumpToGroundSkill || bIsPlayingChargeAttack2Anim || bIsPlayingChargeAttack3Anim ||
-		bWillPlayNextCombo || bIsPlayingMusou || bIsJumping)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, %d, %d, %d, %d, %d, %d"), bIsDead, bIsPlayingJumpToGroundSkill, bIsPlayingChargeAttack2Anim, bIsPlayingChargeAttack3Anim,
-			bWillPlayNextCombo, bIsPlayingMusou);
-		return;
-	}
-
-	int ComboCount = AnimInstance->GetComboCount();
-
-	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, %d, %d, %d, %d"),bIsPlayingJumpToGroundSkill, ComboCount, bWillPlayChargeAttack2Anim, bWillPlayChargeAttack3Anim);
-	if (bIsPlayingJumpToGroundSkill == false && ComboCount == 0)
-	{
-		GetPlayerSkillComponenet().JumpToGroundSkillImplement();
-	}
-	else if (bWillPlayChargeAttack2Anim == false && ComboCount == 1)
-	{
-		AnimInstance->SetWillPlayChargeAttack2Anim(true);
-		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, SetWillKick"));
-	}
-	else if (bWillPlayChargeAttack3Anim == false && ComboCount == 2)
-	{
-		AnimInstance->SetWillPlayChargeAttack3Anim(true);
-		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoChargeAttack, SetWillKick"));
-	}
-}
-
-UCameraComponent& APlayerCharacter::GetCamera()
-{
-	check(Camera);
-	return *Camera;
+	return Camera;
 }
 
 UCameraComponent& APlayerCharacter::GetActionCamera()
@@ -332,101 +278,89 @@ bool APlayerCharacter::GetIsWet()
 	return bIsWet;
 }
 
-void APlayerCharacter::DoMusouAttack()
-{
-	float CurrentMP = CharacterStatComponent->GetMP();
-	float MaxMP = CharacterStatComponent->GetMaxMP();
+//void APlayerCharacter::DoMusouAttack()
+//{
+//	float CurrentMP = CharacterStatComponent->GetMP();
+//	float MaxMP = CharacterStatComponent->GetMaxMP();
+//	bool bIsPlayingMusou = GetIsMusouAttackStarted();
+//
+//	if (bIsPlayingMusou == false && CurrentMP < MaxMP || GetMovementComponent()->IsFalling() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	if (bIsPlayingMusou == false && CurrentMP == MaxMP)
+//	{
+//		PlayMusouAttack();
+//		SetIsMusouAttackStarted(true);
+//
+//		SetIsParrySucceeded(false);
+//		SkillComponenet->SetIsChargeAttack1Started(false);
+//		SkillComponenet->SetIsChargeAttack2Started(false);
+//		SkillComponenet->SetIsChargeAttack3Started(false);
+//		SetIsAttacking(false);
+//		SetIsGuarding(false);
+//		AnimInstance->SetIsGuardHitStart(false);
+//		SetWillPlayNextCombo(false);
+//		SetWillPlayChargeAttack2(false);
+//		SetWillPlayChargeAttack3(false);
+//	}
+//	else if (bIsPlayingMusou && CurrentMP < MaxMP && CurrentMP > 0)
+//	{
+//		bIsConsistentMusou = true;
+//	}
+//
+//	/*FMotionWarpingTarget Target;
+//	float Distance = 500.0f;
+//	Target.Name = FName("AttackTarget");
+//	Target.Location = GetActorLocation() + GetActorForwardVector() * Distance;
+//	Target.Rotation = GetActorRotation();
+//
+//	MotionWarpComponent->AddOrUpdateWarpTarget(Target);*/
+//}
 
-	if (bIsPlayingMusou == false && CurrentMP < MaxMP || GetMovementComponent()->IsFalling())
-	{
-		return;
-	}
+//void APlayerCharacter::DoGuard(const FInputActionValue& Value)
+//{
+//	if (AnimInstance->GetIsPlayingCharacterHitMontage() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	if (GetIsParrySucceeded())
+//	{
+//		AnimInstance->SetIsGuarding(false);
+//		return;
+//	}
+//
+//	bIsGuarding = Value.Get<bool>();
+//	
+//	if (bIsGuarding == false)
+//	{
+//		ParryLeftTime = ParryWindow;
+//	}
+//
+//	AnimInstance->SetIsGuarding(bIsGuarding);
+//}
 
-	AnimInstance->SetIsParrying(false);
-	AnimInstance->SetIsGuardHitStart(false);
-	AnimInstance->SetIsGuarding(false);
-	AnimInstance->SetIsPlayingCharacterHitMontage(false);
-	AnimInstance->SetIsPlayingChargeAttack1Anim(false);
-	AnimInstance->SetIsPlayingChargeAttack2Anim(false);
-	AnimInstance->SetIsPlayingChargeAttack3Anim(false);
-	AnimInstance->SetIsAttacking(false);
+//bool APlayerCharacter::GetPlayingMusou()
+//{
+//	return bIsPlayingMusou;
+//}
+//
+//void APlayerCharacter::SetPlayingMusou(bool NewPlayingMusou)
+//{
+//	bIsPlayingMusou = NewPlayingMusou;
+//}
 
-	AnimInstance->SetWillPlayNextCombo(false);
-	AnimInstance->SetWillPlayChargeAttack2Anim(false);
-	AnimInstance->SetWillPlayChargeAttack3Anim(false);
-
-	AnimInstance->InitBoolCondition();
-
-	if (bIsPlayingMusou == false && CurrentMP == MaxMP)
-	{
-		AnimInstance->PlayMusouAnim();
-		bIsPlayingMusou = true;
-	}
-	else if (bIsPlayingMusou && CurrentMP < MaxMP && CurrentMP > 0)
-	{
-		bIsConsistentMusou = true;
-	}
-
-	/*FMotionWarpingTarget Target;
-	float Distance = 500.0f;
-	Target.Name = FName("AttackTarget");
-	Target.Location = GetActorLocation() + GetActorForwardVector() * Distance;
-	Target.Rotation = GetActorRotation();
-
-	MotionWarpComponent->AddOrUpdateWarpTarget(Target);*/
-}
-
-void APlayerCharacter::DoGuard(const FInputActionValue& Value)
-{
-	if (AnimInstance->GetIsPlayingCharacterHitMontage())
-	{
-		return;
-	}
-
-	if (bIsParryWindow == false && ParryElapsedTime > ParryWindow)
-	{
-		// parry time start
-		bIsParryWindow = true;
-		ParryElapsedTime = 0;
-		bIsParrySucceeded = false;
-	}
-
-	if (AnimInstance->GetIsParrying())
-	{
-		AnimInstance->SetIsGuarding(false);
-		return;
-	}
-
-	bool IsGuarding = Value.Get<bool>();
-	
-	if (IsGuarding == false)
-	{
-		bIsParryWindow = false;
-	}
-
-	AnimInstance->SetIsGuarding(IsGuarding);
-	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::DoGuard, IsGuarding : %d"), IsGuarding);
-}
-
-bool APlayerCharacter::GetPlayingMusou()
-{
-	return bIsPlayingMusou;
-}
-
-void APlayerCharacter::SetPlayingMusou(bool NewPlayingMusou)
-{
-	bIsPlayingMusou = NewPlayingMusou;
-}
-
-bool APlayerCharacter::GetConsistentMusou()
-{
-	return bIsConsistentMusou;
-}
-
-void APlayerCharacter::SetConsistentMusou(bool NewConsistentMusou)
-{
-	bIsConsistentMusou = NewConsistentMusou;
-}
+//bool APlayerCharacter::GetIsConsistentMusou() const
+//{
+//	return bIsConsistentMusou;
+//}
+//
+//void APlayerCharacter::SetIsConsistentMusou(bool bNewIsConsistentMusou)
+//{
+//	bIsConsistentMusou = bNewIsConsistentMusou;
+//}
 
 class UArrowComponent& APlayerCharacter::GetCameraTransformArrowOrigin()
 {
@@ -438,15 +372,50 @@ class UArrowComponent& APlayerCharacter::GetCameraTransformArrowTarget()
 	return *CameraTransformArrowTarget;
 }
 
-bool APlayerCharacter::GetIsParrySucceeded()
-{
-	return bIsParrySucceeded;
-}
+//bool APlayerCharacter::GetIsParrySucceeded() const
+//{
+//	return bIsParrySucceeded;
+//}
+//
+//void APlayerCharacter::SetIsParrySucceeded(bool NewIsParrySucceeded)
+//{
+//	bIsParrySucceeded = NewIsParrySucceeded;
+//}
 
-void APlayerCharacter::SetIsParrySucceeded(bool NewIsParrySucceeded)
-{
-	bIsParrySucceeded = NewIsParrySucceeded;
-}
+//UWarriorSkillComponent* APlayerCharacter::GetSkillComponenet()
+//{
+//	return SkillComponenet;
+//}
+
+//bool APlayerCharacter::GetWillPlayChargeAttack2() const
+//{
+//	return bWillPlayChargeAttack2;
+//}
+//
+//void APlayerCharacter::SetWillPlayChargeAttack2(bool bNewWillPlayChargeAttack2)
+//{
+//	bWillPlayChargeAttack2 = bNewWillPlayChargeAttack2;
+//}
+//
+//bool APlayerCharacter::GetWillPlayChargeAttack3() const
+//{
+//	return bWillPlayChargeAttack3;
+//}
+//
+//void APlayerCharacter::SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3)
+//{
+//	bWillPlayChargeAttack3 = bNewWillPlayChargeAttack3;
+//}
+//
+//bool APlayerCharacter::GetIsGuarding() const
+//{
+//	return bIsGuarding;
+//}
+//
+//void APlayerCharacter::SetIsGuarding(bool bNewIsGuarding)
+//{
+//	bIsGuarding = bNewIsGuarding;
+//}
 
 void APlayerCharacter::OnStartNextCombo()
 {
@@ -464,23 +433,7 @@ void APlayerCharacter::OnStartNextCombo()
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
-	if (Super::AnimInstance->IsPlayingSomething() || AnimInstance->GetIsActionCameraMoving())
-	{
-		return;
-	}
-
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	AddMovementInput(ForwardDirection, MovementVector.X);
-	AddMovementInput(RightDirection, MovementVector.Y);
-
-	bIsMoved = true;
+	Super::Move(Value);
 }
 
 void APlayerCharacter::Look(const FInputActionValue& Value)
@@ -528,3 +481,73 @@ void APlayerCharacter::OnEndOverlapWithSomething(AActor* OverlappedActor, AActor
 	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, OtherActor Name : %s"), *OtherActor->Tags[0].ToString());
 }
 
+//void APlayerCharacter::PlayChargeAttack1()
+//{
+//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	float PlayRate = 1.0f;
+//	GetSkillComponenet()->PlayChargeAttack1(PlayRate);
+//}
+
+//void APlayerCharacter::PlayChargeAttack2()
+//{
+//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	float PlayRate = 1.0f;
+//	GetSkillComponenet()->PlayChargeAttack2(PlayRate);
+//}
+
+//void APlayerCharacter::PlayChargeAttack3()
+//{
+//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	float PlayRate = 1.0f;
+//	GetSkillComponenet()->PlayChargeAttack3(PlayRate);
+//}
+
+//void APlayerCharacter::PlayMusouAttack()
+//{
+//	if (GetMovementComponent()->IsFalling() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	float PlayRate = 1;
+//	GetSkillComponenet()->PlayMusouAttack(PlayRate);
+//}
+
+//void APlayerCharacter::PlayParryAttack()
+//{
+//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
+//	{
+//		return;
+//	}
+//
+//	float PlayRate = 1;
+//	GetSkillComponenet()->PlayParryAttack(PlayRate);
+//}
+
+
+//bool APlayerCharacter::GetIsMusouAttackStarted() const
+//{
+//	return SkillComponenet->GetIsMusouAttackStarted();
+//}
+
+//void APlayerCharacter::SetIsMusouAttackStarted(bool NewIsMusouAttackStarted)
+//{
+//	SkillComponenet->SetIsMusouAttackStarted(NewIsMusouAttackStarted);
+//}
+
+const FVector2D& APlayerCharacter::GetMovementVector() const
+{
+	return MovementVector;
+}

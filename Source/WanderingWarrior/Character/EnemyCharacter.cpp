@@ -35,7 +35,6 @@ void AEnemyCharacter::BeginPlay()
 	PlayerAnimInstance.OnInitIsDamaged.AddLambda([this]()->void {
 		
 		SetIsDamaged(false);
-		UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::BeginPlay SetIsDamage False"));
 	
 	});
 }
@@ -117,7 +116,6 @@ bool AEnemyCharacter::GetIsDamaged()
 
 void AEnemyCharacter::SetIsDamaged(bool bNewIsDamaged)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::SetIsDamaged %d"), bNewIsDamaged);
 	bIsDamaged = bNewIsDamaged;
 }
 

@@ -5,6 +5,7 @@
 
 #include "Character/EnemyCharacter.h"
 #include "Character/PlayerCharacter.h"
+#include "Character/BossCharacter.h"
 #include "WWAnimInstance.h"
 #include "InGameWidget.h"
 #include "WWGameMode.h"
@@ -48,10 +49,17 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		return;
 	}
-	
+
+	ABossCharacter* Boss = Cast<ABossCharacter>(OtherActor);
+	if (Boss) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Boss"));
+	}
+
 	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(OtherActor);
 	if (EnemyCharacter == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, EnemyCharacter == nullptr"));
 		return;
 	}
 
@@ -61,12 +69,12 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	UWWAnimInstance* PlayerAnimInstance = GameMode->GetPlayerAnimInstance();
 	if(ensure(PlayerAnimInstance) == false) return;
 
-	bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
+	//bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
 	
 	bool IsDetectedAttack = PlayerAnimInstance->GetDetectedAttack();
 	UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Damaged : %d, DetectedAttack : %d"), EnemyCharacter->GetIsDamaged(), IsDetectedAttack);
 
-	if (EnemyCharacter->GetIsDamaged() == false && /*IsAttacking*/IsDetectedAttack)
+	if (EnemyCharacter->GetIsDamaged() == false/* &&*/ /*IsAttacking*//*IsDetectedAttack*/)
 	{
 		//UGameplayStatics::SetGlobalTimeDilation(this, 0.5f);
 		EnemyCharacter->SetIsDamaged(true);
@@ -109,4 +117,9 @@ void AWeapon::Use(const UWorld& World)
 	check(PlayerCharacter);
 
 	PlayerCharacter->EquipWeapon(this);
+}
+
+void AWeapon::SetBoxComponentCollision(ECollisionEnabled::Type NewType)
+{
+	BoxComponent->SetCollisionEnabled(NewType);
 }

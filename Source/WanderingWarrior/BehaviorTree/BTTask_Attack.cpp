@@ -38,9 +38,7 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	AWWCharacter* Character = Cast <AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	check(Character != nullptr);
 
-	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
-
-	if (AnimInstance.GetIsAttacking())
+	if (Character->GetIsAttacking())
 	{
 		return;
 	}

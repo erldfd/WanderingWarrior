@@ -8,7 +8,7 @@
 
 AWWGameMode::AWWGameMode()
 {
-	static ConstructorHelpers::FClassFinder<APlayerCharacter> DefaultCharacter(TEXT("/Game/Characters/WWCharacterBlueprint/BP_PlayerCharacter.BP_PlayerCharacter_C"));
+	static ConstructorHelpers::FClassFinder<APlayerCharacter> DefaultCharacter(TEXT("/Game/Characters/WWCharacterBlueprint/BP_PlayerCharacter2.BP_PlayerCharacter2_C"));
 	if (DefaultCharacter.Succeeded())
 	{
 		DefaultPawnClass = DefaultCharacter.Class;

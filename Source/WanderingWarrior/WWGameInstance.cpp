@@ -57,8 +57,6 @@ UWWGameInstance::UWWGameInstance()
 			UE_LOG(LogTemp, Warning, TEXT("WWGameInstance, UWWGameInstance, Failed : %s"), *MiscItemDataArray[i]->BlueprintPath)
 		}
 	}
-
-	
 }
 
 void UWWGameInstance::Init()

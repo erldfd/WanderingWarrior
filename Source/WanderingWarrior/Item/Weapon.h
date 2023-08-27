@@ -21,6 +21,8 @@ public:
 
 	virtual void Use(const UWorld& World) override;
 
+	void SetBoxComponentCollision(ECollisionEnabled::Type NewType);
+
 protected:
 
 	virtual void BeginPlay() override;

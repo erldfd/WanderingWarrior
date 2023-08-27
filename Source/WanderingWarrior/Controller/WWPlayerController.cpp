@@ -36,7 +36,6 @@ AWWPlayerController::AWWPlayerController() : bIsInputModeGameOnly(true)
 void AWWPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::AWWPlayerController, PalyerController OnPossess"));
 
 	PlayerCharacter = Cast<APlayerCharacter>(aPawn);
 	CharacterStat = &PlayerCharacter->GetCharacterStatComponent();
@@ -157,7 +156,7 @@ void AWWPlayerController::OnMPChanged()
 {
 	check(InGameWidget);
 	check(CharacterStat);
-	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnMPChanged, MPRatio : %f"), CharacterStat->GetMPRatio());
+
 	InGameWidget->SetMyMPBarPercent(CharacterStat->GetMPRatio());
 }
 
@@ -274,8 +273,6 @@ void AWWPlayerController::OnKeyEButtonPressed()
 	{
 		check(&OverlapResults[i]);
 
-		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController, OnKeyEButtonPressed, OverlapResults[%d] : %s"), i, *OverlapResults[i].GetActor()->GetName());
-
 		AActor& OverlappedActor = *OverlapResults[i].GetActor();
 
 		if (OverlappedActor.Tags.IsValidIndex(0) == false)
@@ -288,7 +285,6 @@ void AWWPlayerController::OnKeyEButtonPressed()
 		if (ActorTag == "Marchant")
 		{
 			DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
-			UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController, OnKeyEButtonPressed, Found Marchant"));
 
 			SetShowMouseCursor(true);
 
@@ -306,6 +302,5 @@ void AWWPlayerController::OnKeyEButtonPressed()
 
 void AWWPlayerController::OnInteraction(const TArray<FOverlapResult>& OverlapResults)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnInteraction"));
 	Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this))->GetInteractionManager().AnalyzeInteraction(OverlapResults);
 }

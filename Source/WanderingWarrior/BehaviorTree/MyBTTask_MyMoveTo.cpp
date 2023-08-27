@@ -19,6 +19,7 @@
 UMyBTTask_MyMoveTo::UMyBTTask_MyMoveTo()
 {
 	bNotifyTick = true;
+	AttackRange = 200;
 }
 
 EBTNodeResult::Type UMyBTTask_MyMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -50,7 +51,7 @@ void UMyBTTask_MyMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		return;
 	}
 
-	float AttackRange = 100;
+	//float AttackRange = 100;
 	float DistanceToTarget = Target->GetDistanceTo(&ThisCharacter);
 	bool bResult = (DistanceToTarget <= AttackRange);
 	

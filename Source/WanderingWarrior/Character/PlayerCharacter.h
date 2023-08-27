@@ -27,49 +27,68 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	virtual void Jump() override;
+public:
 
-	class UPlayerSkillComponent& GetPlayerSkillComponenet();
+	//virtual void Attack() override;
+	//virtual void DoChargeAttack() override;
+	//virtual void DoMusouAttack() override;
+	//virtual void DoGuard(const struct FInputActionValue& Value) override;
+
+	/*virtual void PlayChargeAttack1() override;
+	virtual void PlayChargeAttack2() override;
+	virtual void PlayChargeAttack3() override;
+	virtual void PlayMusouAttack() override;
+	virtual void PlayParryAttack() override;*/
+
+	/*virtual bool GetIsConsistentMusou() const override;
+	virtual void SetIsConsistentMusou(bool NewConsistentMusou) override;*/
+
+	//virtual bool GetIsParrySucceeded() const override;
+	//virtual void SetIsParrySucceeded(bool NewIsParrySucceeded) override;
+
+	//virtual bool GetWillPlayChargeAttack2() const override;
+	//virtual void SetWillPlayChargeAttack2(bool bNewWillPlayChargeAttack2) override;
+
+	//virtual bool GetWillPlayChargeAttack3() const override;
+	//virtual void SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3) override;
+
+	//virtual bool GetIsGuarding() const override;
+	//virtual void SetIsGuarding(bool bNewIsGuarding) override;
+
+	//virtual bool GetIsMusouAttackStarted() const override;
+	//virtual void SetIsMusouAttackStarted(bool NewIsMusouAttackStarted) override;
+
+public:
+
+	//class UPlayerSkillComponent& GetPlayerSkillComponenet();
 
 	class UCharacterQuickSlot& GetQuickSlot();
 
 	class UCharacterInventory& GetInventory() const;
 
-	virtual void Attack() override;
-
-	void DoChargeAttack();
-
-	class UCameraComponent& GetCamera();
+	class UCameraComponent* GetCamera();
 	class UCameraComponent& GetActionCamera();
 
 	bool GetIsInWater();
 	bool GetIsWet();
 
-	void DoMusouAttack();
-
-	void DoGuard(const struct FInputActionValue& Value);
-
-	bool GetPlayingMusou();
-	void SetPlayingMusou(bool NewPlayingMusou);
-
-	bool GetConsistentMusou();
-	void SetConsistentMusou(bool NewConsistentMusou);
-
 	class UArrowComponent& GetCameraTransformArrowOrigin();
 	class UArrowComponent& GetCameraTransformArrowTarget();
 
-	bool GetIsParrySucceeded();
-	void SetIsParrySucceeded(bool NewIsParrySucceeded);
+	//class UWarriorSkillComponent* GetSkillComponenet();
 
 protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void Move(const struct FInputActionValue& Value) override;
+
+protected:
+
 private:
 
 	void OnStartNextCombo();
 
-	void Move(const struct FInputActionValue& Value);
 	void Look(const struct FInputActionValue& Value);
 
 	UFUNCTION()
@@ -92,8 +111,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UCameraComponent> ActionCamera;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
+	//TObjectPtr<class UPlayerSkillComponent> PlayerSkillComponent;
 
 	UPROPERTY()
 	TObjectPtr<class UInventorySlotData> TempSwapSlot;
@@ -140,23 +159,25 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UArrowComponent> CameraTransformArrowTarget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UStaticMeshComponent> TestStaticMeshComp;
-
 	uint8 bIsWet : 1;
 	uint8 bIsMoved : 1;
 	uint8 bIsReadyToLeftFootprint : 1;
 	uint8 bIsInWater : 1;
-	uint8 bIsPlayingMusou : 1;
-	uint8 bIsConsistentMusou : 1;
+	//uint8 bIsPlayingMusou : 1;
 
-	uint8 bIsParryWindow : 1;
-	uint8 bIsParrySucceeded : 1;
-	uint8 bAllowParryTime : 1;
+	//uint8 bIsStartedChargeAttack : 1;
+	//uint8 bIsStartedAttack : 1;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Time)
-	float ParryWindow;
+public:
 
-	float ParryElapsedTime;
+	const FVector2D& GetMovementVector() const;
 
+private:
+
+	//uint8 bIsMusouAttackStarted : 1;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill, meta = (AllowPrivateAccess = true))
+	//TObjectPtr<class UWarriorSkillComponent> SkillComponenet;
+
+	FVector2D MovementVector;
 };

@@ -60,31 +60,31 @@ void UPlayerSkillComponent::BeginPlay()
 	UWWAnimInstance& AnimInstance = *Cast<UWWAnimInstance>(&PlayerCharacter.GetAnimInstance());
 	check(&AnimInstance);
 
-	AnimInstance.OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
+	/*AnimInstance.OnJumpToGroundAnimEndDelegate.AddUObject(this, &UPlayerSkillComponent::DamageJumpToGrundSkill);
 	AnimInstance.OnJumpToGroundAnimEndDelegate.AddLambda([&]()-> void {
 
 		AnimInstance.SetIsPlayingChargeAttack1Anim(false);
-	});
+	});*/
 
-	AnimInstance.OnKickDamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageKickAttack);
+	/*AnimInstance.OnKickDamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageKickAttack);
 	AnimInstance.OnKickEndDelegate.AddLambda([&]()-> void {
 
 		AnimInstance.SetIsPlayingChargeAttack2Anim(false);
 		AnimInstance.SetWillPlayChargeAttack2Anim(false);
-	});
+	});*/
 
-	AnimInstance.OnChargeAttack3DamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMelee360Attack);
+	/*AnimInstance.OnChargeAttack3DamageDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMelee360Attack);
 	AnimInstance.OnChargeAttack3EndDelegate.AddLambda([&]()-> void {
 
 		AnimInstance.SetIsPlayingChargeAttack3Anim(false);
 		AnimInstance.SetWillPlayChargeAttack3Anim(false);
-	});
+	});*/
 
-	AnimInstance.OnMusouAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMusouAttack);
+//	AnimInstance.OnMusouAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMusouAttack);
 
-	AnimInstance.OnMusouFinishAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMusouFinishAttack);
+//	AnimInstance.OnMusouFinishAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageMusouFinishAttack);
 
-	AnimInstance.OnParryAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageParryAttack);
+	//AnimInstance.OnParryAttackCheckDelegate.AddUObject(this, &UPlayerSkillComponent::DamageParryAttack);
 }
 
 void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -101,18 +101,18 @@ void UPlayerSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 		APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
 		check(&PlayerCharacter);
 
-		UCameraComponent& Camera = PlayerCharacter.GetCamera();
+		UCameraComponent* Camera = PlayerCharacter.GetCamera();
 		check(&Camera);
 
 		float NewFOV = -1;
-		float CurrentFOV = Camera.FieldOfView;
+		float CurrentFOV = Camera->FieldOfView;
 
 		if (bIsDecreaseingFOV && CurrentFOV > FOVChangeGoal)
 		{
 			NewFOV = FMath::Lerp(90.0f, 80.0f, FOVAlpha);
 			//NewFOV = FOVChangeGoal;
 		}
-		else if (bIsDecreaseingFOV == false && Camera.FieldOfView < FOVOrigin)
+		else if (bIsDecreaseingFOV == false && Camera->FieldOfView < FOVOrigin)
 		{ 
 			//NewFOV = FMath::Lerp(FOVChangeGoal, FOVOrigin, FOVAlpha);
 			NewFOV = FOVOrigin;
@@ -190,7 +190,7 @@ void UPlayerSkillComponent::JumpToGroundSkillImplement()
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(RepeatSometingTimerHandle, FTimerDelegate::CreateUObject(this, &UPlayerSkillComponent::JumpToGroundMoveForward), 0.01, true);
-	AnimInstance.PlayJumpToGrundAnim();
+//	AnimInstance.PlayJumpToGrundAnim();
 }
 
 void UPlayerSkillComponent::DamageJumpToGrundSkill()
@@ -280,13 +280,13 @@ void UPlayerSkillComponent::JumpToGroundMoveForward()
 	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
 	check(&PlayerCharacter);
 
-	if (PlayerCharacter.GetPlayingMusou())
+	if (PlayerCharacter.GetIsMusouAttackStarted())
 	{
 		return;
 	}
 
 	FHitResult Hit;
-	PlayerCharacter.AddActorWorldOffset(PlayerCharacter.GetActorForwardVector() * 5, true, &Hit);
+	//PlayerCharacter.AddActorWorldOffset(PlayerCharacter.GetActorForwardVector() * 5, true, &Hit);
 
 	MoveCount++;
 
@@ -504,10 +504,10 @@ void UPlayerSkillComponent::SetPlayerCameraFOV(float FOV)
 	APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(GetOwner());
 	check(&PlayerCharacter);
 
-	UCameraComponent& Camera = PlayerCharacter.GetCamera();
+	UCameraComponent* Camera = PlayerCharacter.GetCamera();
 	check(&Camera);
 
-	Camera.SetFieldOfView(FOV);
+	Camera->SetFieldOfView(FOV);
 }
 
 void UPlayerSkillComponent::ShakeWithCameraFOV(float FOV, float Duration)

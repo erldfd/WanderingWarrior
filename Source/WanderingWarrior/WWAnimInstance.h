@@ -9,10 +9,7 @@
 
 #include "WWAnimInstance.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnAttackStartDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnHitByEnemyDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnCanInputNextComboDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnStartNextComboDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAnimMoveStartDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAnimMoveEndDelegate);
@@ -43,27 +40,10 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	void PlayAttackMontage();
-
-	void JumpToAttackMontageSection(int32 NewSection);
-
 	bool GetIsDead();
 	void SetIsDead(bool IsDead);
 
-	bool GetIsAttacking();
-	void SetIsAttacking(bool NewIsAttacking);
-
-	bool GetCanCombo();
-
-	bool GetWillPlayNextCombo();
-	void SetWillPlayNextCombo(bool bWillPlayNextComboNow);
-
-	void PlayJumpToGrundAnim();
-
 	bool IsPlayingSomething();
-
-	bool GetIsPlayingChargeAttack1Anim();
-	void SetIsPlayingChargeAttack1Anim(bool bIsPlaying);
 
 	void PlayCharacterHitMontage();
 	void StopCharacterHitMontage();
@@ -71,33 +51,11 @@ public:
 	bool GetIsPlayingCharacterHitMontage();
 	void SetIsPlayingCharacterHitMontage(bool bIsPlaying);
 
-	int32 GetComboCount();
-
 	bool GetHitAndFly();
 	void SetHitAndFly(bool NewHitAndFly);
 
-	bool GetIsPlayingChargeAttack2Anim();
-	void SetIsPlayingChargeAttack2Anim(bool NewIsPlayingChargeAttack2Anim);
-
-	bool GetWillPlayChargeAttack2Anim();
-	void SetWillPlayChargeAttack2Anim(bool NewWillPlayChargeAttack2Anim);
-
-	void PlayKickAttackMongate();
-		
-	bool GetIsPlayingChargeAttack3Anim();
-	void SetIsPlayingChargeAttack3Anim(bool NewIsPlayingChargeAttack3Anim);
-
-	bool GetWillPlayChargeAttack3Anim();
-	void SetWillPlayChargeAttack3Anim(bool NewWillPlayChargeAttack3Anim);
-
-	void PlayChargeAttack3Montage();
-
-	void SetAttackAnimRate(float NewAttackAnimRate);
-
 	bool GetDetectedAttack();
 	void SetDetectedAttack(bool NewDetectedAttack);
-
-	void PlayMusouAnim();
 
 	bool GetIsIdleOrRun();
 	void SetIsIdleOrRun(bool NewIsIdleOrWalk);
@@ -113,8 +71,6 @@ public:
 	bool GetBeingStunned();
 	void SetBeingStunned(bool NewBeingStunned);
 
-	void PlayParryAttackAnim();
-
 	bool GetIsParrying();
 	void SetIsParrying(bool NewIsParrying);
 
@@ -128,10 +84,7 @@ public:
 
 public:
 
-	FOnAttackStartDelegate OnAttackStartDelegate;
-	FOnAttackEndDelegate OnAttackEndDelegate;
 	FOnHitByEnemyDelegate OnHitByEnemyDelegate;
-	FOnCanInputNextComboDelegate OnCanInputNextComboDelegate;
 	FOnStartNextComboDelegate OnStartNextComboDelegate;
 	FOnAnimMoveStartDelegate OnAnimMoveStartDelegate;
 	FOnAnimMoveEndDelegate OnAnimMoveEndDelegate;
@@ -157,49 +110,7 @@ public:
 private:
 
 	UFUNCTION()
-	void AnimNotify_AttackDetectStart();
-
-	UFUNCTION()
-	void AnimNotify_AttackDetectEnd();
-
-	UFUNCTION()
-	void AnimNotify_CanComboNotify();
-
-	UFUNCTION()
-	void AnimNotify_StartNextComboNotify();
-
-	UFUNCTION()
-	void AnimNotify_AttackEndNotify();
-
-	UFUNCTION()
-	void AnimNotify_AnimMoveStartNotify();
-
-	UFUNCTION()
-	void AnimNotify_AnimMoveEndNotify();
-
-	UFUNCTION()
-	void AnimNotify_AttackHitCheckNotify();
-
-	UFUNCTION()
-	void AnimNotify_JumpToGroundEndNotify();
-
-	UFUNCTION()
 	void AnimNotify_CharacterHitAnimEndNotify();
-
-	UFUNCTION()
-	void AnimNotify_KickDamage();
-
-	UFUNCTION()
-	void AnimNotify_KickEnd();
-
-	UFUNCTION()
-	void AnimNotify_Melee360AttackDamage();
-
-	UFUNCTION()
-	void AnimNotify_Melee360AttackComboStart();
-
-	UFUNCTION()
-	void AnimNotify_Melee360AttackEnd();
 
 	UFUNCTION()
 	void AnimNotify_FallingStart();
@@ -235,46 +146,10 @@ private:
 	void AnimNotify_ActionCameraMoveEnd();
 
 	UFUNCTION()
-	void AnimNotify_MusouReadyEnd();
-
-	UFUNCTION()
-	void AnimNotify_MusouAttackCheck();
-
-	UFUNCTION()
-	void AnimNotify_MusouAttackEnd();
-
-	UFUNCTION()
-	void AnimNotify_MusouFinishDown();
-
-	UFUNCTION()
-	void AnimNotify_MusouFinishAttackCheck();
-
-	UFUNCTION()
-	void AnimNotify_MusouFinishAttackEnd();
-
-	UFUNCTION()
 	void AnimNotify_WarriorIdleStart();
 
 	UFUNCTION()
 	void AnimNotify_WarriorRunStart();
-
-	UFUNCTION()
-	void AnimNotify_GuardHit();
-
-	UFUNCTION()
-	void AnimNotify_GuardHitStart();
-
-	UFUNCTION()
-	void AnimNotify_GuardHitEnd();
-
-	UFUNCTION()
-	void AnimNotify_ParryAttackCheck();
-
-	UFUNCTION()
-	void AnimNotify_ParryAttackStart();
-
-	UFUNCTION()
-	void AnimNotify_ParryAttackEnd();
 
 private:
 
@@ -323,28 +198,10 @@ private:
 	uint8 bIsActionCameraMoving : 1;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> AttackMontage;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> ChargeAttack1;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> CharacterHitMongtage;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> ChargeAttack2;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> ChargeAttack3;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> MusouAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> GuardHitReaction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
-	TObjectPtr<UAnimMontage> ParryAttack;
 
 	int32 ComboCount;
 
