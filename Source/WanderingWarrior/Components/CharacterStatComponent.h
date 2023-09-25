@@ -22,25 +22,39 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable)
 	float GetHP();
+	UFUNCTION(BlueprintCallable)
 	void SetHP(float CharacterHP);
 
+	UFUNCTION(BlueprintCallable)
 	float GetHPRatio();
+	UFUNCTION(BlueprintCallable)
 	void SetHPRatio(float NewHPRatio);
 
+	UFUNCTION(BlueprintCallable)
 	float GetAttackDamage();
+	UFUNCTION(BlueprintCallable)
 	void SetAttackDamage(float Damage);
 
+	UFUNCTION(BlueprintCallable)
 	float GetMaxHP();
+	UFUNCTION(BlueprintCallable)
 	void SetMaxHP(float NewMaxHP);
 
+	UFUNCTION(BlueprintCallable)
 	float GetMP();
+	UFUNCTION(BlueprintCallable)
 	void SetMP(float CharacterMP);
 
+	UFUNCTION(BlueprintCallable)
 	float GetMPRatio();
+	UFUNCTION(BlueprintCallable)
 	void SetMPRatio(float NewMPRatio);
 
+	UFUNCTION(BlueprintCallable)
 	float GetMaxMP();
+	UFUNCTION(BlueprintCallable)
 	void SetMaxMP(float NewMaxMP);
 
 public:
