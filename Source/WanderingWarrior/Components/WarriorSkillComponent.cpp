@@ -103,6 +103,12 @@ void UWarriorSkillComponent::PlayJumpToGroundSkill(float PlayRate)
 		return;
 	}
 
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayJumpToGroundSkill, SkillData is nullptr"));
+		return;
+	}
+
 	SetIsChargeAttack1Started(true);
 	AnimInstance->Montage_Play(Super::SkillData->GetChargeAttack1Montage(), PlayRate);
 }
@@ -128,6 +134,12 @@ void UWarriorSkillComponent::PlayKickAttack(float PlayRate)
 		return;
 	}
 
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayKickAttack, SkillData is nullptr"));
+		return;
+	}
+
 	SetIsChargeAttack2Started(true);
 	AnimInstance->Montage_Play(Super::SkillData->GetChargeAttack2Montage(), PlayRate);
 }
@@ -150,6 +162,12 @@ void UWarriorSkillComponent::PlayMelee360Attack(float PlayRate)
 	if (AnimInstance == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayMelee360Attack, AnimInstance is nullptr"));
+		return;
+	}
+
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayMelee360Attack, SkillData is nullptr"));
 		return;
 	}
 
@@ -187,6 +205,12 @@ void UWarriorSkillComponent::PlayHurricaneKickAttack(float PlayRate)
 		return;
 	}
 
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayHurricaneKickAttack, SkillData is nullptr"));
+		return;
+	}
+
 	UAnimMontage* MusouAttackMontage = Super::SkillData->GetMusouAttackMontage();
 	if (MusouAttackMontage == nullptr)
 	{
@@ -220,6 +244,12 @@ void UWarriorSkillComponent::PlayParryAttackInternal(float PlayRate)
 		return;
 	}
 
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayParryAttackInternal, SkillData is nullptr"));
+		return;
+	}
+
 	UAnimMontage* ParryAttackMontage = Super::SkillData->GetParryAttackMontage();
 	if (ParryAttackMontage == nullptr)
 	{
@@ -242,21 +272,27 @@ void UWarriorSkillComponent::ReadyToPlayMelee360AttackLastSection()
 	AWWCharacter* Owner = Cast<AWWCharacter>(GetOwner());
 	if (Owner == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayMelee360Attack, Owner is nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::ReadyToPlayMelee360AttackLastSection, Owner is nullptr"));
 		return;
 	}
 
 	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(Owner->GetMesh()->GetAnimInstance());
 	if (AnimInstance == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayMelee360Attack, AnimInstance is nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::ReadyToPlayMelee360AttackLastSection, AnimInstance is nullptr"));
 		return;
 	}
 	
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::ReadyToPlayMelee360AttackLastSection, SkillData is nullptr"));
+		return;
+	}
+
 	UAnimMontage* Melee360AttackMontage = Super::SkillData->GetChargeAttack3Montage();
 	if (Melee360AttackMontage == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::PlayMelee360Attack, Melee360AttackDamage == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::ReadyToPlayMelee360AttackLastSection, Melee360AttackDamage == nullptr"));
 		return;
 	}
 
@@ -286,6 +322,12 @@ void UWarriorSkillComponent::ReadyToPlayMusouFinalAttack()
 		return;
 	}
 
+	if (SkillData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::ReadyToPlayMusouFinalAttack, SkillData is nullptr"));
+		return;
+	}
+
 	UAnimMontage* MusouAttackMontage = Super::SkillData->GetMusouAttackMontage();
 	if (MusouAttackMontage == nullptr)
 	{
@@ -295,66 +337,6 @@ void UWarriorSkillComponent::ReadyToPlayMusouFinalAttack()
 
 	AnimInstance->Montage_SetNextSection(FName("MusouRepeat"), FName("MusouFinish"), MusouAttackMontage);
 }
-
-//bool UWarriorSkillComponent::IsSkillStarted()
-//{
-//	UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::IsSkillStarted, %d, %d, %d, %d, %d"), GetIsChargeAttack1Started(),
-//		GetIsChargeAttack2Started(), GetIsChargeAttack3Started(), GetIsMusouAttackStarted(), GetIsParrying());
-//
-//	return (GetIsChargeAttack1Started() || GetIsChargeAttack2Started() || GetIsChargeAttack3Started() ||
-//		GetIsMusouAttackStarted() || GetIsParrying());
-//}
-
-//bool UWarriorSkillComponent::GetIsChargeAttack1Started() const
-//{
-//	return bIsJumpToGroundSkillStarted;
-//}
-//
-//void UWarriorSkillComponent::SetIsChargeAttack1Started(bool bNewIsChargeAttack1Started)
-//{
-//	bIsJumpToGroundSkillStarted = bNewIsChargeAttack1Started;
-//}
-//
-//bool UWarriorSkillComponent::GetIsChargeAttack2Started() const
-//{
-//	return bIsKickAttackSkillStarted;
-//}
-//
-//void UWarriorSkillComponent::SetIsChargeAttack2Started(bool bNewIsChargeAttack2Started)
-//{
-//	bIsKickAttackSkillStarted = bNewIsChargeAttack2Started;
-//}
-//
-//bool UWarriorSkillComponent::GetIsChargeAttack3Started() const
-//{
-//	return bIsMelee360AttackSkillStarted;
-//}
-//
-//void UWarriorSkillComponent::SetIsChargeAttack3Started(bool bNewIsChargeAttack3Started)
-//{
-//	bIsMelee360AttackSkillStarted = bNewIsChargeAttack3Started;
-//}
-//
-//bool UWarriorSkillComponent::GetIsMusouAttackStarted() const
-//{
-//	return bIsHurricaneKickAttackSkillStarted;
-//}
-//
-//void UWarriorSkillComponent::SetIsMusouAttackStarted(bool bNewIsMusouAttackStarted)
-//{
-//	UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::SetIsMusouAttackStarted, Set To %d"), bNewIsMusouAttackStarted);
-//	bIsHurricaneKickAttackSkillStarted = bNewIsMusouAttackStarted;
-//}
-//
-//bool UWarriorSkillComponent::GetIsParrying() const
-//{
-//	return bIsParrying;
-//}
-//
-//void UWarriorSkillComponent::SetIsParrying(bool bNewIsParrying)
-//{
-//	bIsParrying = bNewIsParrying;
-//}
 
 void UWarriorSkillComponent::DamageChargeAttack1()
 {
@@ -454,7 +436,12 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character.TakeDamage(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			float DamageTaken = Character.TakeDamage(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+
+			if (DamageTaken == 0.0f)
+			{
+				return;
+			}
 
 			Character.GetAnimInstance().SetHitAndFly(true);
 			Character.Launch(Character.GetActorUpVector() * 700, JumpToGrundHeightLimit);
@@ -473,7 +460,7 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
@@ -564,7 +551,11 @@ void UWarriorSkillComponent::DamageKickAttack()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character.TakeDamage(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			float DamageTaken = Character.TakeDamage(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			if (DamageTaken == 0.0f)
+			{
+				return;
+			}
 
 			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
 			if (&PlayerController == false)
@@ -580,7 +571,7 @@ void UWarriorSkillComponent::DamageKickAttack()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
@@ -659,7 +650,11 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			float DamageTaken = Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			if (DamageTaken == 0.0f)
+			{
+				return;
+			}
 
 			/*APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
 
@@ -694,7 +689,7 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
@@ -766,7 +761,11 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character.TakeDamage(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			float DamageTaken = Character.TakeDamage(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			if (DamageTaken == 0.0f)
+			{
+				return;
+			}
 
 			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
 			if (&PlayerController == false)
@@ -782,7 +781,7 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
@@ -874,7 +873,11 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			float DamageTaken = Character.TakeDamage(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			if (DamageTaken == 0.0f)
+			{
+				return;
+			}
 
 			/*APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
 
@@ -909,7 +912,7 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
@@ -994,7 +997,11 @@ void UWarriorSkillComponent::DamageParryAttackInternal()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
 
 			FDamageEvent DamageEvent;
-			Character.TakeDamage(ParryAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			float DamageTaken = Character.TakeDamage(ParryAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
+			if (DamageTaken == 0.0f)
+			{
+				return;
+			}
 
 			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
 			if (&PlayerController == false)
@@ -1010,7 +1017,7 @@ void UWarriorSkillComponent::DamageParryAttackInternal()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);

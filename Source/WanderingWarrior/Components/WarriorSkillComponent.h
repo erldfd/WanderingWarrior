@@ -39,23 +39,6 @@ public:
 	void ReadyToPlayMelee360AttackLastSection();
 	void ReadyToPlayMusouFinalAttack();
 
-	//virtual bool IsSkillStarted() override;
-
-	/*virtual bool GetIsChargeAttack1Started() const override;
-	virtual void SetIsChargeAttack1Started(bool bNewIsChargeAttack1Started);
-
-	virtual bool GetIsChargeAttack2Started() const override;
-	virtual void SetIsChargeAttack2Started(bool bNewIsChargeAttack2Started);
-
-	virtual bool GetIsChargeAttack3Started() const override;
-	virtual void SetIsChargeAttack3Started(bool bNewIsChargeAttack3Started);
-
-	virtual bool GetIsMusouAttackStarted() const override;
-	virtual void SetIsMusouAttackStarted(bool bNewIsMusouAttackStarted);
-
-	virtual bool GetIsParrying() const override;
-	virtual void SetIsParrying(bool bNewIsParrying);*/
-
 	virtual void DamageChargeAttack1() override;
 	virtual void DamageChargeAttack2() override;
 	virtual void DamageChargeAttack3() override;
@@ -133,13 +116,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Skill)
 	float ParryAttackDamage;
-
-
-	/*uint8 bIsJumpToGroundSkillStarted : 1;
-	uint8 bIsKickAttackSkillStarted : 1;
-	uint8 bIsMelee360AttackSkillStarted : 1;
-	uint8 bIsHurricaneKickAttackSkillStarted : 1;
-	uint8 bIsParrying : 1;*/
 
 	float CameraMoveTimeRatio;
 
