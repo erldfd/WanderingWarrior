@@ -170,6 +170,16 @@ UStoreManager& UWWGameInstance::GetStoreManager()
 	return *StoreManager;
 }
 
+bool UWWGameInstance::GetAllowStart()
+{
+	return AllowAIStart;
+}
+
+void UWWGameInstance::SetAllowStart(bool NewAllowStart)
+{
+	AllowAIStart = NewAllowStart;
+}
+
 void UWWGameInstance::OnStartConversation(ANPCCharacter* InteractionActor)
 {
 	int32 StartIndex = InteractionActor->GetConversationIndex();

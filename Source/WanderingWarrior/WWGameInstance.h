@@ -44,6 +44,15 @@ public:
 
 	class UStoreManager& GetStoreManager();
 
+	UFUNCTION(BlueprintCallable)
+	bool GetAllowStart();
+	UFUNCTION(BlueprintCallable)
+	void SetAllowStart(bool NewAllowStart);
+public:
+
+	UPROPERTY()
+	uint8 AllowAIStart : 1;
+
 private:
 
 	UFUNCTION()
