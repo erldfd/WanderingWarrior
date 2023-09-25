@@ -45,6 +45,7 @@ void AWeapon::BeginPlay()
 
 void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	UE_LOG(LogTemp, Warning, TEXT("OverlappedComponent : %s"), *OverlappedComponent->GetName());
 	if (Super::bIsFieldItem)
 	{
 		return;
@@ -74,7 +75,7 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	bool IsDetectedAttack = PlayerAnimInstance->GetDetectedAttack();
 	UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Damaged : %d, DetectedAttack : %d"), EnemyCharacter->GetIsDamaged(), IsDetectedAttack);
 
-	if (EnemyCharacter->GetIsDamaged() == false/* &&*/ /*IsAttacking*//*IsDetectedAttack*/)
+	if (true/*EnemyCharacter->GetIsDamaged() == false*//* &&*/ /*IsAttacking*//*IsDetectedAttack*/)
 	{
 		//UGameplayStatics::SetGlobalTimeDilation(this, 0.5f);
 		EnemyCharacter->SetIsDamaged(true);
@@ -91,7 +92,7 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 		if (ensure(&PlayerInGameWidget) == false) return;
 
-		PlayerInGameWidget.SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent().GetHPRatio());
+		PlayerInGameWidget.SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent()->GetHPRatio());
 		PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
 	}
 }

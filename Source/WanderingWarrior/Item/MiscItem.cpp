@@ -24,7 +24,7 @@ void AMiscItem::Use(const UWorld& World)
 	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
 	check(PlayerCharacter);
 
-	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(&PlayerCharacter->GetCharacterStatComponent());
+	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(PlayerCharacter->GetCharacterStatComponent());
 	check(CharacterStat);
 
 	switch (MiscItemName)
