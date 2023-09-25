@@ -22,6 +22,7 @@
 #include "Data/SkillDataAsset.h"
 #include "Components/WarriorSkillComponent.h"
 
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Camera/CameraActor.h"
@@ -106,14 +107,28 @@ void APlayerCharacter::PostInitializeComponents()
 
 	TempSwapSlot = NewObject<UInventorySlotData>(this);
 
-	Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
+	AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GameMode == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::PostInitializeComponents, GameMode == nullptr"));
+		return;
+	}
+
+	GameMode->SetPlayerAnimInstance(&GetAnimInstance());
+	//Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
 }
 
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::BeginPlay, PlayerController == nullptr"));
+		return;
+	}
+
 	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 
 	if (SubSystem && CharacterInput)
@@ -152,7 +167,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		CharacterStatComponent->SetMP(CharacterStatComponent->GetMP() + 1 * DeltaTime);
 	}
 
-	if (ParryLeftTime > 0 && GetIsGuarding())
+	if (ParryLeftTime > 0 && AnimInstance->GetIsGuarding())
 	{
 		ParryLeftTime -= DeltaTime;
 	}
@@ -183,8 +198,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-	Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->SetPlayerAnimInstance(AnimInstance);
+	//UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::PossessedBy"));
+	
 }
 
 float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -194,7 +209,7 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 		return 0.0f;
 	}
 
-	if (ParryLeftTime > 0 && GetIsGuarding() && GetSkillComponent()->IsSkillStarted() == false)
+	if (ParryLeftTime > 0 && AnimInstance->GetIsGuarding() && GetSkillComponent()->IsSkillStarted() == false)
 	{
 		SetIsParrySucceeded(true);
 		//AnimInstance->PlayParryAttackAnim();
@@ -202,8 +217,12 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 		return 0.0f;
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::TakeDamage, ParryLeftTime : %f, IsGuarding : %d, IsSkillStarted : %d"), ParryLeftTime, AnimInstance->GetIsGuarding(), GetSkillComponent()->IsSkillStarted());
+	}
 
-	if (GetIsGuarding() || AnimInstance->GetIsGuardHitStart())
+	if (AnimInstance->GetIsGuarding() || AnimInstance->GetIsGuardHitStart())
 	{
 		AnimInstance->PlayGuardHitAnim();
 
@@ -446,7 +465,7 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::OnHitToSomething(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
+	/*if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
 	{
 		return;
 	}
@@ -454,7 +473,7 @@ void APlayerCharacter::OnHitToSomething(UPrimitiveComponent* HitComponent, AActo
 	if (OtherActor->Tags[0] == "Water")
 	{
 		
-	}
+	}*/
 }
 
 void APlayerCharacter::OnBeginOverlapWithSomething(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -476,8 +495,10 @@ void APlayerCharacter::OnEndOverlapWithSomething(AActor* OverlappedActor, AActor
 {
 	if (OtherActor->Tags.IsEmpty())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, Empty"))
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, Empty"));
+		return;
 	}
+
 	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, OtherActor Name : %s"), *OtherActor->Tags[0].ToString());
 }
 
