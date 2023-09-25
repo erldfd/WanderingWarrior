@@ -110,9 +110,6 @@ public:
 private:
 
 	UFUNCTION()
-	void AnimNotify_CharacterHitAnimEndNotify();
-
-	UFUNCTION()
 	void AnimNotify_FallingStart();
 
 	UFUNCTION()
@@ -123,12 +120,6 @@ private:
 
 	UFUNCTION()
 	void AnimNotify_StandUpEnd();
-
-	UFUNCTION()
-	void AnimNotify_HitStart();
-
-	UFUNCTION()
-	void AnimNotify_HitEnd();
 
 	UFUNCTION()
 	void AnimNotify_HitAndFlyStart();
@@ -197,7 +188,7 @@ private:
 
 	uint8 bIsActionCameraMoving : 1;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> CharacterHitMongtage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))

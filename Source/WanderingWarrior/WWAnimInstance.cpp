@@ -18,11 +18,11 @@
 
 UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0)
 {
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_HIT_MONTAGE(TEXT("/Game/Animations/CharacterHitMontage.CharacterHitMontage"));
+	/*static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_HIT_MONTAGE(TEXT("/Game/Animations/CharacterHitMontage.CharacterHitMontage"));
 	if (CHARACTER_HIT_MONTAGE.Succeeded())
 	{
 		CharacterHitMongtage = CHARACTER_HIT_MONTAGE.Object;
-	}
+	}*/
 
 	ChargeAttack3MaxComboCount = 4;
 	AttackAnimRate = 1.0f;
@@ -72,7 +72,7 @@ bool UWWAnimInstance::IsPlayingSomething()
 	bool IsPlayingSomething = (/*bIsAttacking ||*/ bIsDead || bIsPlayingChargeAttack1Anim ||
 		bIsPlayingCharacterHitMontage || bIsPlayingChargeAttack2Anim || bIsGuarding ||
 		bIsGuardHitStart || bIsParrying /* || bIsActingMusou */ || bIsPlayingChargeAttack3Anim);
-	UE_LOG(LogTemp, Warning, TEXT("%d, %d, %d, %d, %d, %d, %d, %d"), /*bIsAttacking,*/ bIsDead, bIsPlayingChargeAttack1Anim,
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::IsPlayingSomething, %d, %d, %d, %d, %d, %d, %d, %d"), /*bIsAttacking,*/ bIsDead, bIsPlayingChargeAttack1Anim,
 		bIsPlayingCharacterHitMontage, bIsPlayingChargeAttack2Anim, bIsGuarding,
 		bIsGuardHitStart, bIsParrying /* || bIsActingMusou */ ,bIsPlayingChargeAttack3Anim)
 	return IsPlayingSomething;
@@ -192,12 +192,16 @@ void UWWAnimInstance::PlayCharacterHitMontage()
 		return;
 	}
 
+	if (CharacterHitMongtage == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayCharacterHitMontage, CharacterHitMongtage == false"));
+		return;
+	}
+
 	StopAllMontages(0);
 
 	InitBoolCondition();
 	bIsPlayingCharacterHitMontage = true;
-
-	if (ensure(CharacterHitMongtage) == false) return;
 
 	Montage_Play(CharacterHitMongtage, 1);
 
@@ -217,12 +221,8 @@ bool UWWAnimInstance::GetIsPlayingCharacterHitMontage()
 
 void UWWAnimInstance::SetIsPlayingCharacterHitMontage(bool bIsPlaying)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::SetIsPlayingCharacterHitMontage, bIsPlaying : %d"), bIsPlaying);
 	bIsPlayingCharacterHitMontage = bIsPlaying;
-}
-
-void UWWAnimInstance::AnimNotify_CharacterHitAnimEndNotify()
-{
-	bIsPlayingCharacterHitMontage = false;
 }
 
 void UWWAnimInstance::AnimNotify_FallingStart()
@@ -232,7 +232,7 @@ void UWWAnimInstance::AnimNotify_FallingStart()
 		return;
 	}
 
-	StopAllMontages(0);
+	//StopAllMontages(0);
 	InitBoolCondition();
 	SetIsIdleOrRun(false);
 }
@@ -255,16 +255,6 @@ void UWWAnimInstance::AnimNotify_StandUpStart()
 void UWWAnimInstance::AnimNotify_StandUpEnd()
 {
 	SetHitAndFly(false);
-}
-
-void UWWAnimInstance::AnimNotify_HitStart()
-{
-
-}
-
-void UWWAnimInstance::AnimNotify_HitEnd()
-{
-
 }
 
 void UWWAnimInstance::AnimNotify_HitAndFlyStart()
@@ -375,7 +365,7 @@ void UWWAnimInstance::InitBoolCondition()
 	bWillPlayNextCombo = false;
 	bIsPlayingChargeAttack1Anim = false;
 	bIsPlayingCharacterHitMontage = false;
-
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::InitBoolCondition"));
 	bWillPlayChargeAttack2Anim = false;
 	bIsPlayingChargeAttack2Anim = false;
 
