@@ -6,6 +6,7 @@
 #include "Character/PlayerCharacter.h"
 #include "Components/WarriorSkillComponent.h"
 #include "WWEnumClassContainer.h"
+#include "WWAnimInstance.h"
 
 UANS_Melee360AttackSkillWindow::UANS_Melee360AttackSkillWindow()
 {
@@ -71,15 +72,14 @@ void UANS_Melee360AttackSkillWindow::BranchingPointNotifyEnd(FBranchingPointNoti
 		return;
 	}
 
-	/*UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
 	if (AnimInstance == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, AnimInstance == nullptr"));
 		return;
-	}*/
+	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("UANS_Melee360AttackSkillWindow::BranchingPointNotifyEnd, ReachedEnd : %d"), BranchingPointPayload.bReachedEnd);
+	AnimInstance->SetIsPlayingCharacterHitMontage(false);
 	SkillComp->SetIsChargeAttack3Started(false);
 	//AnimInstance->StopAllMontages(1);
-	
 }

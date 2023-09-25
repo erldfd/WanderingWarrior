@@ -69,6 +69,8 @@ void UANS_ParryAttackWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayloa
 	}
 
 	Character->SetIsParrySucceeded(false);
+	//Character->SetIsGuarding(false);
 	SkillComp->SetIsParrying(false);
 	AnimInstance->SetIsParrying(false);
+	AnimInstance->SetIsGuarding(false);
 }

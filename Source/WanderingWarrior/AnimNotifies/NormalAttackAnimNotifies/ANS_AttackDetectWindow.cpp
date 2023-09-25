@@ -5,6 +5,10 @@
 
 #include "Character/WWCharacter.h"
 #include "Item/Weapon.h"
+#include "WWAnimInstance.h"
+#include "WWGameMode.h"
+
+#include "Kismet/GameplayStatics.h"
 
 void UANS_AttackDetectWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& BranchingPointPayload)
 {
@@ -40,6 +44,21 @@ void UANS_AttackDetectWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPaylo
 	Super::BranchingPointNotifyEnd(BranchingPointPayload);
 
 	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
+
+	/*AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GameMode == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_AttackDetectWindow::BranchingPointNotifyEnd, GameMode == nullptr"));
+		return;
+	}
+	UWWAnimInstance* AnimInstance = GameMode->GetPlayerAnimInstance();
+	if (AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_AttackDetectWindow::BranchingPointNotifyEnd, AnimInstance == nullptr"));
+		return;
+	}
+
+	AnimInstance->OnInitIsDamaged.Broadcast();*/
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)

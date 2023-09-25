@@ -39,4 +39,5 @@ void UANS_CharacterHitReactionWindow::BranchingPointNotifyEnd(FBranchingPointNot
 	}
 
 	AnimInstance->SetIsPlayingCharacterHitMontage(false);
+	UE_LOG(LogTemp, Warning, TEXT("UANS_CharacterHitReactionWindow::BranchingPointNotifyEnd, SetIsPlayingCharacterHitMontage(false)"));
 }

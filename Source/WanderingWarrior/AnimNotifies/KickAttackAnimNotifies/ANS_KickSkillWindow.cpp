@@ -68,7 +68,7 @@ void UANS_KickSkillWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequ
 		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, AnimInstance == nullptr"));
 		return;
 	}
-
+	AnimInstance->SetIsPlayingCharacterHitMontage(false);
 	SkillComp->SetIsChargeAttack2Started(false);
 	//AnimInstance->StopAllMontages(1);
 }
