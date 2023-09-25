@@ -46,7 +46,11 @@ void UCharacterQuickSlot::BeginPlay()
 {
 	Super::BeginPlay();
 
-	check(InventoryWidget);
+	if (InventoryWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UCharacterQuickSlot::BeginPlay, InventoryWidget == nullptr"));
+		return;
+	}
 
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UCharacterQuickSlot::OnSlotImageWidgetClicked);
 	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound() == false)
@@ -96,7 +100,11 @@ bool UCharacterQuickSlot::ObtainItem(EMiscItemName MiscItemName)
 
 bool UCharacterQuickSlot::ObtainItem(const FItemDataRow& NewItemData, UInventoryTabData& Tab)
 {
-	check(InventoryWidget);
+	if (InventoryWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UCharacterQuickSlot::ObtainItem, InventoryWidget == nullptr"));
+		return false;
+	}
 
 	UInventorySlotData& Slot = *Tab.GetHoldableItemSlot();
 

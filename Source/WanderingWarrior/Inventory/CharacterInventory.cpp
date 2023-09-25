@@ -72,7 +72,11 @@ void UCharacterInventory::BeginPlay()
 {
 	Super::BeginPlay();
 
-	check(InventoryWidget);
+	if (InventoryWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UCharacterInventory::BeginPlay, InventoryWidget == nullptr"));
+		return;
+	}
 
 	InventoryWidget->OnSlotImageWidgetClickedDelegate.BindUObject(this, &UCharacterInventory::OnSlotImageWidgetClicked);
 	if (InventoryWidget->OnSlotImageWidgetClickedDelegate.IsBound() == false)
@@ -140,7 +144,11 @@ bool UCharacterInventory::ObtainItem(EMiscItemName MiscItemName)
 
 bool UCharacterInventory::ObtainItem(const FItemDataRow& NewItemData, UInventoryTabData& Tab)
 {
-	check(InventoryWidget);
+	if (InventoryWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UCharacterInventory::ObtainItem, InventoryWidget == nullptr"));
+		return false;
+	}
 
 	UInventorySlotData& Slot = *Tab.GetHoldableItemSlot();
 
