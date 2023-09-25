@@ -38,7 +38,13 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	PlayerCharacter = Cast<APlayerCharacter>(aPawn);
-	CharacterStat = &PlayerCharacter->GetCharacterStatComponent();
+	if (PlayerCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, PlayerCharacter == nullptr"));
+		return;
+	}
+
+	CharacterStat = PlayerCharacter->GetCharacterStatComponent();
 
 	InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
 	check(InGameWidget);
@@ -118,9 +124,33 @@ void AWWPlayerController::SetGameModeUIOnly()
 	bIsInputModeGameOnly = false;
 }
 
+void AWWPlayerController::SetInGameWidgetHide(bool HideWidget)
+{
+	if (InGameWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::SetInGameWidgetHide, InGameWidget == nullptr"));
+		return;
+	}
+
+	if (HideWidget)
+	{
+		InGameWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		InGameWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 void AWWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (CharacterStat == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::BeginPlay, CharacterStat == nullptr"));
+		return;
+	}
 
 	CharacterStat->OnHPChangedDelegate.AddUObject(this, &AWWPlayerController::OnHPChanged);
 	CharacterStat->OnMPChangedDelegate.AddUObject(this, &AWWPlayerController::OnMPChanged);
@@ -236,6 +266,12 @@ void AWWPlayerController::UseQuickSlot7()
 
 void AWWPlayerController::OnKeyEButtonPressed()
 {
+	if (PlayerCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnKeyEButtonPressed, PlayerCharacter == nullptr"));
+		return;
+	}
+
 	UWorld& World = *PlayerCharacter->GetWorld();
 	const FVector& Center = PlayerCharacter->GetActorLocation();
 	float DetectRadius = 200;

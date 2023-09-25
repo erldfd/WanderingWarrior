@@ -29,6 +29,9 @@ public:
 	void SetGameModeGameOnly();
 	void SetGameModeUIOnly();
 
+	UFUNCTION(BlueprintCallable)
+	void SetInGameWidgetHide(bool HideWidget);
+
 public:
 
 	FOnKeyEPressedSignature OnKeyEPressedSignature;
