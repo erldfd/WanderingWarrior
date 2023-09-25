@@ -22,6 +22,8 @@ public:
 
 	virtual void OnPossess(APawn* InPawn) override;
 
+	virtual void Tick(float DeltaTime) override;
+
 public:
 
 	static const FName HomePosKey;
@@ -35,4 +37,17 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UBlackboardData> BBEnemyAI;
+
+	UPROPERTY()
+	TObjectPtr<class UBehaviorTree> BTEnemyRushAI;
+
+	UPROPERTY()
+	TObjectPtr<class UBlackboardData> BBEnemyRushAI;
+
+	UPROPERTY(BlueprintReadWrite)
+	uint8 bWillUseRushAI : 1;
+
+private:
+
+	uint8 bPreviousWillUseRushAI : 1;
 };
