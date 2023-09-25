@@ -29,10 +29,21 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWWAnimInstance& PlayerAnimInstance = *Cast<AWWGameMode>(GetWorld()->GetAuthGameMode())->GetPlayerAnimInstance();
-	if (ensure(&PlayerAnimInstance) == false) return;
+	AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GameMode == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::BeginPlay, GameMode == false"));
+		return;
+	}
 
-	PlayerAnimInstance.OnInitIsDamaged.AddLambda([this]()->void {
+	UWWAnimInstance* PlayerAnimInstance = GameMode->GetPlayerAnimInstance();
+	if (PlayerAnimInstance == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::BeginPlay, PlayerAnimInstance == false"));
+		return;
+	}
+
+	PlayerAnimInstance->OnInitIsDamaged.AddLambda([this]()->void {
 		
 		SetIsDamaged(false);
 	
@@ -49,7 +60,7 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	if (Super::AnimInstance->GetIsDead())
 	{
 		//TODO : drop item randomly
-		int RandomInt = FMath::RandRange(0, 3);
+		int RandomInt = FMath::RandRange(0, 0);
 		UE_LOG(LogTemp, Warning, TEXT("RandomInt : %d"), RandomInt);
 
 		if (RandomInt == 0)
