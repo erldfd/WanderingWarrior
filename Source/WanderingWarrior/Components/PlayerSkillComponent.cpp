@@ -255,7 +255,7 @@ void UPlayerSkillComponent::DamageJumpToGrundSkill()
 			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
@@ -362,7 +362,7 @@ void UPlayerSkillComponent::DamageKickAttack()
 			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
@@ -439,7 +439,7 @@ void UPlayerSkillComponent::DamageMelee360Attack()
 			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
@@ -562,7 +562,7 @@ void UPlayerSkillComponent::DamageMusouAttack()
 			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
@@ -642,7 +642,7 @@ void UPlayerSkillComponent::DamageMusouFinishAttack()
 			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
@@ -740,7 +740,7 @@ void UPlayerSkillComponent::DamageParryAttack()
 			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 			if (ensure(&PlayerInGameWidget) == false) return;
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent().GetHPRatio());
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
 			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
