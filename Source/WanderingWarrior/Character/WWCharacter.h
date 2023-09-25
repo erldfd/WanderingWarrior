@@ -36,7 +36,8 @@ public:
 	virtual void Attack();
 	void AttackCheck();
 
-	class UCharacterStatComponent& GetCharacterStatComponent();
+	UFUNCTION(BlueprintCallable)
+	class UCharacterStatComponent* GetCharacterStatComponent();
 
 	const FName& GetCharacterName() const;
 
@@ -91,8 +92,8 @@ public:
 	virtual bool GetWillPlayChargeAttack3() const;
 	virtual void SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3);
 
-	virtual bool GetIsGuarding() const;
-	virtual void SetIsGuarding(bool bNewIsGuarding);
+	/*virtual bool GetIsGuarding() const;
+	virtual void SetIsGuarding(bool bNewIsGuarding);*/
 
 	virtual bool GetIsMusouAttackStarted() const;
 	virtual void SetIsMusouAttackStarted(bool NewIsMusouAttackStarted);
@@ -115,11 +116,11 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	void InputMoveForward(float Value);
-	void MoveForward(float Value);
+	//void InputMoveForward(float Value);
+	//void MoveForward(float Value);
 
-	void InputMoveRight(float Value);
-	void MoveRight(float Value);
+	//void InputMoveRight(float Value);
+	//void MoveRight(float Value);
 
 	void TestAction();
 
@@ -146,8 +147,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float AttackDamageWithoutWeapon;
 
-	
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Skill)
 	ESkillCompType SkillCompType;
 
@@ -160,7 +159,6 @@ protected:
 	uint8 bIsParrySucceeded : 1;
 	uint8 bWillPlayChargeAttack2 : 1;
 	uint8 bWillPlayChargeAttack3 : 1;
-	uint8 bIsGuarding : 1;
 
 private:
 	
@@ -169,7 +167,7 @@ private:
 
 private:
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class AWeapon> CurrentWeapon;
 
 	uint8 bIsAnimMoveStart : 1;
@@ -196,4 +194,6 @@ private:
 	int32 ComboCount;
 
 	uint8 bIsInvincible : 1;
+
+	int32 GuardStartCheckCount;
 };

@@ -41,14 +41,14 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 
 	CharacterMeshComponent.SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 
-	const ConstructorHelpers::FObjectFinder<USkeletalMesh> MESH(TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard"));
+	/*const ConstructorHelpers::FObjectFinder<USkeletalMesh> MESH(TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard"));
 	if (MESH.Succeeded())
 	{
 		CharacterMeshComponent.SetSkeletalMesh(MESH.Object);
-	}
+	}*/
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> Anim(TEXT("/Game/Animations/BP_WarriorAnim.BP_WarriorAnim_C"));
-	CharacterMeshComponent.SetAnimInstanceClass(Anim.Class);
+	/*static ConstructorHelpers::FClassFinder<UAnimInstance> Anim(TEXT("/Game/Animations/BP_WarriorAnim.BP_WarriorAnim_C"));
+	CharacterMeshComponent.SetAnimInstanceClass(Anim.Class);*/
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
 	GetMesh()->SetGenerateOverlapEvents(true);
@@ -59,12 +59,17 @@ void AWWCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	//UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
 	AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
-	if (ensure(AnimInstance) == false) return;
+	if (AnimInstance == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PostInitializeComponents, AnimInstance == false"));
+		return;
+	}
 
-	AnimInstance->OnAnimMoveStartDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveStart);
-	AnimInstance->OnAnimMoveEndDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveEnd);
-	AnimInstance->OnAttackHitcheckDelegate.AddUObject(this, &AWWCharacter::AttackCheck);
+	//AnimInstance->OnAnimMoveStartDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveStart);
+	//AnimInstance->OnAnimMoveEndDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveEnd);
+	//AnimInstance->OnAttackHitcheckDelegate.AddUObject(this, &AWWCharacter::AttackCheck);
 	//AnimInstance->SetAttackAnimRate(AttackAnimRate);
 	
 	//GetCharacterMovement()->GravityScale = 0;
@@ -109,6 +114,12 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		AnimInstance->SetBeingStunned(false);
 	}
 	
+	USkillComponentBase* SkillComp = GetSkillComponent();
+	if (SkillComp && SkillComp->IsSkillStarted())
+	{
+		return Damage;
+	}
+
 	bIsAnimMoveStart = false;
 	FVector MoveDir = GetActorLocation() - DamageCauser->GetActorLocation();
 	MoveDir.Normalize();
@@ -231,6 +242,11 @@ void AWWCharacter::Tick(float DeltaTime)
 			}
 		}
 	}
+
+	if (AnimInstance->GetIsGuarding() == false)
+	{
+		GuardStartCheckCount = 0;
+	}
 }
 
 void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -239,62 +255,8 @@ void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	check(PlayerInputComponent);
 
-	/*PlayerInputComponent->BindAxis("AttackHold", this, &AWWCharacter::Attack);*/
-
 	PlayerInputComponent->BindAction("Test", IE_Pressed, this, &AWWCharacter::TestAction);
 }
-
-//void AWWCharacter::InputMoveForward(float Value)
-//{
-//	if (AnimInstance->IsPlayingSomething())
-//	{
-//		return;
-//	}
-//
-//	InputForwardValue = Value;
-//	MoveForward(Value);
-//}
-
-//void AWWCharacter::MoveForward(float Value)
-//{
-//	if ((Controller != nullptr) && (Value != 0.0f))
-//	{
-//		// find out which way is forward
-//		const FRotator Rotation = Controller->GetControlRotation();
-//		const FRotator YawRotation(0, Rotation.Yaw, 0);
-//
-//		// get forward vector
-//		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-//		AddMovementInput(Direction, Value);
-//	}
-//}
-//
-//void AWWCharacter::InputMoveRight(float Value)
-//{
-//	if (AnimInstance->IsPlayingSomething())
-//	{
-//		return;
-//	}
-//
-//	InputRightValue = Value;
-//
-//	MoveRight(Value);
-//}
-//
-//void AWWCharacter::MoveRight(float Value)
-//{
-//	if (Controller && (Value != 0.0f))
-//	{
-//		// find out which way is right
-//		const FRotator Rotation = Controller->GetControlRotation();
-//		const FRotator YawRotation(0, Rotation.Yaw, 0);
-//
-//		// get right vector 
-//		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-//		// add movement in that direction
-//		AddMovementInput(Direction, Value);
-//	}
-//}
 
 void AWWCharacter::Attack()
 {
@@ -304,6 +266,7 @@ void AWWCharacter::Attack()
 	bool bBeingStunned = AnimInstance->GetBeingStunned();
 	bool bIsJumping = (GetMovementComponent()->IsFalling() || bPressedJump);
 	bool bIsPlayingCharacterHit = AnimInstance->GetIsPlayingCharacterHitMontage();
+	bool bIsGuarding = AnimInstance->GetIsGuarding();
 
 	if (bIsDead  || bIsGuarding || bIsGuardHitStart || bBeingStunned || bIsSkillStarted || bIsJumping || bIsPlayingCharacterHit)
 	{
@@ -312,7 +275,6 @@ void AWWCharacter::Attack()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, GetIsAttacking : %d, GetCanCombo : %d, GetWillPlayNextCombo : %d"), GetIsAttacking(), GetCanCombo(), GetWillPlayNextCombo());
 	if (GetIsAttacking() == false)
 	{
 		SetIsAttacking(true);
@@ -321,13 +283,17 @@ void AWWCharacter::Attack()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, AttackMontage == nullptr"));
 		}
-
-		AnimInstance->Montage_Play(AttackMontage, AttackAnimRate);
+		PlayAnimMontage(AttackMontage, AttackAnimRate);
+		//AnimInstance->Montage_Play(AttackMontage, AttackAnimRate);
 		SetComboCount(1);
 	}
 	else if (GetCanCombo() && GetWillPlayNextCombo() == false)
 	{
 		SetWillPlayNextCombo(true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, GetIsAttacking : %d, GetCanCombo : %d, GetWillPlayNextCombo : %d"), GetIsAttacking(), GetCanCombo(), GetWillPlayNextCombo());
 	}
 }
 
@@ -384,10 +350,14 @@ void AWWCharacter::AttackCheck()
 	}
 }
 
-UCharacterStatComponent& AWWCharacter::GetCharacterStatComponent()
+UCharacterStatComponent* AWWCharacter::GetCharacterStatComponent()
 {
-	check(CharacterStatComponent);
-	return *CharacterStatComponent;
+	if (CharacterStatComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::GetCharacterStatComponent, CharacterStatComponent == nullptr"))
+	}
+
+	return CharacterStatComponent;
 }
 
 const FName& AWWCharacter::GetCharacterName() const
@@ -520,8 +490,9 @@ void AWWCharacter::OnAnimMoveEnd()
 void AWWCharacter::TestAction()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TestAction"));
-	AnimInstance->StopAllMontages(0);
+	//AnimInstance->StopAllMontages(0);
 	AnimInstance->PlayCharacterHitMontage();
+	//PlayAnimMontage(AttackMontage);
 }
 
 void AWWCharacter::DoChargeAttack()
@@ -538,8 +509,7 @@ void AWWCharacter::DoChargeAttack()
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::DoChargeAttack, IsSkillStarted : %d, ComboCount : %d, WillPlayChargeAttack2 : %d, WillPlayChargeAttack3 : %d"),
-		bIsSkillStarted, GetComboCount(), GetWillPlayChargeAttack2(), GetWillPlayChargeAttack3());
+	
 	if (bIsSkillStarted == false && GetComboCount() == 0)
 	{
 		PlayChargeAttack1();
@@ -551,6 +521,11 @@ void AWWCharacter::DoChargeAttack()
 	else if (GetWillPlayChargeAttack3() == false && GetComboCount() == 2)
 	{
 		SetWillPlayChargeAttack3(true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::DoChargeAttack, IsSkillStarted : %d, ComboCount : %d, WillPlayChargeAttack2 : %d, WillPlayChargeAttack3 : %d"),
+			bIsSkillStarted, GetComboCount(), GetWillPlayChargeAttack2(), GetWillPlayChargeAttack3());
 	}
 }
 
@@ -578,7 +553,7 @@ void AWWCharacter::DoMusouAttack()
 		SkillComponent->SetIsChargeAttack3Started(false);
 
 		SetIsAttacking(false);
-		SetIsGuarding(false);
+		AnimInstance->SetIsGuarding(false);
 		AnimInstance->SetIsGuardHitStart(false);
 		AnimInstance->SetIsPlayingCharacterHitMontage(false);
 		SetWillPlayNextCombo(false);
@@ -601,6 +576,8 @@ void AWWCharacter::DoMusouAttack()
 
 void AWWCharacter::DoGuard(const struct FInputActionValue& Value)
 {
+	GuardStartCheckCount++;
+
 	if (AnimInstance->GetIsPlayingCharacterHitMontage() || bPressedJump || GetMovementComponent()->IsFalling())
 	{
 		return;
@@ -612,9 +589,9 @@ void AWWCharacter::DoGuard(const struct FInputActionValue& Value)
 		return;
 	}
 
-	bIsGuarding = Value.Get<bool>();
+	bool bIsGuarding = Value.Get<bool>();
 
-	if (bIsGuarding == false)
+	if (GuardStartCheckCount == 1)
 	{
 		ParryLeftTime = ParryWindow;
 	}
@@ -747,15 +724,15 @@ void AWWCharacter::SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3)
 	bWillPlayChargeAttack3 = bNewWillPlayChargeAttack3;
 }
 
-bool AWWCharacter::GetIsGuarding() const
-{
-	return bIsGuarding;
-}
-
-void AWWCharacter::SetIsGuarding(bool bNewIsGuarding)
-{
-	bIsGuarding = bNewIsGuarding;
-}
+//bool AWWCharacter::GetIsGuarding() const
+//{
+//	return bIsGuarding;
+//}
+//
+//void AWWCharacter::SetIsGuarding(bool bNewIsGuarding)
+//{
+//	bIsGuarding = bNewIsGuarding;
+//}
 
 bool AWWCharacter::GetIsMusouAttackStarted() const
 {
