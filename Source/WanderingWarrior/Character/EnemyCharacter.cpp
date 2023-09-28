@@ -54,46 +54,43 @@ float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	float HPBeforeDamage = CharacterStatComponent->GetHP();
-	float HPAfterDamage = HPBeforeDamage - Damage;
+	//if (Super::AnimInstance->GetIsDead())
+	//{
+	//	//TODO : drop item randomly
+	//	int RandomInt = FMath::RandRange(0, 0);
+	//	UE_LOG(LogTemp, Warning, TEXT("RandomInt : %d"), RandomInt);
 
-	if (Super::AnimInstance->GetIsDead())
-	{
-		//TODO : drop item randomly
-		int RandomInt = FMath::RandRange(0, 0);
-		UE_LOG(LogTemp, Warning, TEXT("RandomInt : %d"), RandomInt);
+	//	if (RandomInt == 0)
+	//	{
+	//		return Damage;
+	//	}
 
-		if (RandomInt == 0)
-		{
-			return Damage;
-		}
+	//	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
+	//	check(&GameInstance);
 
-		UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
-		check(&GameInstance);
+	//	if (RandomInt == 1)
+	//	{
+	//		AWeapon& Item = *Cast<AWeapon>(&GameInstance.SpawnWeapon(EWeaponName::BlackSword, GetActorLocation()));
+	//		UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Item.GetName());
 
-		if (RandomInt == 1)
-		{
-			AWeapon& Item = *Cast<AWeapon>(&GameInstance.SpawnWeapon(EWeaponName::BlackSword, GetActorLocation()));
-			UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Item.GetName());
+	//		Item.SetbisRotatingOnField(true);
 
-			Item.SetbisRotatingOnField(true);
+	//	}
+	//	else if (RandomInt == 2)
+	//	{
+	//		AWeapon& Item = *Cast<AWeapon>(&GameInstance.SpawnWeapon(EWeaponName::WhiteSword, GetActorLocation()));
+	//		UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Item.GetName());
 
-		}
-		else if (RandomInt == 2)
-		{
-			AWeapon& Item = *Cast<AWeapon>(&GameInstance.SpawnWeapon(EWeaponName::WhiteSword, GetActorLocation()));
-			UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Item.GetName());
+	//		Item.SetbisRotatingOnField(true);
+	//	}
+	//	else if (RandomInt == 3)
+	//	{
+	//		AMiscItem& Item = *Cast<AMiscItem>(&GameInstance.SpawnMiscItem(EMiscItemName::HPPotion, GetActorLocation()));
+	//		UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Item.GetName());
 
-			Item.SetbisRotatingOnField(true);
-		}
-		else if (RandomInt == 3)
-		{
-			AMiscItem& Item = *Cast<AMiscItem>(&GameInstance.SpawnMiscItem(EMiscItemName::HPPotion, GetActorLocation()));
-			UE_LOG(LogTemp, Warning, TEXT("ItemName : %s"), *Item.GetName());
-
-			Item.SetbisRotatingOnField(true);
-		}
-	}
+	//		Item.SetbisRotatingOnField(true);
+	//	}
+	//}
 
 	return Damage;
 }

@@ -28,6 +28,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float TakeDamageWithLaunch(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FVector LaunchVelocity, bool bIsInitializedVelocity, float MaxHeight);
+	//if Damage is 0, Will not play hit reaction.
+	virtual float TakeDamageWithKnockback(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FVector NewKnockbackVelocity, float KnockbackDuration, bool bWillPlayHitReaction);
 
 	virtual void Jump() override;
 
@@ -46,8 +49,6 @@ public:
 	void Launch(FVector Velocity, float MaxHeight);
 
 	void SetMaxHeightInAir(float NewMaxHeight);
-
-	void SetCustomTimeDilation(float NewTimeDilation);
 
 	bool GetIsAttacking();
 	void SetIsAttacking(bool bNewIsAttacking);
@@ -124,7 +125,7 @@ protected:
 
 	void TestAction();
 
-	void StartKnockback(FVector Direction, float Strength, float Duration);
+	void StartKnockback(FVector Velocity, float Duration);
 	void StopKnockback();
 
 protected:
@@ -175,8 +176,7 @@ private:
 	float AttackMoveSpeed;
 
 	uint8 bIsKnockbackStarted : 1;
-	FVector KnockbackDirection;
-	float KnockbackStrength;
+	FVector KnockbackVelocity;
 	FTimerHandle KnockbackTimerHandle;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = AttackProperty)

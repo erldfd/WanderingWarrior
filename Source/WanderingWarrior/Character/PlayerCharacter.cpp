@@ -228,8 +228,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 		FVector Diraction = GetActorLocation() - DamageCauser->GetActorLocation();
 		Diraction.Normalize();
-
-		Super::StartKnockback(Diraction, 100, 0.2);
+		Diraction = Diraction * 100.0f;
+		Super::StartKnockback(Diraction, 0.2);
 
 		return 0.0f;
 	}
@@ -244,12 +244,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return Damage;
 }
 
-//UPlayerSkillComponent& APlayerCharacter::GetPlayerSkillComponenet()
-//{
-//	check(PlayerSkillComponent);
-//	return *PlayerSkillComponent;
-//}
-
 class UCharacterQuickSlot& APlayerCharacter::GetQuickSlot()
 {
 	check(QuickSlot);
@@ -260,16 +254,6 @@ UCharacterInventory& APlayerCharacter::GetInventory() const
 {
 	return *Inventory;
 }
-
-//void APlayerCharacter::Attack()
-//{
-//	Super::Attack();
-//}
-
-//void APlayerCharacter::DoChargeAttack()
-//{
-//	Super::DoChargeAttack();
-//}
 
 UCameraComponent* APlayerCharacter::GetCamera()
 {
@@ -297,90 +281,6 @@ bool APlayerCharacter::GetIsWet()
 	return bIsWet;
 }
 
-//void APlayerCharacter::DoMusouAttack()
-//{
-//	float CurrentMP = CharacterStatComponent->GetMP();
-//	float MaxMP = CharacterStatComponent->GetMaxMP();
-//	bool bIsPlayingMusou = GetIsMusouAttackStarted();
-//
-//	if (bIsPlayingMusou == false && CurrentMP < MaxMP || GetMovementComponent()->IsFalling() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	if (bIsPlayingMusou == false && CurrentMP == MaxMP)
-//	{
-//		PlayMusouAttack();
-//		SetIsMusouAttackStarted(true);
-//
-//		SetIsParrySucceeded(false);
-//		SkillComponenet->SetIsChargeAttack1Started(false);
-//		SkillComponenet->SetIsChargeAttack2Started(false);
-//		SkillComponenet->SetIsChargeAttack3Started(false);
-//		SetIsAttacking(false);
-//		SetIsGuarding(false);
-//		AnimInstance->SetIsGuardHitStart(false);
-//		SetWillPlayNextCombo(false);
-//		SetWillPlayChargeAttack2(false);
-//		SetWillPlayChargeAttack3(false);
-//	}
-//	else if (bIsPlayingMusou && CurrentMP < MaxMP && CurrentMP > 0)
-//	{
-//		bIsConsistentMusou = true;
-//	}
-//
-//	/*FMotionWarpingTarget Target;
-//	float Distance = 500.0f;
-//	Target.Name = FName("AttackTarget");
-//	Target.Location = GetActorLocation() + GetActorForwardVector() * Distance;
-//	Target.Rotation = GetActorRotation();
-//
-//	MotionWarpComponent->AddOrUpdateWarpTarget(Target);*/
-//}
-
-//void APlayerCharacter::DoGuard(const FInputActionValue& Value)
-//{
-//	if (AnimInstance->GetIsPlayingCharacterHitMontage() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	if (GetIsParrySucceeded())
-//	{
-//		AnimInstance->SetIsGuarding(false);
-//		return;
-//	}
-//
-//	bIsGuarding = Value.Get<bool>();
-//	
-//	if (bIsGuarding == false)
-//	{
-//		ParryLeftTime = ParryWindow;
-//	}
-//
-//	AnimInstance->SetIsGuarding(bIsGuarding);
-//}
-
-//bool APlayerCharacter::GetPlayingMusou()
-//{
-//	return bIsPlayingMusou;
-//}
-//
-//void APlayerCharacter::SetPlayingMusou(bool NewPlayingMusou)
-//{
-//	bIsPlayingMusou = NewPlayingMusou;
-//}
-
-//bool APlayerCharacter::GetIsConsistentMusou() const
-//{
-//	return bIsConsistentMusou;
-//}
-//
-//void APlayerCharacter::SetIsConsistentMusou(bool bNewIsConsistentMusou)
-//{
-//	bIsConsistentMusou = bNewIsConsistentMusou;
-//}
-
 class UArrowComponent& APlayerCharacter::GetCameraTransformArrowOrigin()
 {
 	return *CameraTransformArrowOrigin;
@@ -390,51 +290,6 @@ class UArrowComponent& APlayerCharacter::GetCameraTransformArrowTarget()
 {
 	return *CameraTransformArrowTarget;
 }
-
-//bool APlayerCharacter::GetIsParrySucceeded() const
-//{
-//	return bIsParrySucceeded;
-//}
-//
-//void APlayerCharacter::SetIsParrySucceeded(bool NewIsParrySucceeded)
-//{
-//	bIsParrySucceeded = NewIsParrySucceeded;
-//}
-
-//UWarriorSkillComponent* APlayerCharacter::GetSkillComponenet()
-//{
-//	return SkillComponenet;
-//}
-
-//bool APlayerCharacter::GetWillPlayChargeAttack2() const
-//{
-//	return bWillPlayChargeAttack2;
-//}
-//
-//void APlayerCharacter::SetWillPlayChargeAttack2(bool bNewWillPlayChargeAttack2)
-//{
-//	bWillPlayChargeAttack2 = bNewWillPlayChargeAttack2;
-//}
-//
-//bool APlayerCharacter::GetWillPlayChargeAttack3() const
-//{
-//	return bWillPlayChargeAttack3;
-//}
-//
-//void APlayerCharacter::SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3)
-//{
-//	bWillPlayChargeAttack3 = bNewWillPlayChargeAttack3;
-//}
-//
-//bool APlayerCharacter::GetIsGuarding() const
-//{
-//	return bIsGuarding;
-//}
-//
-//void APlayerCharacter::SetIsGuarding(bool bNewIsGuarding)
-//{
-//	bIsGuarding = bNewIsGuarding;
-//}
 
 void APlayerCharacter::OnStartNextCombo()
 {
