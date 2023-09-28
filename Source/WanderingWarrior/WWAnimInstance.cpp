@@ -198,7 +198,7 @@ void UWWAnimInstance::PlayCharacterHitMontage()
 		return;
 	}
 
-	StopAllMontages(0);
+	StopAllMontages(0.1f);
 
 	InitBoolCondition();
 	bIsPlayingCharacterHitMontage = true;

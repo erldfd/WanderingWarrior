@@ -417,34 +417,26 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+			AWWCharacter* Character = Cast<AWWCharacter>(OverlapResult.GetActor());
 
-			if (&Character == nullptr || &Character == GetOwner())
+			if (Character == nullptr || Character == GetOwner())
 			{
 				continue;
 			}
 
 			if (bIsBoss)
 			{
-				APlayerCharacter* Player = Cast<APlayerCharacter>(&Character);
+				APlayerCharacter* Player = Cast<APlayerCharacter>(Character);
 				if (Player == nullptr)
 				{
 					continue;
 				}
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character->GetName());
 
 			FDamageEvent DamageEvent;
-			float DamageTaken = Character.TakeDamage(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
-
-			if (DamageTaken == 0.0f)
-			{
-				return;
-			}
-
-			Character.GetAnimInstance().SetHitAndFly(true);
-			Character.Launch(Character.GetActorUpVector() * 700, JumpToGrundHeightLimit);
+			float DamageTaken = Character->TakeDamageWithLaunch(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Character->GetActorUpVector() * 700, true, JumpToGrundHeightLimit);
 
 			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
 			if (&PlayerController == false)
@@ -460,8 +452,8 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 
@@ -532,30 +524,26 @@ void UWarriorSkillComponent::DamageKickAttack()
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+			AWWCharacter* Character = Cast<AWWCharacter>(OverlapResult.GetActor());
 
-			if (&Character == nullptr || &Character == GetOwner())
+			if (Character == nullptr || Character == GetOwner())
 			{
 				continue;
 			}
 
 			if (bIsBoss)
 			{
-				APlayerCharacter* Player = Cast<APlayerCharacter>(&Character);
+				APlayerCharacter* Player = Cast<APlayerCharacter>(Character);
 				if (Player == nullptr)
 				{
 					continue;
 				}
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character->GetName());
 
 			FDamageEvent DamageEvent;
-			float DamageTaken = Character.TakeDamage(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
-			if (DamageTaken == 0.0f)
-			{
-				return;
-			}
+			float DamageTaken = Character->TakeDamageWithLaunch(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Character->GetActorUpVector() * 700, true, JumpToGrundHeightLimit);
 
 			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
 			if (&PlayerController == false)
@@ -571,8 +559,8 @@ void UWarriorSkillComponent::DamageKickAttack()
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 		}
@@ -631,66 +619,54 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+			AWWCharacter* Character = Cast<AWWCharacter>(OverlapResult.GetActor());
 
-			if (&Character == nullptr || &Character == GetOwner())
+			if (Character == nullptr || Character == GetOwner())
 			{
 				continue;
 			}
 
 			if (bIsBoss)
 			{
-				APlayerCharacter* Player = Cast<APlayerCharacter>(&Character);
+				APlayerCharacter* Player = Cast<APlayerCharacter>(Character);
 				if (Player == nullptr)
 				{
 					continue;
 				}
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character->GetName());
 
-			FDamageEvent DamageEvent;
-			float DamageTaken = Character.TakeDamage(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
-			if (DamageTaken == 0.0f)
-			{
-				return;
-			}
-
-			/*APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
-
-			if (Player == nullptr)
-			{
-				continue;;
-			}*/
-
-			Character.GetAnimInstance().SetHitAndFly(true);
 			float EnemyPositionAdjustmentFactor = 100;
 			FVector TargetLocation = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
-			FVector Dir = TargetLocation - Character.GetActorLocation();
+			FVector Dir = TargetLocation - Character->GetActorLocation();
 
 			float DirectionVectorMultiplier = 2;
 			Dir = Dir * DirectionVectorMultiplier;
 
 			float HeightLimit = Melee360AttackHeightLimit;
 			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit;
-			Character.Launch(Dir, HeightLimit);
+			Character->Launch(Dir, HeightLimit);
 
-			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (&PlayerController == false)
+			FDamageEvent DamageEvent;
+			float DamageTaken = Character->TakeDamageWithLaunch(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
+
+			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (PlayerController == false)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMelee360Attack, &PlayerController == false"));
+				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMelee360Attack, PlayerController == false"));
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
 			if (&PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMelee360Attack, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
@@ -742,66 +718,62 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+			AWWCharacter* Character = Cast<AWWCharacter>(OverlapResult.GetActor());
 
-			if (&Character == nullptr || &Character == GetOwner())
+			if (Character == nullptr || Character == GetOwner())
 			{
 				continue;
 			}
 
 			if (bIsBoss)
 			{
-				APlayerCharacter* Player = Cast<APlayerCharacter>(&Character);
+				APlayerCharacter* Player = Cast<APlayerCharacter>(Character);
 				if (Player == nullptr)
 				{
 					continue;
 				}
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character->GetName());
 
-			FDamageEvent DamageEvent;
-			float DamageTaken = Character.TakeDamage(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
-			if (DamageTaken == 0.0f)
-			{
-				return;
-			}
+			AWWCharacter* SkillUser = Cast<AWWCharacter>(GetOwner());
 
-			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (&PlayerController == false)
+			if (SkillUser == nullptr)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouAttackInternal, &PlayerController == false"));
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			float EnemyPositionAdjustmentFactor = 100;
+			FVector TargetLocation = SkillUser->GetActorLocation() + SkillUser->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
+			FVector Dir = TargetLocation - Character->GetActorLocation();
+
+			float DirectionVectorMultiplier = 2;
+			Dir = Dir * DirectionVectorMultiplier;
+
+			float HeightLimit = MusouAttackHeightLimit;
+			Dir.Z = SkillUser->GetActorLocation().Z + HeightLimit;
+
+			FDamageEvent DamageEvent;
+			float DamageTaken = Character->TakeDamageWithLaunch(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
+
+			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (PlayerController == false)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouAttackInternal, PlayerController == false"));
+				continue;
+			}
+
+			UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
 			if (&PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouAttackInternal, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
-			APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
-
-			if (Player == nullptr)
-			{
-				continue;;
-			}
-
-			Character.GetAnimInstance().SetHitAndFly(true);
-			float EnemyPositionAdjustmentFactor = 100;
-			FVector TargetLocation = Player->GetActorLocation() + Player->GetActorForwardVector() * EnemyPositionAdjustmentFactor;
-			FVector Dir = TargetLocation - Character.GetActorLocation();
-
-			float DirectionVectorMultiplier = 2;
-			Dir = Dir * DirectionVectorMultiplier;
-
-			float HeightLimit = MusouAttackHeightLimit;
-			Dir.Z = Player->GetActorLocation().Z + HeightLimit;
-			Character.Launch(Dir, HeightLimit);
+			
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
@@ -854,66 +826,53 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			AWWCharacter& Character = *Cast<AWWCharacter>(OverlapResult.GetActor());
+			AWWCharacter* Character = Cast<AWWCharacter>(OverlapResult.GetActor());
 
-			if (&Character == nullptr || &Character == GetOwner())
+			if (Character == nullptr || Character == GetOwner())
 			{
 				continue;
 			}
 
 			if (bIsBoss)
 			{
-				APlayerCharacter* Player = Cast<APlayerCharacter>(&Character);
+				APlayerCharacter* Player = Cast<APlayerCharacter>(Character);
 				if (Player == nullptr)
 				{
 					continue;
 				}
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *Character->GetName());
 
-			FDamageEvent DamageEvent;
-			float DamageTaken = Character.TakeDamage(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner());
-			if (DamageTaken == 0.0f)
-			{
-				return;
-			}
-
-			/*APlayerCharacter* Player = Cast<APlayerCharacter>(GetOwner());
-
-			if (Player == nullptr)
-			{
-				continue;;
-			}*/
-
-			Character.GetAnimInstance().SetHitAndFly(true);
 			float EnemyPositionAdjustmentFactor = 100;
 			FVector TargetLocation = GetOwner()->GetActorLocation();
-			FVector Dir = Character.GetActorLocation() - TargetLocation;
+			FVector Dir = Character->GetActorLocation() - TargetLocation;
 
 			float DirectionVectorMultiplier = 3;
 			Dir = Dir * DirectionVectorMultiplier;
 
 			float HeightLimit = 600;
 			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit;
-			Character.Launch(Dir, HeightLimit);
 
-			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (&PlayerController == false)
+			FDamageEvent DamageEvent;
+			float DamageTaken = Character->TakeDamageWithLaunch(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
+
+			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (PlayerController == false)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouFinishAttackInternal, &PlayerController == false"));
+				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouFinishAttackInternal, PlayerController == false"));
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
+			UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
 			if (&PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouFinishAttackInternal, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}

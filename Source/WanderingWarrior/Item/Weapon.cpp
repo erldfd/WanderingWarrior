@@ -86,8 +86,11 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(WeaponOwner.GetInstigatorController());
 		if (ensure(&PlayerController) == false) return;
 
+		FVector MoveDir = EnemyCharacter->GetActorLocation() - WeaponOwner.GetActorLocation();
+		MoveDir.Normalize();
+
 		FDamageEvent DamageEvent;
-		EnemyCharacter->TakeDamage(AttackDamage, DamageEvent, &PlayerController, &WeaponOwner);
+		EnemyCharacter->TakeDamageWithKnockback(AttackDamage, DamageEvent, &PlayerController, &WeaponOwner, MoveDir * 1000, 0.1f, true);
 
 		UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
 		if (ensure(&PlayerInGameWidget) == false) return;
