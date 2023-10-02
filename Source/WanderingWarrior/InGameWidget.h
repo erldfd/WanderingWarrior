@@ -53,19 +53,19 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> MyMPBar;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UInventoryWidget> QuickSlotWidget;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<class UInventoryWidget> QuickSlotWidget;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UInventoryWidget> InventoryWidget;
 
-	UPROPERTY(meta = (BindWidget))
+	/*UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UInventoryWidget> MarchantInventoryWidget;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UConversationWidget> ConversationWidget;
+	TObjectPtr<class UConversationWidget> ConversationWidget;*/
 
-	FTimerHandle HideEnemyHPAndNameWidgetTimerHandle = { };
+	FTimerHandle HideEnemyHPAndNameWidgetTimerHandle;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UInventoryItemInfoWidget> InventoryItemInfoWidget;

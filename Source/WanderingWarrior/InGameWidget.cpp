@@ -45,8 +45,8 @@ void UInGameWidget::SetMyMPBarPercent(float Percent)
 
 UInventoryWidget* UInGameWidget::GetQuickSlotWidget()
 {
-	check(QuickSlotWidget != nullptr);
-	return QuickSlotWidget;
+	//check(QuickSlotWidget != nullptr);
+	return nullptr;
 }
 
 UInventoryWidget* UInGameWidget::GetInventoryWidget()
@@ -57,14 +57,14 @@ UInventoryWidget* UInGameWidget::GetInventoryWidget()
 
 UInventoryWidget* UInGameWidget::GetMarchantInventoryWidget()
 {
-	check(MarchantInventoryWidget);
-	return MarchantInventoryWidget;
+	//check(MarchantInventoryWidget);
+	return nullptr;
 }
 
 UConversationWidget* UInGameWidget::GetConversationWidget()
 {
-	check(ConversationWidget);
-	return ConversationWidget;
+	//check(ConversationWidget);
+	return nullptr;
 }
 
 UInventoryItemInfoWidget* UInGameWidget::GetInventoryItemInfoWidget()
@@ -92,23 +92,23 @@ void UInGameWidget::NativeOnInitialized()
 	InventoryWidget->SetInventoryType(EInventory::CharacterInventory);
 	InventoryWidget->InitInventoryWidget(Settings);
 
-	Settings.TabCount = TabCount::QUICKSLOT_TAB_COUNT;
+	/*Settings.TabCount = TabCount::QUICKSLOT_TAB_COUNT;
 	Settings.SlotCountByTab = SlotCount::QUICK_SLOT_COUNT;
 	Settings.InventoryType = EInventory::CharacterQuickSlot;
 	Settings.TabTypeArray.Init(ETabType::QuickSlotTab, TabCount::QUICKSLOT_TAB_COUNT);
 
 	ensure(QuickSlotWidget != nullptr);
 	QuickSlotWidget->SetInventoryType(EInventory::CharacterQuickSlot);
-	QuickSlotWidget->InitInventoryWidget(Settings);
+	QuickSlotWidget->InitInventoryWidget(Settings);*/
 
 	Settings.TabCount = TabCount::DEFUALT_TAB_COUNT;
 	Settings.SlotCountByTab = SlotCount::MARCHANT_SLOT_COUNT;
 	Settings.InventoryType = EInventory::MarchantInventory;
 	Settings.TabTypeArray.Init(ETabType::QuickSlotTab, TabCount::QUICKSLOT_TAB_COUNT);
 
-	ensure(MarchantInventoryWidget != nullptr);
-	MarchantInventoryWidget->SetInventoryType(EInventory::MarchantInventory);
-	MarchantInventoryWidget->InitInventoryWidget(Settings);
+	//ensure(MarchantInventoryWidget != nullptr);
+	//MarchantInventoryWidget->SetInventoryType(EInventory::MarchantInventory);
+	//MarchantInventoryWidget->InitInventoryWidget(Settings);
 
 	HideEnemyHPAndNameWidget();
 
