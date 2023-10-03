@@ -58,20 +58,20 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	PlayerInventory.SetInventoryWidget(*InGameWidget->GetInventoryWidget());
 	PlayerInventory.SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
-	TempMarchantCharacter = Cast<ANPCCharacter>(UGameplayStatics::GetActorOfClass(this, ANPCCharacter::StaticClass()));
-	if (TempMarchantCharacter)
-	{
-		UMarchantInventory* MarchantInventory = &TempMarchantCharacter->GetInventory();
-		if (MarchantInventory)
-		{
-			MarchantInventory->SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
-		}
-	}
+	//TempMarchantCharacter = Cast<ANPCCharacter>(UGameplayStatics::GetActorOfClass(this, ANPCCharacter::StaticClass()));
+	//if (TempMarchantCharacter)
+	//{
+	//	UMarchantInventory* MarchantInventory = &TempMarchantCharacter->GetInventory();
+	//	if (MarchantInventory)
+	//	{
+	//		MarchantInventory->SetInventoryWidget(*InGameWidget->GetMarchantInventoryWidget());
+	//	}
+	//}
 
-	UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
-	GameInstance.GetConversationManager().SetConversationWidget(*InGameWidget->GetConversationWidget());
-	GameInstance.GetConversationManager().BindConversationWidgetSignature();
-	GameInstance.GetStoreManager().SetStoreWidget(InGameWidget->GetMarchantInventoryWidget());
+	//UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
+	//GameInstance.GetConversationManager().SetConversationWidget(*InGameWidget->GetConversationWidget());
+	//GameInstance.GetConversationManager().BindConversationWidgetSignature();
+	//GameInstance.GetStoreManager().SetStoreWidget(InGameWidget->GetMarchantInventoryWidget());
 
 	SetShowMouseCursor(false);
 
