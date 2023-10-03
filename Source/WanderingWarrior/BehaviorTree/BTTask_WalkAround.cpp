@@ -44,8 +44,8 @@ void UBTTask_WalkAround::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 		return;
 	}
 
-	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
-	if (AnimInstance.GetIsDead())
+	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
+	if (AnimInstance->GetIsDead())
 	{
 		return;
 	}

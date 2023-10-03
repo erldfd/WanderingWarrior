@@ -33,14 +33,14 @@ void UMyBTTask_MyMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (&ThisCharacter == nullptr)
+	AWWCharacter* ThisCharacter = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (ThisCharacter == nullptr)
 	{
 		return;
 	}
 
-	UWWAnimInstance& AnimInstance = ThisCharacter.GetAnimInstance();
-	if (AnimInstance.GetIsDead())
+	UWWAnimInstance* AnimInstance = ThisCharacter->GetAnimInstance();
+	if (AnimInstance->GetIsDead())
 	{
 		return;
 	}
@@ -52,10 +52,10 @@ void UMyBTTask_MyMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	}
 
 	//float AttackRange = 100;
-	float DistanceToTarget = Target->GetDistanceTo(&ThisCharacter);
+	float DistanceToTarget = Target->GetDistanceTo(ThisCharacter);
 	bool bResult = (DistanceToTarget <= AttackRange);
 	
-	if (bResult || AnimInstance.GetBeingStunned() || AnimInstance.GetIsDead() || AnimInstance.GetIsIdleOrRun() == false)
+	if (bResult || AnimInstance->GetBeingStunned() || AnimInstance->GetIsDead() || AnimInstance->GetIsIdleOrRun() == false)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

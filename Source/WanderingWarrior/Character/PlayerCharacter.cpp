@@ -113,7 +113,7 @@ void APlayerCharacter::PostInitializeComponents()
 		return;
 	}
 
-	GameMode->SetPlayerAnimInstance(&GetAnimInstance());
+	GameMode->SetPlayerAnimInstance(GetAnimInstance());
 	//Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
 }
 

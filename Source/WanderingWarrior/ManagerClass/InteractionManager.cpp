@@ -27,40 +27,40 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, OverlapResults[%d] : %s"), i, *OverlapResults[i].GetActor()->GetName());
 
-		AActor& OverlappedActor = *OverlapResults[i].GetActor();
+		AActor* OverlappedActor = OverlapResults[i].GetActor();
 
-		if (OverlappedActor.Tags.IsValidIndex(0) == false)
+		if (OverlappedActor->Tags.IsValidIndex(0) == false)
 		{
 			continue;
 		}
 
-		FName& ActorTag = OverlappedActor.Tags[0];
+		FName& ActorTag = OverlappedActor->Tags[0];
 
 		if (ActorTag == "Marchant")
 		{
-			ANPCCharacter& Marchant = *Cast<ANPCCharacter>(&OverlappedActor);
+			ANPCCharacter* Marchant = Cast<ANPCCharacter>(OverlappedActor);
 
-			static UWWGameInstance& GameInstance = *Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(OverlappedActor.GetWorld()));
-			check(&GameInstance);
+			static UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(OverlappedActor->GetWorld()));
+			check(GameInstance);
 
-			GameInstance.GetConversationManager().SetNPCNameText(FText::FromString(Marchant.GetNPCName()));
+			GameInstance->GetConversationManager().SetNPCNameText(FText::FromString(Marchant->GetNPCName()));
 
-			OnStartConversationSignature.Broadcast(&Marchant);
+			OnStartConversationSignature.Broadcast(Marchant);
 
 			return;
 		}
 		else if (ActorTag == "Weapon")
 		{
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, FoundWeapon"));
-			AWeapon& Weapon = *Cast<AWeapon>(&OverlappedActor);
+			AWeapon* Weapon = Cast<AWeapon>(OverlappedActor);
 
-			if (Weapon.GetbIsFieldItem() == false)
+			if (Weapon->GetbIsFieldItem() == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, Weapon is not Field item"));
 				continue;
 			}
 
-			FName& WeaponTag = OverlappedActor.Tags[1];
+			FName& WeaponTag = OverlappedActor->Tags[1];
 
 			static APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetActorOfClass(this, APlayerCharacter::StaticClass()));
 			check(PlayerCharacter);
@@ -82,22 +82,22 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, EWeaponName : %d "), (int32)WeaponName);
 
 			PlayerInventory->ObtainItem(WeaponName);
-			OverlappedActor.Destroy();
+			OverlappedActor->Destroy();
 
 			return;
 		}
 		else if (ActorTag == "MiscItem")
 		{
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, Found MiscItem"));
-			AMiscItem& MiscItem = *Cast<AMiscItem>(&OverlappedActor);
+			AMiscItem* MiscItem = Cast<AMiscItem>(OverlappedActor);
 
-			if (MiscItem.GetbIsFieldItem() == false)
+			if (MiscItem->GetbIsFieldItem() == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, MiscItem is not Field item"));
 				continue;
 			}
 
-			FName& MiscItemTag = OverlappedActor.Tags[1];
+			FName& MiscItemTag = OverlappedActor->Tags[1];
 
 			static APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetActorOfClass(this, APlayerCharacter::StaticClass()));
 			check(PlayerCharacter);
@@ -119,7 +119,7 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, EWeaponName : %d "), (int32)MiscItemName);
 
 			PlayerInventory->ObtainItem(MiscItemName);
-			OverlappedActor.Destroy();
+			OverlappedActor->Destroy();
 
 			return;
 		}

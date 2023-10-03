@@ -17,17 +17,17 @@ EBTNodeResult::Type UBTTask_ChargeAttack3::ExecuteTask(UBehaviorTreeComponent& O
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	AWWCharacter& Character = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	check(&Character);
+	AWWCharacter* Character = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	check(Character);
 
-	UWWAnimInstance& AnimInstance = Character.GetAnimInstance();
+	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
 
-	if (AnimInstance.GetIsDead())
+	if (AnimInstance->GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	Character.Attack();
+	Character->Attack();
 
 	return EBTNodeResult::InProgress;
 }
@@ -42,8 +42,6 @@ void UBTTask_ChargeAttack3::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 		UE_LOG(LogTemp, Warning, TEXT("UBTTask_ChargeAttack3::TickTask, Character == nullptr"));
 		return;
 	}
-
-	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
 
 	if (Character->GetComboCount() < 2)
 	{

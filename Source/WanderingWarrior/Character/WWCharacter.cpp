@@ -36,19 +36,10 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 
-	USkeletalMeshComponent& CharacterMeshComponent = *GetMesh();
-	check(&CharacterMeshComponent);
+	USkeletalMeshComponent* CharacterMeshComponent = GetMesh();
+	check(CharacterMeshComponent);
 
-	CharacterMeshComponent.SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
-
-	/*const ConstructorHelpers::FObjectFinder<USkeletalMesh> MESH(TEXT("/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard"));
-	if (MESH.Succeeded())
-	{
-		CharacterMeshComponent.SetSkeletalMesh(MESH.Object);
-	}*/
-
-	/*static ConstructorHelpers::FClassFinder<UAnimInstance> Anim(TEXT("/Game/Animations/BP_WarriorAnim.BP_WarriorAnim_C"));
-	CharacterMeshComponent.SetAnimInstanceClass(Anim.Class);*/
+	CharacterMeshComponent->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
 	GetMesh()->SetGenerateOverlapEvents(true);
@@ -102,7 +93,7 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	
 	APlayerCharacter* Player = Cast<APlayerCharacter>(DamageCauser);
 
-	if (Player && Player->GetAnimInstance().GetIsParrying())
+	if (Player && Player->GetAnimInstance()->GetIsParrying())
 	{
 		AnimInstance->SetBeingStunned(true);
 
@@ -203,9 +194,9 @@ void AWWCharacter::Jump()
 	Super::Jump();
 }
 
-UWWAnimInstance& AWWCharacter::GetAnimInstance()
+UWWAnimInstance* AWWCharacter::GetAnimInstance() const
 {
-	return *AnimInstance;
+	return AnimInstance;
 }
 
 // Called every frame
@@ -423,7 +414,7 @@ void AWWCharacter::SetMaxHeightInAir(float NewMaxHeight)
 	MaxHeightInAir = NewMaxHeight;
 }
 
-bool AWWCharacter::GetIsAttacking()
+bool AWWCharacter::GetIsAttacking() const
 {
 	return bIsAttacking;
 }
@@ -433,7 +424,7 @@ void AWWCharacter::SetIsAttacking(bool bNewIsAttacking)
 	bIsAttacking = bNewIsAttacking;
 }
 
-bool AWWCharacter::GetCanCombo()
+bool AWWCharacter::GetCanCombo() const
 {
 	return bCanCombo;
 }
@@ -443,7 +434,7 @@ void AWWCharacter::SetCanCombo(bool bNewCanCombo)
 	bCanCombo = bNewCanCombo;
 }
 
-bool AWWCharacter::GetWillPlayNextCombo()
+bool AWWCharacter::GetWillPlayNextCombo() const
 {
 	return bWillPlayNextCombo;
 }
@@ -453,7 +444,7 @@ void AWWCharacter::SetWillPlayNextCombo(bool bNewWillPlayNextCombo)
 	bWillPlayNextCombo = bNewWillPlayNextCombo;
 }
 
-int32 AWWCharacter::GetComboCount()
+int32 AWWCharacter::GetComboCount() const
 {
 	return ComboCount;
 }
@@ -463,12 +454,12 @@ void AWWCharacter::SetComboCount(int32 NewComboCount)
 	ComboCount = NewComboCount;
 }
 
-UAnimMontage* AWWCharacter::GetAttackMontage()
+UAnimMontage* AWWCharacter::GetAttackMontage() const
 {
 	return AttackMontage;
 }
 
-AWeapon* AWWCharacter::GetCurrentWeapon()
+AWeapon* AWWCharacter::GetCurrentWeapon() const
 {
 	return CurrentWeapon;
 }

@@ -17,17 +17,17 @@ EBTNodeResult::Type UBTTask_ChargeAttack1::ExecuteTask(UBehaviorTreeComponent& O
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	AWWCharacter& Character = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	check(&Character);
+	AWWCharacter* Character = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	check(Character);
 
-	UWWAnimInstance& AnimInstance = Character.GetAnimInstance();
+	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
 
-	if (AnimInstance.GetIsDead())
+	if (AnimInstance->GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	Character.DoChargeAttack();
+	Character->DoChargeAttack();
 
 	return EBTNodeResult::InProgress;
 }

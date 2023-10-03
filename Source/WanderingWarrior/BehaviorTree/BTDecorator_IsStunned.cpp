@@ -18,8 +18,8 @@ bool UBTDecorator_IsStunned::CalculateRawConditionValue(UBehaviorTreeComponent& 
 {
 	Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
-	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (&ThisCharacter && ThisCharacter.GetAnimInstance().GetBeingStunned())
+	AWWCharacter* ThisCharacter = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (ThisCharacter && ThisCharacter->GetAnimInstance()->GetBeingStunned())
 	{
 		return true;
 	}

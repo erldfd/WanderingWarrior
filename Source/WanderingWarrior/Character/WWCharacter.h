@@ -34,7 +34,7 @@ public:
 
 	virtual void Jump() override;
 
-	class UWWAnimInstance& GetAnimInstance();
+	class UWWAnimInstance* GetAnimInstance() const;
 
 	virtual void Attack();
 	void AttackCheck();
@@ -50,21 +50,21 @@ public:
 
 	void SetMaxHeightInAir(float NewMaxHeight);
 
-	bool GetIsAttacking();
+	bool GetIsAttacking() const;
 	void SetIsAttacking(bool bNewIsAttacking);
 
-	bool GetCanCombo();
+	bool GetCanCombo() const;
 	void SetCanCombo(bool bNewCanCombo);
 
-	bool GetWillPlayNextCombo();
+	bool GetWillPlayNextCombo() const;
 	void SetWillPlayNextCombo(bool bNewWillPlayNextCombo);
 
-	int32 GetComboCount();
+	int32 GetComboCount() const;
 	void SetComboCount(int32 NewComboCount);
 
-	UAnimMontage* GetAttackMontage();
+	UAnimMontage* GetAttackMontage() const;
 
-	class AWeapon* GetCurrentWeapon();
+	class AWeapon* GetCurrentWeapon() const;
 
 	bool GetIsInvincible();
 	void SetIsInvincible(bool bNewIsInvincible);

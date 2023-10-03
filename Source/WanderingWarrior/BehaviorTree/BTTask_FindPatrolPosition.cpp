@@ -19,19 +19,19 @@ EBTNodeResult::Type UBTTask_FindPatrolPosition::ExecuteTask(UBehaviorTreeCompone
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (&ThisCharacter == nullptr)
+	AWWCharacter* ThisCharacter = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (ThisCharacter == nullptr)
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	UWWAnimInstance& AnimInstance = ThisCharacter.GetAnimInstance();
-	if (AnimInstance.GetIsDead())
+	UWWAnimInstance* AnimInstance = ThisCharacter->GetAnimInstance();
+	if (AnimInstance->GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ThisCharacter.GetWorld());
+	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ThisCharacter->GetWorld());
 	if (NavSystem == nullptr)
 	{
 		return EBTNodeResult::Failed;

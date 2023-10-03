@@ -25,8 +25,8 @@ EBTNodeResult::Type UBTTask_TurnToTargetDirectly::ExecuteTask(UBehaviorTreeCompo
 		return EBTNodeResult::Failed;
 	}
 
-	UWWAnimInstance& AnimInstance = Character->GetAnimInstance();
-	if (AnimInstance.GetIsDead())
+	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
+	if (AnimInstance->GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}

@@ -24,23 +24,23 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 		return EBTNodeResult::Failed;
 	}
 
-	AWWCharacter& Character = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
-	if (&Character == nullptr)
+	AWWCharacter* Character = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	if (Character == nullptr)
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	UWWAnimInstance& AnimInstance = Character.GetAnimInstance();
-	if (AnimInstance.GetIsDead())
+	UWWAnimInstance* AnimInstance = Character->GetAnimInstance();
+	if (AnimInstance->GetIsDead())
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	FVector LookVector = Target.GetActorLocation() - Character.GetActorLocation();
+	FVector LookVector = Target.GetActorLocation() - Character->GetActorLocation();
 	LookVector.Z = 0.0f;
 	const FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 	//Character->SetActorRotation(TargetRot);// Look Directly
-	Character.SetActorRotation(FMath::RInterpTo(Character.GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 2.0f));
+	Character->SetActorRotation(FMath::RInterpTo(Character->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 2.0f));
 
 	return EBTNodeResult::Succeeded;
 }

@@ -124,6 +124,13 @@ void UWWAnimInstance::SetIsGuardHitStart(bool NewIsGuardHitStart)
 void UWWAnimInstance::PlayGuardHitAnim()
 {
 	float GuardReactionRate = 1.3;
+
+	if (GuardHitReaction == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::PlayGuardHitAnim, GuardHitReaction == nullptr"));
+		return;
+	}
+
 	Montage_Play(GuardHitReaction, GuardReactionRate);
 }
 

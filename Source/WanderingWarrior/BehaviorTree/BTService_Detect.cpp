@@ -23,20 +23,20 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	AWWCharacter& ThisCharacter = *Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+	AWWCharacter* ThisCharacter = Cast<AWWCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (&ThisCharacter == nullptr)
 	{
 		return;
 	}
 
-	UWWAnimInstance& AnimInstance = ThisCharacter.GetAnimInstance();
-	if (AnimInstance.GetIsDead())
+	UWWAnimInstance* AnimInstance = ThisCharacter->GetAnimInstance();
+	if (AnimInstance->GetIsDead())
 	{
 		return;
 	}
 
-	UWorld& World = *ThisCharacter.GetWorld();
-	const FVector& Center = ThisCharacter.GetActorLocation();
+	UWorld* World = ThisCharacter->GetWorld();
+	const FVector& Center = ThisCharacter->GetActorLocation();
 
 	if (&World == nullptr)
 	{
@@ -44,8 +44,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam(NAME_None, false, &ThisCharacter);
-	bool bResult = World.OverlapMultiByChannel(
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ThisCharacter);
+	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,
 		Center,
 		FQuat::Identity,
