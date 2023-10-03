@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "AIController.h"
+#include "Controller/EnemyAIControllerBase.h"
 
 #include "EnemyAIController.generated.h"
 
@@ -12,7 +12,7 @@
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API AEnemyAIController : public AAIController
+class WANDERINGWARRIOR_API AEnemyAIController : public AEnemyAIControllerBase
 {
 	GENERATED_BODY()
 
@@ -24,24 +24,12 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-public:
-
-	static const FName HomePosKey;
-	static const FName PatrolPosKey;
-	static const FName TargetKey;
-
 protected:
 
-	UPROPERTY()
-	TObjectPtr<class UBehaviorTree> BTEnemyAI;
-
-	UPROPERTY()
-	TObjectPtr<class UBlackboardData> BBEnemyAI;
-
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UBehaviorTree> BTEnemyRushAI;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UBlackboardData> BBEnemyRushAI;
 
 	UPROPERTY(BlueprintReadWrite)

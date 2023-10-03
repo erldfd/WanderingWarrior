@@ -3,20 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "Controller/EnemyAIControllerBase.h"
-
-#include "BossAIController.generated.h"
+#include "WizardAIController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API ABossAIController : public AEnemyAIControllerBase
+class WANDERINGWARRIOR_API AWizardAIController : public AEnemyAIControllerBase
 {
 	GENERATED_BODY()
 	
-public:
-
-	ABossAIController();
 };

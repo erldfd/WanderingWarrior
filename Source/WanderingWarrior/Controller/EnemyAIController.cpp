@@ -7,22 +7,18 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-const FName AEnemyAIController::HomePosKey(TEXT("HomePos"));
-const FName AEnemyAIController::PatrolPosKey(TEXT("PatrolPos"));
-const FName AEnemyAIController::TargetKey(TEXT("Target"));
-
 AEnemyAIController::AEnemyAIController()
 {
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BT (TEXT("/Game/AI/BT_EnemyAI.BT_EnemyAI"));
+	/*static ConstructorHelpers::FObjectFinder<UBehaviorTree> BT (TEXT("/Game/AI/BT_EnemyAI.BT_EnemyAI"));
 	if (BT.Succeeded())
 	{
-		BTEnemyAI = BT.Object;
+		Super::BTEnemyAI = BT.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBData(TEXT("/Game/AI/BB_EnemyAI.BB_EnemyAI"));
 	if (BBData.Succeeded())
 	{
-		BBEnemyAI = BBData.Object;
+		Super::BBEnemyAI = BBData.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTRush(TEXT("/Game/AI/BT_EnemyRushAI.BT_EnemyRushAI"));
@@ -35,7 +31,7 @@ AEnemyAIController::AEnemyAIController()
 	if (BBRushData.Succeeded())
 	{
 		BBEnemyRushAI = BBRushData.Object;
-	}
+	}*/
 }
 
 void AEnemyAIController::OnPossess(APawn* InPawn)
