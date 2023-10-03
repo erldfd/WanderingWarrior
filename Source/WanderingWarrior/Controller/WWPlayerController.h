@@ -23,7 +23,7 @@ public:
 
 	virtual void OnPossess(APawn* aPawn) override;
 
-	class UInGameWidget& GetInGameWidget();
+	class UInGameWidget* GetInGameWidget();
 
 	void SetGameModeGameAndUI();
 	void SetGameModeGameOnly();

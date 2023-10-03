@@ -16,15 +16,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
 
-UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0), ChargeAttack3ComboCount(0)
+UWWAnimInstance::UWWAnimInstance():CurentPawnSpeed(0)
 {
-	/*static ConstructorHelpers::FObjectFinder<UAnimMontage> CHARACTER_HIT_MONTAGE(TEXT("/Game/Animations/CharacterHitMontage.CharacterHitMontage"));
-	if (CHARACTER_HIT_MONTAGE.Succeeded())
-	{
-		CharacterHitMongtage = CHARACTER_HIT_MONTAGE.Object;
-	}*/
-
-	ChargeAttack3MaxComboCount = 4;
 	AttackAnimRate = 1.0f;
 }
 
@@ -57,7 +50,7 @@ void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 }
 
-bool UWWAnimInstance::GetIsDead()
+bool UWWAnimInstance::GetIsDead() const
 {
 	return bIsDead;
 }
@@ -78,7 +71,7 @@ bool UWWAnimInstance::IsPlayingSomething()
 	return IsPlayingSomething;
 }
 
-bool UWWAnimInstance::GetHitAndFly()
+bool UWWAnimInstance::GetHitAndFly() const
 {
 	return bIsHitAndFly;
 }
@@ -88,17 +81,17 @@ void UWWAnimInstance::SetHitAndFly(bool NewHitAndFly)
 	bIsHitAndFly = NewHitAndFly;
 }
 
-bool UWWAnimInstance::GetDetectedAttack()
+bool UWWAnimInstance::GetIsAttackDetected() const
 {
-	return bIsDetectedAttack;
+	return bIsAttackDetected;
 }
 
 void UWWAnimInstance::SetDetectedAttack(bool NewDetectedAttack)
 {
-	bIsDetectedAttack = NewDetectedAttack;
+	bIsAttackDetected = NewDetectedAttack;
 }
 
-bool UWWAnimInstance::GetIsIdleOrRun()
+bool UWWAnimInstance::GetIsIdleOrRun() const
 {
 	return bIsIdleOrRun;
 }
@@ -108,7 +101,7 @@ void UWWAnimInstance::SetIsIdleOrRun(bool NewIsIdleOrWalk)
 	bIsIdleOrRun = NewIsIdleOrWalk;
 }
 
-bool UWWAnimInstance::GetIsGuarding()
+bool UWWAnimInstance::GetIsGuarding() const
 {
 	return bIsGuarding;
 }
@@ -118,7 +111,7 @@ void UWWAnimInstance::SetIsGuarding(bool NewIsGuarding)
 	bIsGuarding = NewIsGuarding;
 }
 
-bool UWWAnimInstance::GetIsGuardHitStart()
+bool UWWAnimInstance::GetIsGuardHitStart() const
 {
 	return bIsGuardHitStart;
 }
@@ -134,7 +127,7 @@ void UWWAnimInstance::PlayGuardHitAnim()
 	Montage_Play(GuardHitReaction, GuardReactionRate);
 }
 
-bool UWWAnimInstance::GetBeingStunned()
+bool UWWAnimInstance::GetBeingStunned() const
 {
 	return bBeingStunned;
 }
@@ -144,7 +137,7 @@ void UWWAnimInstance::SetBeingStunned(bool NewBeingStunned)
 	bBeingStunned = NewBeingStunned;
 }
 
-bool UWWAnimInstance::GetIsParrying()
+bool UWWAnimInstance::GetIsParrying() const
 {
 	return bIsParrying;
 }
@@ -154,7 +147,7 @@ void UWWAnimInstance::SetIsParrying(bool NewIsParrying)
 	bIsParrying = NewIsParrying;
 }
 
-bool UWWAnimInstance::GetIsActingMusou()
+bool UWWAnimInstance::GetIsActingMusou() const
 {
 	return bIsActingMusou;
 }
@@ -164,7 +157,7 @@ void UWWAnimInstance::SetIsActingMusou(bool NewIsActingMusou)
 	bIsActingMusou = NewIsActingMusou;
 }
 
-bool UWWAnimInstance::GetIsActionCameraMoving()
+bool UWWAnimInstance::GetIsActionCameraMoving() const
 {
 	return bIsActionCameraMoving;
 }
@@ -214,7 +207,7 @@ void UWWAnimInstance::StopCharacterHitMontage()
 	Montage_Stop(0, CharacterHitMongtage);
 }
 
-bool UWWAnimInstance::GetIsPlayingCharacterHitMontage()
+bool UWWAnimInstance::GetIsPlayingCharacterHitMontage() const
 {
 	return bIsPlayingCharacterHitMontage;
 }
@@ -360,7 +353,7 @@ void UWWAnimInstance::AnimNotify_WarriorRunStart()
 void UWWAnimInstance::InitBoolCondition()
 {
 	bIsAttacking = false;
-	bIsDetectedAttack = false;
+	bIsAttackDetected = false;
 	bCanComboAttack = false;
 	bWillPlayNextCombo = false;
 	bIsPlayingChargeAttack1Anim = false;

@@ -62,18 +62,18 @@ public:
 
 	//class UPlayerSkillComponent& GetPlayerSkillComponenet();
 
-	class UCharacterQuickSlot& GetQuickSlot();
+	class UCharacterQuickSlot* GetQuickSlot();
 
-	class UCharacterInventory& GetInventory() const;
+	class UCharacterInventory* GetInventory() const;
 
 	class UCameraComponent* GetCamera();
-	class UCameraComponent& GetActionCamera();
+	class UCameraComponent* GetActionCamera();
 
 	bool GetIsInWater();
 	bool GetIsWet();
 
-	class UArrowComponent& GetCameraTransformArrowOrigin();
-	class UArrowComponent& GetCameraTransformArrowTarget();
+	class UArrowComponent* GetCameraTransformArrowOrigin();
+	class UArrowComponent* GetCameraTransformArrowTarget();
 
 	//class UWarriorSkillComponent* GetSkillComponenet();
 

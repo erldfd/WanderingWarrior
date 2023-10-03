@@ -72,7 +72,7 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 	//bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
 	
-	bool IsDetectedAttack = PlayerAnimInstance->GetDetectedAttack();
+	bool IsDetectedAttack = PlayerAnimInstance->GetIsAttackDetected();
 	UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Damaged : %d, DetectedAttack : %d"), EnemyCharacter->GetIsDamaged(), IsDetectedAttack);
 
 	if (true/*EnemyCharacter->GetIsDamaged() == false*//* &&*/ /*IsAttacking*//*IsDetectedAttack*/)
@@ -80,23 +80,23 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		//UGameplayStatics::SetGlobalTimeDilation(this, 0.5f);
 		EnemyCharacter->SetIsDamaged(true);
 
-		AActor& WeaponOwner = *GetOwner();
-		if (ensure(&WeaponOwner) == false) return;
+		AActor* WeaponOwner = GetOwner();
+		if (ensure(WeaponOwner) == false) return;
 
-		AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(WeaponOwner.GetInstigatorController());
-		if (ensure(&PlayerController) == false) return;
+		AWWPlayerController* PlayerController = Cast<AWWPlayerController>(WeaponOwner->GetInstigatorController());
+		if (ensure(PlayerController) == false) return;
 
-		FVector MoveDir = EnemyCharacter->GetActorLocation() - WeaponOwner.GetActorLocation();
+		FVector MoveDir = EnemyCharacter->GetActorLocation() - WeaponOwner->GetActorLocation();
 		MoveDir.Normalize();
 
 		FDamageEvent DamageEvent;
-		EnemyCharacter->TakeDamageWithKnockback(AttackDamage, DamageEvent, &PlayerController, &WeaponOwner, MoveDir * 1000, 0.1f, true);
+		EnemyCharacter->TakeDamageWithKnockback(AttackDamage, DamageEvent, PlayerController, WeaponOwner, MoveDir * 1000, 0.1f, true);
 
-		UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
-		if (ensure(&PlayerInGameWidget) == false) return;
+		UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+		if (ensure(PlayerInGameWidget) == false) return;
 
-		PlayerInGameWidget.SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent()->GetHPRatio());
-		PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
+		PlayerInGameWidget->SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent()->GetHPRatio());
+		PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
 	}
 }
 

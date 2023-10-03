@@ -10,7 +10,6 @@
 #include "WWConstContainer.h"
 #include "Item/Weapon.h"
 #include "Item/MiscItem.h"
-#include "Components/PlayerSkillComponent.h"
 #include "Components/CharacterStatComponent.h"
 #include "Inventory/InventorySlotWidget.h"
 #include "Inventory/InventoryWidget.h"
@@ -244,15 +243,15 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	return Damage;
 }
 
-class UCharacterQuickSlot& APlayerCharacter::GetQuickSlot()
+class UCharacterQuickSlot* APlayerCharacter::GetQuickSlot()
 {
 	check(QuickSlot);
-	return *QuickSlot;
+	return QuickSlot;
 }
 
-UCharacterInventory& APlayerCharacter::GetInventory() const
+UCharacterInventory* APlayerCharacter::GetInventory() const
 {
-	return *Inventory;
+	return Inventory;
 }
 
 UCameraComponent* APlayerCharacter::GetCamera()
@@ -265,10 +264,10 @@ UCameraComponent* APlayerCharacter::GetCamera()
 	return Camera;
 }
 
-UCameraComponent& APlayerCharacter::GetActionCamera()
+UCameraComponent* APlayerCharacter::GetActionCamera()
 {
 	check(ActionCamera);
-	return *ActionCamera;
+	return ActionCamera;
 }
 
 bool APlayerCharacter::GetIsInWater()
@@ -281,14 +280,14 @@ bool APlayerCharacter::GetIsWet()
 	return bIsWet;
 }
 
-class UArrowComponent& APlayerCharacter::GetCameraTransformArrowOrigin()
+class UArrowComponent* APlayerCharacter::GetCameraTransformArrowOrigin()
 {
-	return *CameraTransformArrowOrigin;
+	return CameraTransformArrowOrigin;
 }
 
-class UArrowComponent& APlayerCharacter::GetCameraTransformArrowTarget()
+class UArrowComponent* APlayerCharacter::GetCameraTransformArrowTarget()
 {
-	return *CameraTransformArrowTarget;
+	return CameraTransformArrowTarget;
 }
 
 void APlayerCharacter::OnStartNextCombo()

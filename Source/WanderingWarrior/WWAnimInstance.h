@@ -40,7 +40,7 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	bool GetIsDead();
+	bool GetIsDead() const;
 	void SetIsDead(bool IsDead);
 
 	bool IsPlayingSomething();
@@ -48,36 +48,36 @@ public:
 	void PlayCharacterHitMontage();
 	void StopCharacterHitMontage();
 
-	bool GetIsPlayingCharacterHitMontage();
+	bool GetIsPlayingCharacterHitMontage() const;
 	void SetIsPlayingCharacterHitMontage(bool bIsPlaying);
 
-	bool GetHitAndFly();
+	bool GetHitAndFly() const;
 	void SetHitAndFly(bool NewHitAndFly);
 
-	bool GetDetectedAttack();
+	bool GetIsAttackDetected() const;
 	void SetDetectedAttack(bool NewDetectedAttack);
 
-	bool GetIsIdleOrRun();
+	bool GetIsIdleOrRun() const;
 	void SetIsIdleOrRun(bool NewIsIdleOrWalk);
 
-	bool GetIsGuarding();
+	bool GetIsGuarding() const;
 	void SetIsGuarding(bool NewIsGuarding);
 
-	bool GetIsGuardHitStart();
+	bool GetIsGuardHitStart() const;
 	void SetIsGuardHitStart(bool NewIsGuardHitStart);
 
 	void PlayGuardHitAnim();
 
-	bool GetBeingStunned();
+	bool GetBeingStunned() const;
 	void SetBeingStunned(bool NewBeingStunned);
 
-	bool GetIsParrying();
+	bool GetIsParrying() const;
 	void SetIsParrying(bool NewIsParrying);
 
-	bool GetIsActingMusou();
+	bool GetIsActingMusou() const;
 	void SetIsActingMusou(bool NewIsActingMusou);
 
-	bool GetIsActionCameraMoving();
+	bool GetIsActionCameraMoving() const;
 	void SetIsActionCameraMoving(bool NewIsActionCameraMoving);
 
 	void InitBoolCondition();
@@ -168,7 +168,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
 	uint8 bIsActingMusou : 1;
 
-	uint8 bIsDetectedAttack : 1;
+	uint8 bIsAttackDetected : 1;
 	uint8 bIsAttacking : 1; // about attack anim
 
 	uint8 bCanComboAttack : 1;
@@ -197,9 +197,6 @@ private:
 	int32 ComboCount;
 
 	int32 ChargeAttack3ComboCount;
-
-	UPROPERTY(EditAnywhere, Category = Anim, meta = (AllowPrivateAccess = true))
-	int32 ChargeAttack3MaxComboCount;
 
 	float AttackAnimRate;
 

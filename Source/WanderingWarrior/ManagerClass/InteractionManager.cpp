@@ -62,12 +62,12 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 
 			FName& WeaponTag = OverlappedActor.Tags[1];
 
-			static APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(UGameplayStatics::GetActorOfClass(this, APlayerCharacter::StaticClass()));
-			check(&PlayerCharacter);
+			static APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetActorOfClass(this, APlayerCharacter::StaticClass()));
+			check(PlayerCharacter);
 
-			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, PlayerName : %s"), *PlayerCharacter.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, PlayerName : %s"), *PlayerCharacter->GetName());
 
-			UCharacterInventory& PlayerInventory = PlayerCharacter.GetInventory();
+			UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
 
 			const UEnum* WeaponNameEnum = FindObject<UEnum>(nullptr, TEXT("/Script/WanderingWarrior.EWeaponName"));
 
@@ -81,7 +81,7 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, EWeaponName : %d "), (int32)WeaponName);
 
-			PlayerInventory.ObtainItem(WeaponName);
+			PlayerInventory->ObtainItem(WeaponName);
 			OverlappedActor.Destroy();
 
 			return;
@@ -99,12 +99,12 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 
 			FName& MiscItemTag = OverlappedActor.Tags[1];
 
-			static APlayerCharacter& PlayerCharacter = *Cast<APlayerCharacter>(UGameplayStatics::GetActorOfClass(this, APlayerCharacter::StaticClass()));
-			check(&PlayerCharacter);
+			static APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetActorOfClass(this, APlayerCharacter::StaticClass()));
+			check(PlayerCharacter);
 
-			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, PlayerName : %s"), *PlayerCharacter.GetName());
+			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, PlayerName : %s"), *PlayerCharacter->GetName());
 
-			UCharacterInventory& PlayerInventory = PlayerCharacter.GetInventory();
+			UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
 
 			const UEnum* MiscItemNameEnum = FindObject<UEnum>(nullptr, TEXT("/Script/WanderingWarrior.EMiscItemName"));
 
@@ -118,7 +118,7 @@ void UInteractionManager::AnalyzeInteraction(const TArray<FOverlapResult>& Overl
 
 			UE_LOG(LogTemp, Warning, TEXT("UInteractionManager::AnalyzeInteraction, EWeaponName : %d "), (int32)MiscItemName);
 
-			PlayerInventory.ObtainItem(MiscItemName);
+			PlayerInventory->ObtainItem(MiscItemName);
 			OverlappedActor.Destroy();
 
 			return;

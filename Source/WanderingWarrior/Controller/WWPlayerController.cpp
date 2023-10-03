@@ -7,7 +7,6 @@
 #include "WWGameInstance.h"
 #include "ConversationWidget.h"
 #include "Components/CharacterStatComponent.h"
-#include "Components/PlayerSkillComponent.h"
 #include "Character/PlayerCharacter.h"
 #include "Character/NPCCharacter.h"
 #include "Inventory/InventoryComponent.h"
@@ -51,12 +50,12 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 
 	InGameWidget->AddToViewport();
 
-	PlayerCharacter->GetQuickSlot().SetInventoryWidget(*InGameWidget->GetQuickSlotWidget());
+	PlayerCharacter->GetQuickSlot()->SetInventoryWidget(*InGameWidget->GetQuickSlotWidget());
 
-	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
+	UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
 
-	PlayerInventory.SetInventoryWidget(*InGameWidget->GetInventoryWidget());
-	PlayerInventory.SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
+	PlayerInventory->SetInventoryWidget(*InGameWidget->GetInventoryWidget());
+	PlayerInventory->SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
 	//TempMarchantCharacter = Cast<ANPCCharacter>(UGameplayStatics::GetActorOfClass(this, ANPCCharacter::StaticClass()));
 	//if (TempMarchantCharacter)
@@ -86,10 +85,10 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	}
 }
 
-UInGameWidget& AWWPlayerController::GetInGameWidget()
+UInGameWidget* AWWPlayerController::GetInGameWidget()
 {
 	check(InGameWidget);
-	return *InGameWidget;
+	return InGameWidget;
 }
 
 void AWWPlayerController::SetGameModeGameAndUI()
@@ -192,11 +191,11 @@ void AWWPlayerController::OnMPChanged()
 
 void AWWPlayerController::OpenAndCloseInventory()
 {
-	UCharacterInventory& PlayerInventory = PlayerCharacter->GetInventory();
+	UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
 
-	PlayerInventory.OpenAndCloseInventory();
+	PlayerInventory->OpenAndCloseInventory();
 	
-	if (PlayerInventory.IsInventoryVisible())
+	if (PlayerInventory->IsInventoryVisible())
 	{
 		SetShowMouseCursor(true);
 
@@ -226,42 +225,42 @@ void AWWPlayerController::OpenAndCloseInventory()
 
 void AWWPlayerController::UseQuickSlot0()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(0);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(0);
 }
 
 void AWWPlayerController::UseQuickSlot1()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(1);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(1);
 }
 
 void AWWPlayerController::UseQuickSlot2()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(2);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(2);
 }
 
 void AWWPlayerController::UseQuickSlot3()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(3);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(3);
 }
 
 void AWWPlayerController::UseQuickSlot4()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(4);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(4);
 }
 
 void AWWPlayerController::UseQuickSlot5()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(5);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(5);
 }
 
 void AWWPlayerController::UseQuickSlot6()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(6);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(6);
 }
 
 void AWWPlayerController::UseQuickSlot7()
 {
-	PlayerCharacter->GetQuickSlot().UseSlotItemFormSlotIndex(7);
+	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(7);
 }
 
 void AWWPlayerController::OnKeyEButtonPressed()
@@ -272,7 +271,7 @@ void AWWPlayerController::OnKeyEButtonPressed()
 		return;
 	}
 
-	UWorld& World = *PlayerCharacter->GetWorld();
+	UWorld* World = PlayerCharacter->GetWorld();
 	const FVector& Center = PlayerCharacter->GetActorLocation();
 	float DetectRadius = 200;
 
@@ -283,7 +282,7 @@ void AWWPlayerController::OnKeyEButtonPressed()
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, PlayerCharacter);
-	bool bResult = World.OverlapMultiByChannel(
+	bool bResult = World->OverlapMultiByChannel(
 		OverlapResults,
 		Center,
 		FQuat::Identity,
@@ -320,7 +319,7 @@ void AWWPlayerController::OnKeyEButtonPressed()
 
 		if (ActorTag == "Marchant")
 		{
-			DrawDebugSphere(&World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
+			DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.5);
 
 			SetShowMouseCursor(true);
 

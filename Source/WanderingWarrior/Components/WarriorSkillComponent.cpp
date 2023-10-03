@@ -438,22 +438,22 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 			FDamageEvent DamageEvent;
 			float DamageTaken = Character->TakeDamageWithLaunch(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Character->GetActorUpVector() * 700, true, JumpToGrundHeightLimit);
 
-			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (&PlayerController == false)
+			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (PlayerController == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageJumpToGrundSkill, &PlayerController == false"));
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
-			if (&PlayerInGameWidget == false)
+			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+			if (PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageJumpToGrundSkill, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 
@@ -545,22 +545,22 @@ void UWarriorSkillComponent::DamageKickAttack()
 			FDamageEvent DamageEvent;
 			float DamageTaken = Character->TakeDamageWithLaunch(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Character->GetActorUpVector() * 700, true, JumpToGrundHeightLimit);
 
-			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (&PlayerController == false)
+			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (PlayerController == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageKickAttack, &PlayerController == false"));
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
-			if (&PlayerInGameWidget == false)
+			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+			if (PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageKickAttack, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 		}
@@ -658,15 +658,15 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
-			if (&PlayerInGameWidget == false)
+			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+			if (PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMelee360Attack, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
@@ -763,15 +763,15 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
-			if (&PlayerInGameWidget == false)
+			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+			if (PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouAttackInternal, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			
 
@@ -864,15 +864,15 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController->GetInGameWidget();
-			if (&PlayerInGameWidget == false)
+			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+			if (PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageMusouFinishAttackInternal, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character->GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character->GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
@@ -962,22 +962,22 @@ void UWarriorSkillComponent::DamageParryAttackInternal()
 				return;
 			}
 
-			AWWPlayerController& PlayerController = *Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (&PlayerController == false)
+			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+			if (PlayerController == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageParryAttackInternal, &PlayerController == false"));
 				continue;
 			}
 
-			UInGameWidget& PlayerInGameWidget = PlayerController.GetInGameWidget();
-			if (&PlayerInGameWidget == false)
+			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+			if (PlayerInGameWidget == false)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageParryAttackInternal, &PlayerInGameWidget == false"));
 				continue;
 			}
 
-			PlayerInGameWidget.SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
-			PlayerInGameWidget.SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
+			PlayerInGameWidget->SetEnemyHPBarPercent(Character.GetCharacterStatComponent()->GetHPRatio());
+			PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(Character.GetCharacterName()));
 
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 		}
