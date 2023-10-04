@@ -30,12 +30,6 @@ public:
 	virtual void PlayMusouAttack(float PlayRate) override;
 	virtual void PlayParryAttack(float PlayRate) override;
 
-	void PlayJumpToGroundSkill(float PlayRate);
-	void PlayKickAttack(float PlayRate);
-	void PlayMelee360Attack(float PlayRate);
-	void PlayHurricaneKickAttack(float PlayRate);
-	void PlayParryAttackInternal(float PlayRate);
-
 	void ReadyToPlayMelee360AttackLastSection();
 	void ReadyToPlayMusouFinalAttack();
 
@@ -46,18 +40,6 @@ public:
 	virtual void DamageMusouFinishAttack() override;
 	virtual void DamageParryAttack() override;
 
-	void DamageJumpToGrundSkill();
-
-	void DamageKickAttack();
-
-	void DamageMelee360Attack();
-
-	void DamageMusouAttackInternal();
-
-	void DamageMusouFinishAttackInternal();
-
-	void DamageParryAttackInternal();
-
 	int32 GetMelee360AttackRepeatCount() const;
 	void SetMelee360AttackRepeatCount(int32 NewRepeatCount);
 
@@ -66,6 +48,19 @@ private:
 	void SetPlayerCameraFOV(float FOV);
 
 	void ShakeWithCameraFOV(float FOV, float Duration);
+
+	void PlayJumpToGroundSkill(float PlayRate);
+	void PlayKickAttack(float PlayRate);
+	void PlayMelee360Attack(float PlayRate);
+	void PlayHurricaneKickAttack(float PlayRate);
+	void PlayParryAttackInternal(float PlayRate);
+
+	void DamageJumpToGrundSkill();
+	void DamageKickAttack();
+	void DamageMelee360Attack();
+	void DamageMusouAttackInternal();
+	void DamageMusouFinishAttackInternal();
+	void DamageParryAttackInternal();
 
 private:
 

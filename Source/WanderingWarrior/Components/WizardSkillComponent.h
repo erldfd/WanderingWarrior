@@ -30,7 +30,8 @@ public:
 	virtual void PlayMusouAttack(float PlayRate) override;
 	virtual void PlayParryAttack(float PlayRate) override;
 
-	//void PlayJumpToGroundSkill(float PlayRate);
+	
+
 	//void PlayKickAttack(float PlayRate);
 	//void PlayMelee360Attack(float PlayRate);
 	//void PlayHurricaneKickAttack(float PlayRate);
@@ -46,7 +47,7 @@ public:
 	virtual void DamageMusouFinishAttack() override;
 	virtual void DamageParryAttack() override;
 
-	//void DamageJumpToGrundSkill();
+	
 
 	//void DamageKickAttack();
 
@@ -63,14 +64,25 @@ public:
 
 private:
 
-	//UPROPERTY(EditAnywhere, Category = Skill)
-	//float JumpToGrundRadius;
+	void PlayWizardSkill1(float PlayRate);
+	void PlayWizardSkill2(float PlayRate);
+	void PlayWizardSkill3(float PlayRate);
 
-	//UPROPERTY(EditAnywhere, Category = Skill)
-	//float JumpToGrundDamage;
+	void DamageWizardSkill1();
+	void DamageWizardSkill2();
+	void DamageWizardSkill3();
 
-	//UPROPERTY(EditAnywhere, Category = Skill)
-	//float JumpToGrundHeightLimit;
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float WizardSkill1Radius;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float WizardSkill1Damage;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float WizardSkill1HeightLimit;
 
 	//UPROPERTY(EditAnywhere, Category = Skill)
 	//float KickAttackRange;

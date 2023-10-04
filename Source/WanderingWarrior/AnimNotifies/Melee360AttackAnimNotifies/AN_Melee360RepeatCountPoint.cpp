@@ -56,7 +56,7 @@ void UAN_Melee360RepeatCountPoint::BranchingPointNotify(FBranchingPointNotifyPay
 		return;
 	}
 
-	SkillComp->DamageMelee360Attack();
+	SkillComp->DamageChargeAttack3();
 	CurrentRepeatCount++;
 
 	if (SkillComp->GetMelee360AttackRepeatCount() == CurrentRepeatCount)

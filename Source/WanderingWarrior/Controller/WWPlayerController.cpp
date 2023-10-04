@@ -43,6 +43,8 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 		return;
 	}
 
+	PlayerCharacter->SetIsPlayer(true);
+
 	CharacterStat = PlayerCharacter->GetCharacterStatComponent();
 
 	InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);

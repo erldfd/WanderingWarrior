@@ -69,6 +69,9 @@ public:
 	bool GetIsInvincible();
 	void SetIsInvincible(bool bNewIsInvincible);
 
+	bool GetIsPlayer();
+	void SetIsPlayer(bool bNewIsPlayer);
+
 public:
 
 	virtual void DoChargeAttack();
@@ -117,12 +120,6 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	//void InputMoveForward(float Value);
-	//void MoveForward(float Value);
-
-	//void InputMoveRight(float Value);
-	//void MoveRight(float Value);
-
 	void TestAction();
 
 	void StartKnockback(FVector Velocity, float Duration);
@@ -160,6 +157,7 @@ protected:
 	uint8 bIsParrySucceeded : 1;
 	uint8 bWillPlayChargeAttack2 : 1;
 	uint8 bWillPlayChargeAttack3 : 1;
+	uint8 bIsPlayer : 1;
 
 private:
 	

@@ -60,4 +60,5 @@ UENUM()
 enum class ESkillCompType : uint8
 {
 	WarriorSkillComponent,
+	WizardSkillComponent
 };

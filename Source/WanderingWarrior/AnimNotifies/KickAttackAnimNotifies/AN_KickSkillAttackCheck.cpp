@@ -44,5 +44,5 @@ void UAN_KickSkillAttackCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 		return;
 	}
 
-	SkillComp->DamageKickAttack();
+	SkillComp->DamageChargeAttack2();
 }

@@ -22,31 +22,10 @@ void UANS_JumpToGroundSkillWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, U
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
-	/*APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	if (Player == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyEnd, Player == nullptr"));
-		return;
-	}
-
-	UWarriorSkillComponent* SkillComp = Cast<UWarriorSkillComponent>(Player->GetSkillComponenet());
-	if (SkillComp == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyEnd, SkillComp == nullptr"));
-		return;
-	}
-
-	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
-	if (AnimInstance == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyEnd, AnimInstance == nullptr"));
-		return;
-	}*/
-
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyEnd, Player == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyEnd, Character == nullptr"));
 		return;
 	}
 
@@ -70,5 +49,4 @@ void UANS_JumpToGroundSkillWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, U
 	}
 
 	SkillComp->SetIsChargeAttack1Started(false);
-	//AnimInstance->StopAllMontages(0);
 }

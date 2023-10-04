@@ -3,27 +3,13 @@
 
 #include "AnimNotifies/JumpToGroundAnimNotifies/AN_JumpToGroundAttackCheck.h"
 
-#include "Character/PlayerCharacter.h"
+#include "Character/WWCharacter.h"
 #include "Components/WarriorSkillComponent.h"
 #include "WWEnumClassContainer.h"
 
 void UAN_JumpToGroundAttackCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
-
-	/*APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	if (Player == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UAN_JumpToGroundAttackCheck::Notify, Player == nullptr"));
-		return;
-	}
-
-	UWarriorSkillComponent* SkillComp = Player->GetSkillComponenet();
-	if (SkillComp == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UAN_JumpToGroundAttackCheck::Notify, SkillComp == nullptr"));
-		return;
-	}*/
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
@@ -44,5 +30,5 @@ void UAN_JumpToGroundAttackCheck::Notify(USkeletalMeshComponent* MeshComp, UAnim
 		return;
 	}
 
-	SkillComp->DamageJumpToGrundSkill();
+	SkillComp->DamageChargeAttack1();
 }

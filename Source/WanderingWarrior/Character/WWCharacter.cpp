@@ -474,6 +474,16 @@ void AWWCharacter::SetIsInvincible(bool bNewIsInvincible)
 	bIsInvincible = bNewIsInvincible;
 }
 
+bool AWWCharacter::GetIsPlayer()
+{
+	return bIsPlayer;
+}
+
+void AWWCharacter::SetIsPlayer(bool bNewIsPlayer)
+{
+	bIsPlayer = bNewIsPlayer;
+}
+
 void AWWCharacter::StartKnockback(FVector Velocity, float Duration)
 {
 	bIsKnockbackStarted = true;

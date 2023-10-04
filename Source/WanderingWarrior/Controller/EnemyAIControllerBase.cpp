@@ -3,6 +3,8 @@
 
 #include "Controller/EnemyAIControllerBase.h"
 
+#include "Character/WWCharacter.h"
+
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -14,6 +16,15 @@ const FName AEnemyAIControllerBase::TargetKey(TEXT("Target"));
 void AEnemyAIControllerBase::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	AWWCharacter* PossessedCharacter = Cast<AWWCharacter>(InPawn);
+	if (PossessedCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AEnemyAIControllerBase::OnPossess, PossessedCharacter == nullptr"));
+		return;
+	}
+
+	PossessedCharacter->SetIsPlayer(false);
 
 	if (UseBlackboard(BBEnemyAI, (UBlackboardComponent*&)Blackboard))
 	{
