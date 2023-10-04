@@ -37,7 +37,7 @@ public:
 	class UWWAnimInstance* GetAnimInstance() const;
 
 	virtual void Attack();
-	void AttackCheck();
+	virtual void AttackCheck();
 
 	UFUNCTION(BlueprintCallable)
 	class UCharacterStatComponent* GetCharacterStatComponent();

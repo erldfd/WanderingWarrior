@@ -19,4 +19,11 @@ class WANDERINGWARRIOR_API AWizardCharacter : public AWWCharacter
 public: 
 
 	AWizardCharacter();
+
+	virtual void AttackCheck() override;
+
+private:
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class AMagicBall> NormalAttackMagicBall;
 };
