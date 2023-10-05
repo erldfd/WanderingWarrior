@@ -31,10 +31,6 @@ public:
 	virtual void PlayParryAttack(float PlayRate) override;
 
 	
-
-	//void PlayKickAttack(float PlayRate);
-	//void PlayMelee360Attack(float PlayRate);
-	//void PlayHurricaneKickAttack(float PlayRate);
 	//void PlayParryAttackInternal(float PlayRate);
 
 	//void ReadyToPlayMelee360AttackLastSection();
@@ -47,15 +43,7 @@ public:
 	virtual void DamageMusouFinishAttack() override;
 	virtual void DamageParryAttack() override;
 
-	
-
-	//void DamageKickAttack();
-
-	//void DamageMelee360Attack();
-
-	//void DamageMusouAttackInternal();
-
-	//void DamageMusouFinishAttackInternal();
+	void DamageWizardSkill3JumpAttack();
 
 	//void DamageParryAttackInternal();
 
@@ -67,11 +55,14 @@ private:
 	void PlayWizardSkill1(float PlayRate);
 	void PlayWizardSkill2(float PlayRate);
 	void PlayWizardSkill3(float PlayRate);
+	void PlayWizardMusouAttack(float PlayRate);
 
 	void DamageWizardSkill1();
 	void DamageWizardSkill2();
 	void DamageWizardSkill3();
 
+	void DamageWizardMusouAttack();
+	void DamageWizardMusouFinalAttack();
 
 private:
 
@@ -83,6 +74,24 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Skill)
 	float WizardSkill1HeightLimit;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class AMagicBall> WizardSkill2MagicBall;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class AMagicBall> WizardSkill3MagicBall;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float WizardSkill3JumpDamage;
+
+	UPROPERTY(EditAnywhere, Category = Skill)
+	float WizardSkill3HeightLimit;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class AMagicBall> WizardMusouSmallMagicBall;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class AMagicBall> WizardMusouBigMagicBall;
 
 	//UPROPERTY(EditAnywhere, Category = Skill)
 	//float KickAttackRange;

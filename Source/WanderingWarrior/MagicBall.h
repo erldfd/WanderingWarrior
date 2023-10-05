@@ -30,12 +30,18 @@ public:
 
 	void SetOwner(AActor* NewOwner);
 
+	void SetLifeTime(float NewLifeTime);
+	void SetIsTargetChasing(bool bNewIsTargetChasing);
+	void SetFlySpeed(float NewFlySpeed);
+
 private:
 
 	UFUNCTION(BlueprintCallable)
 	void OnBeginOverlap(AActor* OverlappedActor);
 
 	void DamageExplosive();
+
+	void DestroyMagicBall();
 
 private:
 
@@ -68,4 +74,7 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UParticleSystem> HitParticle;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	float LifeTime;
 };

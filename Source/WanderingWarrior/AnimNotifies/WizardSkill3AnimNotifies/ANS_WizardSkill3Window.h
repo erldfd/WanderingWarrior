@@ -6,13 +6,13 @@
 
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 
-#include "ANS_MusouTotalWindow.generated.h"
+#include "ANS_WizardSkill3Window.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API UANS_MusouTotalWindow : public UAnimNotifyState
+class WANDERINGWARRIOR_API UANS_WizardSkill3Window : public UAnimNotifyState
 {
 	GENERATED_BODY()
 	

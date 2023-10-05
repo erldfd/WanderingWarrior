@@ -17,6 +17,7 @@ AMagicBall::AMagicBall()
 	ExplosionDamage = 20;
 	ExplosionRadius = 32;
 	FlySpeed = 10;
+	LifeTime = 4;
 }
 
 void AMagicBall::BeginPlay()
@@ -28,7 +29,15 @@ void AMagicBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector MyLocation = GetActorLocation();
+	LifeTime -= DeltaTime;
+
+	if (LifeTime <= 0)
+	{
+		DestroyMagicBall();
+		return;
+	}
+
+	const FVector& MyLocation = GetActorLocation();
 
 	if (bIsTargetChasing && TargetActor)
 	{
@@ -47,18 +56,8 @@ void AMagicBall::Tick(float DeltaTime)
 		
 		if (Tolerance.X < 1 && Tolerance.Y < 1 && Tolerance.Z < 1)
 		{
-			if (bIsExplosible)
-			{
-				DamageExplosive();
-			}
-			
-			UWorld* World = GetWorld();
-			if (HitParticle && World)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(World, HitParticle, GetActorTransform());
-			}
-
-			Destroy();
+			DestroyMagicBall();
+			return;
 		}
 	}
 }
@@ -85,6 +84,10 @@ void AMagicBall::FlyToTargetLocation(const FVector& NewTargetLocation)
 	Velocity = NewTargetLocation - GetActorLocation();
 	Velocity.Normalize();
 	Velocity = Velocity * FlySpeed;
+
+	const FVector LookVector = TargetLocation - GetActorLocation();
+	const FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
+	SetActorRotation(TargetRot);
 }
 
 void AMagicBall::SetOwner(AActor* NewOwner)
@@ -92,9 +95,23 @@ void AMagicBall::SetOwner(AActor* NewOwner)
 	Owner = NewOwner;
 }
 
+void AMagicBall::SetLifeTime(float NewLifeTime)
+{
+	LifeTime = NewLifeTime;
+}
+
+void AMagicBall::SetIsTargetChasing(bool bNewIsTargetChasing)
+{
+	bIsTargetChasing = bNewIsTargetChasing;
+}
+
+void AMagicBall::SetFlySpeed(float NewFlySpeed)
+{
+	FlySpeed = NewFlySpeed;
+}
+
 void AMagicBall::OnBeginOverlap(AActor* OverlappedActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AMagicBall::OnBeginOverlap, OverlapActor : %s"), *OverlappedActor->GetName());
 	AWWCharacter* OverlappedCharacter = Cast<AWWCharacter>(OverlappedActor);
 	if (OverlappedCharacter == nullptr)
 	{
@@ -120,17 +137,7 @@ void AMagicBall::OnBeginOverlap(AActor* OverlappedActor)
 		return;
 	}
 
-	if (HitParticle)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(World, HitParticle, GetActorTransform());
-	}
-
-	if (bIsExplosible)
-	{
-		DamageExplosive();
-	}
-
-	Destroy();
+	DestroyMagicBall();
 }
 
 void AMagicBall::DamageExplosive()
@@ -186,4 +193,20 @@ void AMagicBall::DamageExplosive()
 		FDamageEvent DamageEvent;
 		DamagedCharacter->TakeDamageWithKnockback(ExplosionDamage, DamageEvent, Owner->GetInstigatorController(), Owner, KnockbackVelocity, KnockbackDuration, true);
 	}
+}
+
+void AMagicBall::DestroyMagicBall()
+{
+	if (bIsExplosible)
+	{
+		DamageExplosive();
+	}
+
+	UWorld* World = GetWorld();
+	if (HitParticle && World)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(World, HitParticle, GetActorTransform());
+	}
+
+	Destroy();
 }

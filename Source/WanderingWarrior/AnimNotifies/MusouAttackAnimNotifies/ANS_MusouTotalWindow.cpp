@@ -38,7 +38,7 @@ void UANS_MusouTotalWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyEnd, Player == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyEnd, Character == nullptr"));
 		return;
 	}
 
