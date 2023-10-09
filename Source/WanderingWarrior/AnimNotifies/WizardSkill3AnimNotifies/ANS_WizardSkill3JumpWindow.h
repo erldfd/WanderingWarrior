@@ -31,6 +31,5 @@ private:
 	float JumpHeight;
 
 	float JumpElapsedTime;
-	float JumpGoalHeight;
 	float StartHeight;
 };

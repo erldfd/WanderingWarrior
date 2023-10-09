@@ -16,6 +16,41 @@ void UANS_JumpToGroundSkillWindow::NotifyBegin(USkeletalMeshComponent* MeshComp,
 void UANS_JumpToGroundSkillWindow::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyTick, Character == nullptr"));
+		return;
+	}
+
+	UWarriorSkillComponent* SkillComp = nullptr;
+	if (Character->GetSkillCompType() == ESkillCompType::WarriorSkillComponent)
+	{
+		SkillComp = Cast<UWarriorSkillComponent>(Character->GetSkillComponent());
+	}
+
+	if (SkillComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyTick, SkillComp == nullptr"));
+		return;
+	}
+
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyTick, AnimInstance == nullptr"));
+		return;
+	}
+
+	if (AnimInstance->GetBeingStunned())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyTick, AnimInstance->GetBeingStunned()"));
+		SkillComp->SetIsChargeAttack1Started(false);
+		AnimInstance->StopAllMontages(1);
+		return;
+	}
+	
 }
 
 void UANS_JumpToGroundSkillWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

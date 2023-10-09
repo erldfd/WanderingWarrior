@@ -46,10 +46,12 @@ void UBTTask_ChargeAttack2::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	if (Character->GetComboCount() < 1)
 	{
 		Character->Attack();
+		//FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 	}
 	else if (Character->GetWillPlayChargeAttack2() == false)
 	{
 		Character->DoChargeAttack();
+		//FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 	}
 	else if (Character->GetSkillComponent()->GetIsChargeAttack2Started() == false)
 	{

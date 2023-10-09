@@ -30,6 +30,11 @@ void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
+	if (AnimTimer > 0)
+	{
+		AnimTimer -= DeltaSeconds;
+	}
+
 	APawn* Pawn = TryGetPawnOwner();
 
 	if (IsValid(Pawn))
@@ -41,12 +46,20 @@ void UWWAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		if (Character)
 		{
 			bIsInAir = Character->GetMovementComponent()->IsFalling();
-
-			if (Cast<AEnemyCharacter>(Character) == nullptr)
-			{
-				return;
-			}
 		}
+	}
+
+//	UE_LOG(LogTemp, Warning, TEXT("IsInAir : %d, IsHitAndFly :%d, IsDead : %d, MontageIsPlaying : %d"), bIsInAir, bIsHitAndFly, bIsDead, Montage_IsPlaying(FallenToStandMontage));
+	if (AnimTimer > 0)
+	{
+		return;
+	}
+
+	if (bIsInAir == false && bIsHitAndFly && bIsDead == false && Montage_IsPlaying(FallenToStandMontage) == false)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("IN IsInAir : %d, IsHitAndFly :%d, IsDead : %d, MontageIsPlaying : %d"), bIsInAir, bIsHitAndFly, bIsDead, Montage_IsPlaying(FallenToStandMontage));
+		Montage_Play(FallenToStandMontage, 1);
+		AnimTimer = 1;
 	}
 }
 
@@ -76,9 +89,10 @@ bool UWWAnimInstance::GetHitAndFly() const
 	return bIsHitAndFly;
 }
 
-void UWWAnimInstance::SetHitAndFly(bool NewHitAndFly)
+void UWWAnimInstance::SetHitAndFly(bool bNewHitAndFly)
 {
-	bIsHitAndFly = NewHitAndFly;
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::SetHitAndFly : %d"), bNewHitAndFly)
+	bIsHitAndFly = bNewHitAndFly;
 }
 
 bool UWWAnimInstance::GetIsAttackDetected() const
@@ -355,6 +369,17 @@ void UWWAnimInstance::AnimNotify_WarriorIdleStart()
 void UWWAnimInstance::AnimNotify_WarriorRunStart()
 {
 	SetIsIdleOrRun(true);
+}
+
+void UWWAnimInstance::AnimNotify_IdleOrRun()
+{
+	SetIsIdleOrRun(true);
+}
+
+void UWWAnimInstance::AnimNotify_WizardHitAndFlyEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::AnimNotify_WizardHitAndFlyEnd"));
+	bIsHitAndFly = false;
 }
 
 void UWWAnimInstance::InitBoolCondition()

@@ -52,7 +52,7 @@ public:
 	void SetIsPlayingCharacterHitMontage(bool bIsPlaying);
 
 	bool GetHitAndFly() const;
-	void SetHitAndFly(bool NewHitAndFly);
+	void SetHitAndFly(bool bNewHitAndFly);
 
 	bool GetIsAttackDetected() const;
 	void SetDetectedAttack(bool NewDetectedAttack);
@@ -142,6 +142,12 @@ private:
 	UFUNCTION()
 	void AnimNotify_WarriorRunStart();
 
+	UFUNCTION()
+	void AnimNotify_IdleOrRun();
+
+	UFUNCTION()
+	void AnimNotify_WizardHitAndFlyEnd();
+
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Meta = (AllowPrivateAccess = true))
@@ -194,6 +200,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Anim, Meta = (AllowPrivateAccess = true))
 	TObjectPtr<UAnimMontage> GuardHitReaction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, Meta = (AllowPrivateAccess = true))
+	TObjectPtr<UAnimMontage> FallenToStandMontage;
+
 	int32 ComboCount;
 
 	int32 ChargeAttack3ComboCount;
@@ -208,4 +217,6 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = VisualEffect)
 	TObjectPtr<UParticleSystem> PS_WaterSplash;
+
+	float AnimTimer;
 };

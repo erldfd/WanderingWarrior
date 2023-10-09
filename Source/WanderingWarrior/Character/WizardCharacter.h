@@ -22,6 +22,10 @@ public:
 
 	virtual void AttackCheck() override;
 
+protected:
+
+	virtual void BeginPlay() override;
+
 private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))

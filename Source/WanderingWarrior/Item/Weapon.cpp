@@ -51,12 +51,6 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		return;
 	}
 
-	ABossCharacter* Boss = Cast<ABossCharacter>(OtherActor);
-	if (Boss) 
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Boss"));
-	}
-
 	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(OtherActor);
 	if (EnemyCharacter == nullptr)
 	{

@@ -16,32 +16,45 @@ void UANS_KickSkillWindow::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSe
 void UANS_KickSkillWindow::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyTick, Player == nullptr"));
+		return;
+	}
+
+	UWarriorSkillComponent* SkillComp = nullptr;
+	if (Character->GetSkillCompType() == ESkillCompType::WarriorSkillComponent)
+	{
+		SkillComp = Cast<UWarriorSkillComponent>(Character->GetSkillComponent());
+	}
+
+	if (SkillComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyTick, SkillComp == nullptr"));
+		return;
+	}
+
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyTick, AnimInstance == nullptr"));
+		return;
+	}
+
+	if (AnimInstance->GetBeingStunned())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyTick, AnimInstance->GetBeingStunned()"));
+		SkillComp->SetIsChargeAttack2Started(false);
+		AnimInstance->StopAllMontages(1);
+		return;
+	}
 }
 
 void UANS_KickSkillWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
-
-	//APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	//if (Player == nullptr)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, Player == nullptr"));
-	//	return;
-	//}
-
-	//UWarriorSkillComponent* SkillComp = Cast<UWarriorSkillComponent>(Player->GetSkillComponenet());
-	//if (SkillComp == nullptr)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, SkillComp == nullptr"));
-	//	return;
-	//}
-
-	//UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
-	//if (AnimInstance == nullptr)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, AnimInstance == nullptr"));
-	//	return;
-	//}
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
@@ -68,7 +81,8 @@ void UANS_KickSkillWindow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequ
 		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, AnimInstance == nullptr"));
 		return;
 	}
-	AnimInstance->SetIsPlayingCharacterHitMontage(false);
+
+	//AnimInstance->SetIsPlayingCharacterHitMontage(false);
 	SkillComp->SetIsChargeAttack2Started(false);
 	//AnimInstance->StopAllMontages(1);
 }

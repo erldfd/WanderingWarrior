@@ -83,7 +83,7 @@ void AMagicBall::FlyToTargetLocation(const FVector& NewTargetLocation)
 	TargetLocation = NewTargetLocation;
 	Velocity = NewTargetLocation - GetActorLocation();
 	Velocity.Normalize();
-	Velocity = Velocity * FlySpeed;
+	Velocity *= FlySpeed;
 
 	const FVector LookVector = TargetLocation - GetActorLocation();
 	const FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();

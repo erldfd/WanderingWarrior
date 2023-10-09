@@ -111,44 +111,6 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 		return Damage;
 	}
 
-	//AWWCharacter* DamageCauserCharacter = Cast<AWWCharacter>(DamageCauser);
-	//
-	//if (DamageCauserCharacter && DamageCauserCharacter->GetComboCount() == 3)
-	//{
-	//	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	//	AnimInstance->StopAllMontages(0);
-	//	GetAnimInstance().SetHitAndFly(true);
-	//	
-
-	//	//MoveDir.Z = -10.0f;
-	//	//StartHitFly(MoveDir, 0.5f, 200, 200, 45);
-
-	//	/*UE_LOG(LogTemp, Warning, TEXT("Tan %f : %f"), 45.0f, FMath::Tan(FMath::DegreesToRadians(45.0f)));
-	//	MoveDir.Z = 1.1;
-	//	StartKnockback(MoveDir, 500, 0.2);*/
-
-	//	/*float LaunchStrength = 300;
-	//	MoveDir.Z = 1;
-
-	//	LaunchCharacter(MoveDir * LaunchStrength, false, false);*/
-
-	//	float LaunchStrength = 1000;
-	//	float Angle = 30;
-	//	MoveDir.Z = MoveDir.Size() * FMath::Tan(FMath::DegreesToRadians(80));
-	//	MoveDir.Normalize();
-	//	LaunchCharacter(MoveDir * LaunchStrength, false, false);
-	//}
-	//else
-	//{
-	//	MoveDir.Z = 0;
-	//	StartKnockback(MoveDir, 1000, 0.1);
-	//	
-	//	//LaunchCharacter(MoveDir * 1000, false, false);
-
-	//	/*MoveDir.Z = 4;
-	//	StartKnockback(MoveDir, 300, 0.2);*/
-	//}
-
 	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamage, Damage : %f, ActorHP : %f, Actor : %s"), Damage, HPAfterDamage, *GetName());
 	return Damage;
 }
@@ -156,6 +118,21 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 float AWWCharacter::TakeDamageWithLaunch(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FVector LaunchVelocity, bool bIsInitializedVelocity, float MaxHeight)
 {
 	float Damage = TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	USkillComponentBase* SkillComp = GetSkillComponent();
+	if (SkillComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamageWithLaunch, SkillComp == nullptr"));
+		return Damage;
+	}
+
+	bool bIsPlayingSkill = SkillComp->GetIsChargeAttack1Started() || SkillComp->GetIsChargeAttack2Started() || SkillComp->GetIsChargeAttack3Started() || SkillComp->GetIsMusouAttackStarted() || SkillComp->GetIsParrying();
+	bool bIsGettingUp = AnimInstance->GetHitAndFly() && (GetMovementComponent()->IsFalling() == false);
+
+	if (Damage <= 0.0f || bIsPlayingSkill || bIsGettingUp)
+	{
+		return 0.0f;
+	}
 
 	if (bIsInitializedVelocity)
 	{
@@ -172,12 +149,13 @@ float AWWCharacter::TakeDamageWithKnockback(float DamageAmount, FDamageEvent con
 	float Damage = TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	bool bIsPlayingSkill = GetSkillComponent()->GetIsChargeAttack1Started() || GetSkillComponent()->GetIsChargeAttack2Started() || GetSkillComponent()->GetIsChargeAttack3Started() || GetSkillComponent()->GetIsMusouAttackStarted() || GetSkillComponent()->GetIsParrying();
-	if (bWillPlayHitReaction && Damage > 0.0f && bIsPlayingSkill == false)
+	bool bIsGettingUp = AnimInstance->GetHitAndFly() && (GetMovementComponent()->IsFalling() == false);
+
+	if (bWillPlayHitReaction && Damage > 0.0f && bIsPlayingSkill == false && bIsGettingUp == false)
 	{
 		AnimInstance->PlayCharacterHitMontage();
+		StartKnockback(NewKnockbackVelocity, KnockbackDuration);
 	}
-
-	StartKnockback(NewKnockbackVelocity, KnockbackDuration);
 
 	return Damage;
 }

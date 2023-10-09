@@ -47,4 +47,8 @@ void UBTTask_MusouAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
+	else
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
+	}
 }

@@ -5,7 +5,7 @@
 
 #include "Character/WWCharacter.h"
 #include "Controller/EnemyAIController.h"
-#include "Components/WarriorSkillComponent.h"
+#include "Components/SkillComponentBase.h"
 #include "WWAnimInstance.h"
 
 UBTTask_ChargeAttack1::UBTTask_ChargeAttack1()
@@ -46,5 +46,9 @@ void UBTTask_ChargeAttack1::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* N
 	if (Character->GetSkillComponent()->GetIsChargeAttack1Started() == false)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+	}
+	else 
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 	}
 }

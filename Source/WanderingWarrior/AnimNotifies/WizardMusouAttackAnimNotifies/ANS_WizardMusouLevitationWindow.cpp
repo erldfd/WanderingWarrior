@@ -5,6 +5,7 @@
 
 #include "Character/WWCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Controller/EnemyAIControllerBase.h"
 
 void UANS_WizardMusouLevitationWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& BranchingPointPayload)
 {
@@ -23,24 +24,16 @@ void UANS_WizardMusouLevitationWindow::BranchingPointNotifyBegin(FBranchingPoint
 	StartHeight = Character->GetActorLocation().Z;
 	DefaultGravityScale = Character->GetCharacterMovement()->GravityScale;
 	Character->GetCharacterMovement()->GravityScale = 0;
+
+	if (Character->GetIsPlayer())
+	{
+		return;
+	}
 }
 
 void UANS_WizardMusouLevitationWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
 {
 	Super::BranchingPointNotifyTick(BranchingPointPayload, FrameDeltaTime);
-
-	ElapsedTime += FrameDeltaTime;
-
-	float CurrentHeight;
-
-	if (ElapsedTime < MaxLevitationHeightReachTime)
-	{
-		CurrentHeight = StartHeight + MaxLevitationHeight / MaxLevitationHeightReachTime * ElapsedTime;
-	}
-	else
-	{
-		CurrentHeight = MaxLevitationHeight;
-	}
 
 	USkeletalMeshComponent* Mesh = BranchingPointPayload.SkelMeshComponent;
 
@@ -49,6 +42,19 @@ void UANS_WizardMusouLevitationWindow::BranchingPointNotifyTick(FBranchingPointN
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardMusouLevitationWindow::BranchingPointNotifyTick, Character == nullptr"));
 		return;
+	}
+
+	ElapsedTime += FrameDeltaTime;
+
+	float CurrentHeight;
+
+	if (ElapsedTime < MaxLevitationHeightReachTime)
+	{
+		CurrentHeight = StartHeight + (MaxLevitationHeight) / MaxLevitationHeightReachTime * ElapsedTime;
+	}
+	else
+	{
+		CurrentHeight = StartHeight + MaxLevitationHeight;
 	}
 
 	FVector CharacterLocation = Character->GetActorLocation();

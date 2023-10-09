@@ -23,7 +23,7 @@ void UANS_WizardMusouWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayloa
 	Super::BranchingPointNotifyEnd(BranchingPointPayload);
 
 	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
-	UE_LOG(LogTemp, Warning, TEXT("UANS_WizardMusouWindow::BranchingPointNotifyEnd, Character == nullptr"));
+
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
 	{

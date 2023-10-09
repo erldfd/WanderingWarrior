@@ -43,11 +43,13 @@ void UBTTask_ComboAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Nod
 	if (Character->GetComboCount() > 0)
 	{
 		Character->Attack();
+		//FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 		return;
 	}
 
 	if (Character->GetIsAttacking())
 	{
+		//FinishLatentTask(OwnerComp, EBTNodeResult::InProgress);
 		return;
 	}
 

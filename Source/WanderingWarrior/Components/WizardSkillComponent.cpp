@@ -469,7 +469,7 @@ void UWizardSkillComponent::DamageWizardSkill2()
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5;
 
-	DrawDebugCapsule(GetWorld(), Center, HalfHeight, DetectRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
+	//DrawDebugCapsule(GetWorld(), Center, HalfHeight, DetectRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
 
 	if (bResult)
 	{
@@ -538,7 +538,7 @@ void UWizardSkillComponent::DamageWizardSkill3()
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5;
 
-	DrawDebugCapsule(GetWorld(), Center, HalfHeight, DetectRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
+	//DrawDebugCapsule(GetWorld(), Center, HalfHeight, DetectRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
 
 	if (bResult)
 	{
@@ -623,7 +623,7 @@ void UWizardSkillComponent::DamageWizardMusouAttack()
 			const FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 			OwnerCharacter->SetActorRotation(TargetRot);
 
-			MagicBall->FlyToTargetActor(HitCharacter, false);
+			MagicBall->FlyToTargetActor(HitCharacter, true);
 		}
 	}
 	else
@@ -701,7 +701,7 @@ void UWizardSkillComponent::DamageWizardMusouFinalAttack()
 			const FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 			OwnerCharacter->SetActorRotation(TargetRot);
 
-			MagicBall->FlyToTargetActor(HitCharacter, false);
+			MagicBall->FlyToTargetActor(HitCharacter, true);
 		}
 	}
 	else

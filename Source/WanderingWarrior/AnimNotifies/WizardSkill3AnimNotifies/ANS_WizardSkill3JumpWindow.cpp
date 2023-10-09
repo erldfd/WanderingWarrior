@@ -20,7 +20,6 @@ void UANS_WizardSkill3JumpWindow::BranchingPointNotifyBegin(FBranchingPointNotif
 	}
 
 	StartHeight = Character->GetActorLocation().Z;
-	JumpGoalHeight = StartHeight + JumpHeight;
 	JumpElapsedTime = 0;
 }
 
@@ -35,20 +34,25 @@ void UANS_WizardSkill3JumpWindow::BranchingPointNotifyTick(FBranchingPointNotify
 		JumpElapsedTime = JumpDuration;
 	}
 
-	float CurrentHeight = StartHeight + (-4 * JumpGoalHeight * JumpElapsedTime / (JumpDuration * JumpDuration)) * (JumpElapsedTime - JumpDuration);
+	float CurrentHeight = StartHeight + (-4 * JumpHeight * JumpElapsedTime / (JumpDuration * JumpDuration)) * (JumpElapsedTime - JumpDuration);
 
+	if (CurrentHeight < StartHeight)
+	{
+		CurrentHeight = StartHeight;
+	}
+	
 	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardSkill3JumpWindow::BranchingPointNotifyBegin, Character == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardSkill3JumpWindow::BranchingPointNotifyTick, Character == nullptr"));
 		return;
 	}
 
 	FVector CharacterLocation = Character->GetActorLocation();
 	CharacterLocation.Z = CurrentHeight;
-	Character->SetActorLocation(CharacterLocation);
+	Character->SetActorLocation(CharacterLocation, true);
 }
 
 void UANS_WizardSkill3JumpWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& BranchingPointPayload)

@@ -60,7 +60,7 @@ void AWizardCharacter::AttackCheck()
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5;
 
-	DrawDebugCapsule(GetWorld(), Center, HalfHeight, DetectRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
+	//DrawDebugCapsule(GetWorld(), Center, HalfHeight, DetectRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
 
 	if (bResult)
 	{
@@ -74,4 +74,10 @@ void AWizardCharacter::AttackCheck()
 	{
 		MagicBall->FlyToTargetLocation(GetActorLocation() + TraceVector);
 	}
+}
+
+void AWizardCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
 }

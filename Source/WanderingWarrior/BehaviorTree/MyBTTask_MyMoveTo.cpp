@@ -6,6 +6,7 @@
 #include "Controller/EnemyAIController.h"
 #include "Character/WWCharacter.h"
 #include "WWAnimInstance.h"
+#include "Components/SkillComponentBase.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -55,6 +56,12 @@ void UMyBTTask_MyMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
 	float DistanceToTarget = Target->GetDistanceTo(ThisCharacter);
 	bool bResult = (DistanceToTarget <= AttackRange);
 	
+	if (ThisCharacter->GetSkillComponent()->IsSkillStarted())
+	{
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
+
 	if (bResult || AnimInstance->GetBeingStunned() || AnimInstance->GetIsDead() || AnimInstance->GetIsIdleOrRun() == false)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);

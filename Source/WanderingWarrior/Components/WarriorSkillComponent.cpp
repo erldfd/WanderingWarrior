@@ -639,9 +639,9 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 			Dir = Dir * DirectionVectorMultiplier;
 
 			float HeightLimit = Melee360AttackHeightLimit;
-			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit;
-			DamagedCharacter->Launch(Dir, HeightLimit);
-
+			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit - DamagedCharacter->GetActorLocation().Z;
+			//DamagedCharacter->Launch(Dir, HeightLimit);
+			UE_LOG(LogTemp, Warning, TEXT("Dir : %s, Target : %s, Damaged : %s"), *Dir.ToString(), *TargetLocation.ToString(), *DamagedCharacter->GetActorLocation().ToString());
 			FDamageEvent DamageEvent;
 			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
 
@@ -742,7 +742,7 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 			Dir = Dir * DirectionVectorMultiplier;
 
 			float HeightLimit = MusouAttackHeightLimit;
-			Dir.Z = OwnerCharacter->GetActorLocation().Z + HeightLimit;
+			Dir.Z = OwnerCharacter->GetActorLocation().Z + HeightLimit - DamagedCharacter->GetActorLocation().Z;
 
 			FDamageEvent DamageEvent;
 			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
@@ -847,7 +847,7 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 			Dir = Dir * DirectionVectorMultiplier;
 
 			float HeightLimit = 600;
-			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit;
+			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit - DamagedCharacter->GetActorLocation().Z;
 
 			FDamageEvent DamageEvent;
 			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
