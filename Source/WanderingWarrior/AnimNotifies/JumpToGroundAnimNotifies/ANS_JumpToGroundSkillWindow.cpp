@@ -48,6 +48,7 @@ void UANS_JumpToGroundSkillWindow::NotifyTick(USkeletalMeshComponent* MeshComp, 
 		UE_LOG(LogTemp, Warning, TEXT("UANS_JumpToGroundSkillWindow::NotifyTick, AnimInstance->GetBeingStunned()"));
 		SkillComp->SetIsChargeAttack1Started(false);
 		AnimInstance->StopAllMontages(1);
+
 		return;
 	}
 	

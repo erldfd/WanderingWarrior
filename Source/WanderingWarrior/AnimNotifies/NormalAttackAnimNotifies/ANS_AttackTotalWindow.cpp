@@ -4,6 +4,7 @@
 #include "AnimNotifies/NormalAttackAnimNotifies/ANS_AttackTotalWindow.h"
 
 #include "Character/WWCharacter.h"
+#include "WWAnimInstance.h"
 
 void UANS_AttackTotalWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& BranchingPointPayload)
 {
@@ -13,6 +14,33 @@ void UANS_AttackTotalWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayl
 void UANS_AttackTotalWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
 {
 	Super::BranchingPointNotifyTick(BranchingPointPayload, FrameDeltaTime);
+
+	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_AttackTotalWindow::BranchingPointNotifyTick, Character == nullptr"));
+		return;
+	}
+
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_AttackTotalWindow::BranchingPointNotifyTick, AnimInstance == nullptr"));
+		return;
+	}
+
+	if (AnimInstance->GetBeingStunned())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_AttackTotalWindow::BranchingPointNotifyTick, AnimInstance->GetBeingStunned(), ComboCount : %d"), Character->GetComboCount());
+		Character->SetComboCount(0);
+		Character->SetWillPlayNextCombo(false);
+		Character->SetIsAttacking(false);
+		AnimInstance->StopAllMontages(1);
+
+		return;
+	}
 }
 
 void UANS_AttackTotalWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& BranchingPointPayload)

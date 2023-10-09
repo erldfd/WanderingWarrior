@@ -16,6 +16,50 @@ void UANS_WizardMusouWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayl
 void UANS_WizardMusouWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
 {
 	Super::BranchingPointNotifyTick(BranchingPointPayload, FrameDeltaTime);
+
+	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardMusouWindow::BranchingPointNotifyTick, Character == nullptr"));
+		return;
+	}
+
+	UWizardSkillComponent* SkillComp = nullptr;
+	if (Character->GetSkillCompType() == ESkillCompType::WizardSkillComponent)
+	{
+		SkillComp = Cast<UWizardSkillComponent>(Character->GetSkillComponent());
+	}
+
+	if (SkillComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardMusouWindow::BranchingPointNotifyTick, SkillComp == nullptr"));
+		return;
+	}
+
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardMusouWindow::BranchingPointNotifyTick, AnimInstance == nullptr"));
+		return;
+	}
+
+	if (AnimInstance->GetBeingStunned())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_WizardMusouWindow::BranchingPointNotifyTick, AnimInstance->GetBeingStunned()"));
+
+		SkillComp->SetIsMusouAttackStarted(false);
+
+		FRotator CharacterRoation = Character->GetActorRotation();
+		CharacterRoation.Pitch = 0;
+		Character->SetActorRotation(CharacterRoation);
+
+		AnimInstance->StopAllMontages(1);
+
+		return;
+	}
+	
 }
 
 void UANS_WizardMusouWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& BranchingPointPayload)

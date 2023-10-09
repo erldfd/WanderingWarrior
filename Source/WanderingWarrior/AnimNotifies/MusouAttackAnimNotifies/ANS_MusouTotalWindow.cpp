@@ -16,6 +16,44 @@ void UANS_MusouTotalWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPaylo
 void UANS_MusouTotalWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
 {
 	Super::BranchingPointNotifyTick(BranchingPointPayload, FrameDeltaTime);
+
+	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyTick, Character == nullptr"));
+		return;
+	}
+
+	UWarriorSkillComponent* SkillComp = nullptr;
+	if (Character->GetSkillCompType() == ESkillCompType::WarriorSkillComponent)
+	{
+		SkillComp = Cast<UWarriorSkillComponent>(Character->GetSkillComponent());
+	}
+
+	if (SkillComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyTick, SkillComp == nullptr"));
+		return;
+	}
+
+	UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
+	if (AnimInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyTick, AnimInstance == nullptr"));
+		return;
+	}
+
+	if (AnimInstance->GetBeingStunned())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyTick, AnimInstance->GetBeingStunned()"));
+		SkillComp->SetIsMusouAttackStarted(false);
+		AnimInstance->StopAllMontages(1);
+
+		return;
+	}
+	
 }
 
 void UANS_MusouTotalWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& BranchingPointPayload)
@@ -23,17 +61,6 @@ void UANS_MusouTotalWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload
 	Super::BranchingPointNotifyEnd(BranchingPointPayload);
 
 	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
-	/*APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	if (Player == nullptr)
-	{
-		return;
-	}
-
-	UWarriorSkillComponent* SkillComp = Player->GetSkillComponenet();
-	if (SkillComp == nullptr)
-	{
-		return;
-	}*/
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
