@@ -29,7 +29,8 @@ void UANS_AttackDetectWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPay
 		return;
 	}
 
-	CurrentWeapon->SetBoxComponentCollision(ECollisionEnabled::QueryOnly);
+	CurrentWeapon->StartSwing();
+	UE_LOG(LogTemp, Warning, TEXT("UANS_AttackDetectWindow::BranchingPointNotifyBegin, StartSwing"));
 }
 
 void UANS_AttackDetectWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
@@ -73,5 +74,6 @@ void UANS_AttackDetectWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPaylo
 		return;
 	}
 
-	CurrentWeapon->SetBoxComponentCollision(ECollisionEnabled::NoCollision);
+	CurrentWeapon->EndSwing();
+	UE_LOG(LogTemp, Warning, TEXT("UANS_AttackDetectWindow::BranchingPointNotifyBegin, EndSwing"));
 }

@@ -11,15 +11,9 @@
 #include "Item/Weapon.h"
 #include "Item/MiscItem.h"
 #include "Components/CharacterStatComponent.h"
-#include "Inventory/InventorySlotWidget.h"
-#include "Inventory/InventoryWidget.h"
-#include "Inventory/InventoryTabData.h"
-#include "Inventory/InventorySlotData.h"
-#include "Inventory/CharacterInventory.h"
-#include "Inventory/CharacterQuickSlot.h"
-#include "Inventory/InventoryComponent.h"
 #include "Data/SkillDataAsset.h"
 #include "Components/WarriorSkillComponent.h"
+#include "Inventory/InventoryComponent.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -73,8 +67,8 @@ APlayerCharacter::APlayerCharacter()
 
 	Tags.Init("Player", 1);
 
-	Inventory = CreateDefaultSubobject<UCharacterInventory>(TEXT("NewInventory"));
-	QuickSlot = CreateDefaultSubobject<UCharacterQuickSlot>(TEXT("NewQuickSlot"));
+	//Inventory = CreateDefaultSubobject<UCharacterInventory>(TEXT("NewInventory"));
+	//QuickSlot = CreateDefaultSubobject<UCharacterQuickSlot>(TEXT("NewQuickSlot"));
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnHitToSomething);
 	if (GetCapsuleComponent()->OnComponentHit.IsBound() == false)
@@ -104,16 +98,16 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	TempSwapSlot = NewObject<UInventorySlotData>(this);
+	//TempSwapSlot = NewObject<UInventorySlotData>(this);
 
-	AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+	/*AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
 	if (GameMode == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::PostInitializeComponents, GameMode == nullptr"));
 		return;
 	}
 
-	GameMode->SetPlayerAnimInstance(GetAnimInstance());
+	GameMode->SetPlayerAnimInstance(GetAnimInstance());*/
 	//Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
 }
 
@@ -128,29 +122,36 @@ void APlayerCharacter::BeginPlay()
 		return;
 	}
 
-	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	/*UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 
 	if (SubSystem && CharacterInput)
 	{
 		SubSystem->AddMappingContext(CharacterInput, 0);
-	}
+	}*/
 
-	for (int i = 0; i < SlotCount::WEAPON_TAB_SLOT_COUNT; ++i)
-	{
-		Inventory->RemoveAllItem(i);
-	}
-	
-	Inventory->ObtainItem(EWeaponName::BlackSword);
-	Inventory->ObtainItem(EWeaponName::WhiteSword);
-	
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
-	Inventory->ObtainItem(EMiscItemName::HPPotion);
+	//for (int i = 0; i < SlotCount::WEAPON_TAB_SLOT_COUNT; ++i)
+	//{
+	//	Inventory->RemoveAllItem(i);
+	//}
+	//
+	//Inventory->ObtainItem(EWeaponName::BlackSword);
+	//Inventory->ObtainItem(EWeaponName::WhiteSword);
+	//
+	//Inventory->ObtainItem(EMiscItemName::HPPotion);
+	//Inventory->ObtainItem(EMiscItemName::HPPotion);
+	//Inventory->ObtainItem(EMiscItemName::HPPotion);
+	//Inventory->ObtainItem(EMiscItemName::HPPotion);
 
-	QuickSlot->ObtainItem(EMiscItemName::HPPotion);
+	//QuickSlot->ObtainItem(EMiscItemName::HPPotion);
 
 	CharacterStatComponent->SetMP(CharacterStatComponent->GetMaxMP());
+	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
+	AWeapon& Weapon = GameInstance->SpawnWeapon(EWeaponName::WhiteSword);
+	EquipWeapon(&Weapon);
+
+	InventoryComponent->ObtainItem(30, GameInstance->GetWeaponData(EWeaponName::WhiteSword));
+	InventoryComponent->ObtainItem(3, GameInstance->GetWeaponData(EWeaponName::BlackSword));
+	InventoryComponent->ObtainItem(2, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
@@ -176,22 +177,22 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* EnhancedInputComponenet = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	//UEnhancedInputComponent* EnhancedInputComponenet = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Jump);
-	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	//EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Jump);
+	//EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-	EnhancedInputComponenet->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
+	//EnhancedInputComponenet->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 
-	EnhancedInputComponenet->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AWWCharacter::Attack);
+	//EnhancedInputComponenet->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AWWCharacter::Attack);
 
-	EnhancedInputComponenet->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+	//EnhancedInputComponenet->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 
-	EnhancedInputComponenet->BindAction(ChargeAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoChargeAttack);
+	//EnhancedInputComponenet->BindAction(ChargeAttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoChargeAttack);
 
-	EnhancedInputComponenet->BindAction(MusouAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoMusouAttack);
+	//EnhancedInputComponenet->BindAction(MusouAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoMusouAttack);
 
-	EnhancedInputComponenet->BindAction(GuardAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoGuard);
+	//EnhancedInputComponenet->BindAction(GuardAction, ETriggerEvent::Triggered, this, &APlayerCharacter::DoGuard);
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -239,19 +240,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	}
 
 	float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
+	
 	return Damage;
-}
-
-class UCharacterQuickSlot* APlayerCharacter::GetQuickSlot()
-{
-	check(QuickSlot);
-	return QuickSlot;
-}
-
-UCharacterInventory* APlayerCharacter::GetInventory() const
-{
-	return Inventory;
 }
 
 UCameraComponent* APlayerCharacter::GetCamera()
@@ -304,19 +294,6 @@ void APlayerCharacter::OnStartNextCombo()
 	SetActorRotation(FRotationMatrix::MakeFromX(LookVector).Rotator());
 }
 
-void APlayerCharacter::Move(const FInputActionValue& Value)
-{
-	Super::Move(Value);
-}
-
-void APlayerCharacter::Look(const FInputActionValue& Value)
-{
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	AddControllerYawInput(LookAxisVector.X);
-	AddControllerPitchInput(LookAxisVector.Y);
-}
-
 void APlayerCharacter::OnHitToSomething(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	/*if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
@@ -355,72 +332,6 @@ void APlayerCharacter::OnEndOverlapWithSomething(AActor* OverlappedActor, AActor
 
 	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::OnEndOverlapWithSomething, OtherActor Name : %s"), *OtherActor->Tags[0].ToString());
 }
-
-//void APlayerCharacter::PlayChargeAttack1()
-//{
-//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	float PlayRate = 1.0f;
-//	GetSkillComponenet()->PlayChargeAttack1(PlayRate);
-//}
-
-//void APlayerCharacter::PlayChargeAttack2()
-//{
-//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	float PlayRate = 1.0f;
-//	GetSkillComponenet()->PlayChargeAttack2(PlayRate);
-//}
-
-//void APlayerCharacter::PlayChargeAttack3()
-//{
-//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	float PlayRate = 1.0f;
-//	GetSkillComponenet()->PlayChargeAttack3(PlayRate);
-//}
-
-//void APlayerCharacter::PlayMusouAttack()
-//{
-//	if (GetMovementComponent()->IsFalling() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	float PlayRate = 1;
-//	GetSkillComponenet()->PlayMusouAttack(PlayRate);
-//}
-
-//void APlayerCharacter::PlayParryAttack()
-//{
-//	if (GetSkillComponenet()->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
-//	{
-//		return;
-//	}
-//
-//	float PlayRate = 1;
-//	GetSkillComponenet()->PlayParryAttack(PlayRate);
-//}
-
-
-//bool APlayerCharacter::GetIsMusouAttackStarted() const
-//{
-//	return SkillComponenet->GetIsMusouAttackStarted();
-//}
-
-//void APlayerCharacter::SetIsMusouAttackStarted(bool NewIsMusouAttackStarted)
-//{
-//	SkillComponenet->SetIsMusouAttackStarted(NewIsMusouAttackStarted);
-//}
 
 const FVector2D& APlayerCharacter::GetMovementVector() const
 {

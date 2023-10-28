@@ -8,31 +8,14 @@
 
 #include "InventoryWidget.generated.h"
 
-enum class ETabType : uint8;
-enum class EInventory : uint8;
+// params : int32 SlotIndex
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTileViewItemUpdateInInventoryWidgetSignature, int32 /*SlotIndex*/);
 
-//param : SlotIndex
-DECLARE_DELEGATE_OneParam(FOnSlotImageWigetClickedDelegate, int32);
-//param : TabIndex, 0= weapontab, 1 = misctab
-DECLARE_DELEGATE_OneParam(FOnConvertTabDelegate, int32);
+// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSlotDragDropEndedSignature, int32 /*DragStartSlotIndex*/, int32 /*DragEndSlotIndex*/);
 /**
  * 
  */
-
-USTRUCT(BlueprintType)
-struct FInventoryWidgetSettings
-{
-	GENERATED_BODY()
-
-public:
-
-	int32 TabCount;
-	int32 SlotCountByTab;
-
-	EInventory InventoryType;
-	TArray<ETabType> TabTypeArray;
-};
-
 UCLASS()
 class WANDERINGWARRIOR_API UInventoryWidget : public UUserWidget
 {
@@ -40,57 +23,48 @@ class WANDERINGWARRIOR_API UInventoryWidget : public UUserWidget
 	
 public:
 
-	TArray<class UInventorySlotWidget*>& GetSlotWidgetArray(ETabType TabType);
+	int32 GetSlotCount() const;
+	void SetSlotCount(int32 NewSlotCount);
 
-	//if SlotTexture is null, SlotTexture set to EmptySlotTexture
-	void SetSlotWidgetImageFromTexture(ETabType TabType, int32 SlotIndex, class UTexture2D* SlotTexture = nullptr);
-	void SetSlotWidgetImageFromTexture(const TArray<UInventorySlotWidget*>& SlotImageArray, int32 SlotIndex, class UTexture2D* SlotTexture = nullptr);
-	void SetSlotWidgetImageFromTexture(UInventorySlotWidget& SlotWidget, class UTexture2D* SlotTexture = nullptr);
-	void SetSlotItemCountText(int32 SlotItemCount, int32 SlotIndex, ETabType TabType);
+	// if NewTexture is nullptr, EmptySlotTexture will use for this.
+	void SetBrushSlotImageFromTexture(int32 SlotIndex, UTexture2D* NewTexture = nullptr);
 
-	void InitNullTabButtonArray(int32 ArrayCount);
-
-	TArray<class UInventoryTabButtonWidget*>& GetTabButtonArray();
-
-	void InitInventoryWidget(const FInventoryWidgetSettings& Settings);
-
-	void SetInventoryType(EInventory NewInventoryType);
+	void ReceiveSlotItemCount(int32 SlotIndex, int32 NewSlotItemCount);
 
 public:
 
-	//param : SlotIndex
-	FOnSlotImageWigetClickedDelegate OnSlotImageWidgetClickedDelegate;
-	FOnConvertTabDelegate OnConvertTabDelegate;
+	// params : int32 SlotIndex
+	FOnTileViewItemUpdateInInventoryWidgetSignature OnTileViewItemUpdateInInventoryWidgetSignature;
+
+	// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
+	FOnSlotDragDropEndedSignature OnSlotDragDropEndedSignature;
 
 protected:
 
-	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 
 private:
 
-	void OnWeaponTabSlotClicked(int32 SlotIndex);
-	void OnMiscTabSlotClicked(int32 SlotIndex);
+	UFUNCTION()
+	void OnTileViewSlotUpdate(class UInventorySlotWidgetData* UpdatedSlotWidgetData, class UInventorySlotWidget* EntryWidget);
 
 	UFUNCTION()
-	void ConvertTab(int32 TabNum);
+	void OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex);
 
 	UFUNCTION()
-	void ConvertToWeaponTab();
-
-	UFUNCTION()
-	void ConvertToMiscTab();
+	void OnDragDetectedAt(int32 DragStartSlotIndex);
 
 private:
 
-	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<class UInventoryTabButtonWidget>> TabButtonArray;
+	UPROPERTY(VisibleDefaultsOnly, meta = (AllowPrivateAccess = true), meta = (BindWidget))
+	TObjectPtr<class UInventoryTileView> InventoryTileView;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UInventorySlotWidget> InventorySlotWidgetClass;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UWidgetSwitcher> InventoryWidgetTabSwitcher;
+	UPROPERTY()
+	int32 SlotCount;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UTexture2D> EmptySlotTexture;
-
-	EInventory InventoryType;
 };

@@ -13,8 +13,8 @@ enum class ETabType : uint8
 UENUM()
 enum class EItemType : uint8
 {
-	Weapon,
-	Misc
+	Weapon UMETA(DisplayName = "Weapon"),
+	Misc UMETA(DisplayName = "Misc")
 };
 
 UENUM()

@@ -5,18 +5,26 @@
 
 #include "WWAnimInstance.h"
 #include "WWEnumClassContainer.h"
+#include "WWGameInstance.h"
 #include "Components/CharacterStatComponent.h"
 #include "Components/SkillComponentBase.h"
 #include "Components/WarriorSkillComponent.h"
 #include "Item/Weapon.h"
 #include "PlayerCharacter.h"
+#include "WWGameMode.h"
+#include "Inventory/InventoryComponent.h"
 
 #include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/EngineTypes.h"
 #include "DrawDebugHelpers.h"
+#include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Kismet/GameplayStatics.h"
+
+
 //#include "EnhancedInputSubsystems.h"
 
 // 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
@@ -44,6 +52,9 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
 	GetMesh()->SetGenerateOverlapEvents(true);
 	MaxHeightInAir = 100000;
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("INVENTORY"));
+	check(InventoryComponent);
 }
 
 void AWWCharacter::PostInitializeComponents()
@@ -52,9 +63,9 @@ void AWWCharacter::PostInitializeComponents()
 
 	//UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
 	AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
-	if (AnimInstance == false)
+	if (AnimInstance == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PostInitializeComponents, AnimInstance == false"));
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PostInitializeComponents, AnimInstance == nullptr"));
 		return;
 	}
 
@@ -69,6 +80,20 @@ void AWWCharacter::PostInitializeComponents()
 void AWWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::BeginPlay, PlayerController == nullptr"));
+		return;
+	}
+
+	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+
+	if (SubSystem && CharacterInput)
+	{
+		SubSystem->AddMappingContext(CharacterInput, 0);
+	}
 }
 
 float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -86,12 +111,47 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 	CharacterStatComponent->SetHP(HPAfterDamage);
 
+	APlayerCharacter* Player = Cast<APlayerCharacter>(DamageCauser);
+	if (Player)
+	{
+		AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+		if (GameMode)
+		{
+			GameMode->AddAndShowComboCount();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::TakeDamage, GameMode == nullptr"));
+		}
+	}
+
 	if (HPAfterDamage <= 0)
 	{
-		AnimInstance->SetIsDead(true);
+		OnDead();
+
+		if (Player)
+		{
+			AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+			if (GameMode)
+			{
+				if (HPBeforeDamage > 0)
+				{
+					GameMode->AddKillCount();
+				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::TakeDamage, GameMode == nullptr"));
+			}
+		}
+
+		return Damage;
 	}
-	
-	APlayerCharacter* Player = Cast<APlayerCharacter>(DamageCauser);
+
+	if (Damage > 0)
+	{
+		PlayRandomHurtSound();
+	}
 
 	if (Player && Player->GetAnimInstance()->GetIsParrying())
 	{
@@ -117,16 +177,18 @@ float AWWCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 
 float AWWCharacter::TakeDamageWithLaunch(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser, FVector LaunchVelocity, bool bIsInitializedVelocity, float MaxHeight)
 {
-	float Damage = TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	float Damage = DamageAmount;
 
 	USkillComponentBase* SkillComp = GetSkillComponent();
-	if (SkillComp == nullptr)
+	bool bIsPlayingSkill = false;
+
+	if (SkillComp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::TakeDamageWithLaunch, SkillComp == nullptr"));
-		return Damage;
+		bIsPlayingSkill = SkillComp->GetIsChargeAttack1Started() || SkillComp->GetIsChargeAttack2Started() || SkillComp->GetIsChargeAttack3Started() || SkillComp->GetIsMusouAttackStarted() || SkillComp->GetIsParrying();
 	}
 
-	bool bIsPlayingSkill = SkillComp->GetIsChargeAttack1Started() || SkillComp->GetIsChargeAttack2Started() || SkillComp->GetIsChargeAttack3Started() || SkillComp->GetIsMusouAttackStarted() || SkillComp->GetIsParrying();
+	Damage = TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
 	bool bIsGettingUp = AnimInstance->GetHitAndFly() && (GetMovementComponent()->IsFalling() == false);
 
 	if (Damage <= 0.0f || bIsPlayingSkill || bIsGettingUp)
@@ -148,7 +210,14 @@ float AWWCharacter::TakeDamageWithKnockback(float DamageAmount, FDamageEvent con
 {
 	float Damage = TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	bool bIsPlayingSkill = GetSkillComponent()->GetIsChargeAttack1Started() || GetSkillComponent()->GetIsChargeAttack2Started() || GetSkillComponent()->GetIsChargeAttack3Started() || GetSkillComponent()->GetIsMusouAttackStarted() || GetSkillComponent()->GetIsParrying();
+	USkillComponentBase* SkillComp = GetSkillComponent();
+	bool bIsPlayingSkill = false;
+
+	if (SkillComp)
+	{
+		bIsPlayingSkill = SkillComp->GetIsChargeAttack1Started() || SkillComp->GetIsChargeAttack2Started() || SkillComp->GetIsChargeAttack3Started() || SkillComp->GetIsMusouAttackStarted() || SkillComp->GetIsParrying();
+	}
+	
 	bool bIsGettingUp = AnimInstance->GetHitAndFly() && (GetMovementComponent()->IsFalling() == false);
 
 	if (bWillPlayHitReaction && Damage > 0.0f && bIsPlayingSkill == false && bIsGettingUp == false)
@@ -162,7 +231,9 @@ float AWWCharacter::TakeDamageWithKnockback(float DamageAmount, FDamageEvent con
 
 void AWWCharacter::Jump()
 {
-	if (GetSkillComponent()->IsSkillStarted() || GetIsAttacking())
+	USkillComponentBase* SkillComp = GetSkillComponent();
+
+	if (SkillComp && SkillComp->IsSkillStarted() || GetIsAttacking())
 	{
 		return;
 	}
@@ -186,21 +257,6 @@ void AWWCharacter::Tick(float DeltaTime)
 	{
 		GetCharacterMovement()->Velocity.Z = -10;
 	}
-
-	//if (bIsAnimMoveStart)
-	//{
-	//	FHitResult Hit;
-	//	AddActorWorldOffset(GetActorForwardVector() * AttackMoveSpeed, true, &Hit);
-
-	//	if (Hit.bBlockingHit)
-	//	{
-	//		AttackMoveSpeed = 0;
-	//	}
-	//	else
-	//	{
-	//		AttackMoveSpeed = 5;
-	//	}
-	//}
 
 	bool bIsPlayingHitMontage = AnimInstance->GetIsPlayingCharacterHitMontage();
 	bool bIsHitAndFly = AnimInstance->GetHitAndFly();
@@ -242,9 +298,25 @@ void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	check(PlayerInputComponent);
+	UEnhancedInputComponent* EnhancedInputComponenet = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Test", IE_Pressed, this, &AWWCharacter::TestAction);
+	EnhancedInputComponenet->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &AWWCharacter::OpenAndCloseInventory);
+
+	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AWWCharacter::Jump);
+	EnhancedInputComponenet->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+
+	EnhancedInputComponenet->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AWWCharacter::Move);
+
+	EnhancedInputComponenet->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AWWCharacter::Attack);
+
+	EnhancedInputComponenet->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWWCharacter::Look);
+
+	EnhancedInputComponenet->BindAction(ChargeAttackAction, ETriggerEvent::Triggered, this, &AWWCharacter::DoChargeAttack);
+
+	EnhancedInputComponenet->BindAction(MusouAction, ETriggerEvent::Triggered, this, &AWWCharacter::DoMusouAttack);
+
+	EnhancedInputComponenet->BindAction(GuardAction, ETriggerEvent::Triggered, this, &AWWCharacter::DoGuard);
+
 }
 
 void AWWCharacter::Attack()
@@ -259,6 +331,13 @@ void AWWCharacter::Attack()
 
 	if (bIsDead  || bIsGuarding || bIsGuardHitStart || bBeingStunned || bIsSkillStarted || bIsJumping || bIsPlayingCharacterHit)
 	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 3, FColor::Cyan,
+				FString::Printf(TEXT("AWWCharacter::Attack, IsDead : %d, bIsSkillStarted : %d, bIsGuarding : %d, bIsGuardHitStart : %d, bBeingStunned : %d"),
+					bIsDead, bIsSkillStarted, bIsGuarding, bIsGuardHitStart, bBeingStunned));
+		}
+
 		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, %d %d %d %d %d"), bIsDead, bIsSkillStarted,
 			 bIsGuarding ,bIsGuardHitStart, bBeingStunned);
 		return;
@@ -272,8 +351,8 @@ void AWWCharacter::Attack()
 		{
 			UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, AttackMontage == nullptr"));
 		}
+
 		PlayAnimMontage(AttackMontage, AttackAnimRate);
-		//AnimInstance->Montage_Play(AttackMontage, AttackAnimRate);
 		SetComboCount(1);
 	}
 	else if (GetCanCombo() && GetWillPlayNextCombo() == false)
@@ -288,6 +367,8 @@ void AWWCharacter::Attack()
 
 void AWWCharacter::AttackCheck()
 {
+	PlayRandomAttackShoutSound();
+
 	if (bWIllSweepAttack)
 	{
 		return;
@@ -486,6 +567,95 @@ void AWWCharacter::OnAnimMoveEnd()
 	bIsAnimMoveStart = false;
 }
 
+void AWWCharacter::OnDead()
+{
+	if (AnimInstance->GetIsDead())
+	{
+		return;
+	}
+
+	AnimInstance->SetIsDead(true);
+	
+	PlayDeathSound();
+
+	GetWorld()->GetTimerManager().SetTimer(DeathTimeHandle, FTimerDelegate::CreateLambda([&]()->void {Destroy(); }), 1, false, 5);
+}
+
+void AWWCharacter::PlayDeathSound()
+{
+	if (DeathSound == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PlayDeathSound, DeathSound == nullptr"));
+		return;
+	}
+
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+}
+
+void AWWCharacter::PlayRandomHurtSound()
+{
+	int32 RandomInt = FMath::RandRange(0, HurtSoundArray.Num() - 1);
+
+	if (HurtSoundArray.IsValidIndex(RandomInt) == false || HurtSoundArray[RandomInt] == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PlayRandomHurtSound, HurtSoundArray.IsValidIndex(RandomInt) == false || HurtSoundArray[RandomInt] == nullptr"));
+		return;
+	}
+
+	UGameplayStatics::PlaySoundAtLocation(this, HurtSoundArray[RandomInt], GetActorLocation());
+}
+
+void AWWCharacter::PlayRandomAttackShoutSound()
+{
+	int32 RandomInt = FMath::RandRange(0, AttackShoutSoundArray.Num() - 1);
+
+	if (AttackShoutSoundArray.IsValidIndex(RandomInt) == false || AttackShoutSoundArray[RandomInt] == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PlayRandomHurtSound, AttackShoutSoundArray.IsValidIndex(RandomInt) == false || AttackShoutSoundArray[RandomInt] == nullptr"));
+		return;
+	}
+
+	UGameplayStatics::PlaySoundAtLocation(this, AttackShoutSoundArray[RandomInt], GetActorLocation());
+}
+
+TObjectPtr<class UInventoryComponent> AWWCharacter::GetInventoryComponent() const
+{
+	if (InventoryComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::GetInventoryComponent, InventoryComponent == nullptr"));
+	}
+
+	return InventoryComponent;
+}
+
+void AWWCharacter::OpenAndCloseInventory()
+{
+	InventoryComponent->OpenAndCloseInventory();
+}
+
+void AWWCharacter::Look(const FInputActionValue& Value)
+{
+	if (GetIsPlayer() == false)
+	{
+		return;
+	}
+
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	AddControllerYawInput(LookAxisVector.X);
+	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AWWCharacter::OnInventoryDataSaved(bool bIsSaveSucceeded)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("Save Succeeded? : %d "), bIsSaveSucceeded));
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::OnInventoryDataSaved, SaveSucceeded? : %d"), bIsSaveSucceeded);
+}
+
 void AWWCharacter::TestAction()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TestAction"));
@@ -577,8 +747,9 @@ void AWWCharacter::DoGuard(const struct FInputActionValue& Value)
 {
 	GuardStartCheckCount++;
 
-	if (AnimInstance->GetIsPlayingCharacterHitMontage() || bPressedJump || GetMovementComponent()->IsFalling())
+	if (AnimInstance->GetIsPlayingCharacterHitMontage() || bPressedJump || GetMovementComponent()->IsFalling() || AnimInstance->GetHitAndFly() || AnimInstance->GetIsIdleOrRun() == false )
 	{
+		AnimInstance->SetIsGuarding(false);
 		return;
 	}
 
@@ -674,7 +845,7 @@ void AWWCharacter::PlayParryAttack()
 		return;
 	}
 
-	if (SkillComp->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump)
+	if (SkillComp->IsSkillStarted() || GetMovementComponent()->IsFalling() || bPressedJump || AnimInstance->GetIsIdleOrRun() == false)
 	{
 		return;
 	}
@@ -735,26 +906,28 @@ void AWWCharacter::SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3)
 
 bool AWWCharacter::GetIsMusouAttackStarted() const
 {
-	if (GetSkillComponent() == nullptr)
+	USkillComponentBase* SkillComp = GetSkillComponent();
+	if (SkillComp == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::GetIsMusouAttackStarted, Faild to Get SkillComp"));
 		return false;
 	}
 
-	bool bIsMusouAttackStarted = GetSkillComponent()->GetIsMusouAttackStarted();
+	bool bIsMusouAttackStarted = SkillComp->GetIsMusouAttackStarted();
 
 	return bIsMusouAttackStarted;
 }
 
 void AWWCharacter::SetIsMusouAttackStarted(bool NewIsMusouAttackStarted)
 {
-	if (GetSkillComponent() == nullptr)
+	USkillComponentBase* SkillComp = GetSkillComponent();
+	if (SkillComp == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::SetIsMusouAttackStarted, Faild to Get SkillComp"));
 		return;
 	}
 
-	GetSkillComponent()->SetIsMusouAttackStarted(NewIsMusouAttackStarted);
+	SkillComp->SetIsMusouAttackStarted(NewIsMusouAttackStarted);
 }
 
 void AWWCharacter::Move(const FInputActionValue& Value)
@@ -768,9 +941,10 @@ void AWWCharacter::Move(const FInputActionValue& Value)
 
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (GetSkillComponent()->IsSkillStarted())
+	USkillComponentBase* SkillComp = GetSkillComponent();
+	if (SkillComp->IsSkillStarted())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Move,IsSkillStarted : %d"), GetSkillComponent()->IsSkillStarted());
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Move,IsSkillStarted : %d"), SkillComp->IsSkillStarted());
 		return;
 	}
 
@@ -790,7 +964,6 @@ USkillComponentBase* AWWCharacter::GetSkillComponent() const
 	if (SkillComponent == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::GetSkillComponent, Fail to Get SkillComp"));
-		return nullptr;
 	}
 
 	return SkillComponent;

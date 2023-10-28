@@ -45,10 +45,6 @@ public:
 
 private:
 
-	void SetPlayerCameraFOV(float FOV);
-
-	void ShakeWithCameraFOV(float FOV, float Duration);
-
 	void PlayJumpToGroundSkill(float PlayRate);
 	void PlayKickAttack(float PlayRate);
 	void PlayMelee360Attack(float PlayRate);

@@ -19,9 +19,13 @@ public:
 
 	void SetAttackDamage(float NewDamage);
 
-	virtual void Use(const UWorld& World) override;
+	virtual void Use(class AWWCharacter* ItemUser) override;
 
 	void SetBoxComponentCollision(ECollisionEnabled::Type NewType);
+
+	void StartSwing();
+
+	void EndSwing();
 
 protected:
 
@@ -42,4 +46,13 @@ private:
 
 	UFUNCTION()
 	void OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+private:
+
+	TSet<TObjectPtr<class AWWCharacter>> DamagedTargetSet;
+
+	uint8 bIsSwingStarted : 1;
+
+	UPROPERTY()
+	int32 ExpectedNumElements;
 };

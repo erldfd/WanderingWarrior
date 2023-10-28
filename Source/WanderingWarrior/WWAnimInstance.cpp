@@ -220,7 +220,6 @@ void UWWAnimInstance::PlayCharacterHitMontage()
 	Montage_Play(CharacterHitMongtage, 1);
 
 	OnHitByEnemyDelegate.Broadcast();
-	OnInitIsDamaged.Broadcast();
 }
 
 void UWWAnimInstance::StopCharacterHitMontage()

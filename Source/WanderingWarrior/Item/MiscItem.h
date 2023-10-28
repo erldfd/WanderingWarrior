@@ -22,7 +22,7 @@ public:
 
 	AMiscItem();
 
-	virtual void Use(const UWorld& World) override;
+	virtual void Use(class AWWCharacter* ItemUser) override;
 
 protected:
 

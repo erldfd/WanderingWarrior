@@ -8,9 +8,25 @@
 #include "WWAnimInstance.h"
 #include "WWEnumClassContainer.h"
 
+#include "Kismet/GameplayStatics.h"
+
 void UANS_MusouTotalWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	Super::BranchingPointNotifyBegin(BranchingPointPayload);
+
+	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouTotalWindow::BranchingPointNotifyBegin, Character == nullptr"));
+		return;
+	}
+
+	Character->SetIsInvincible(true);
+
+	UGameplayStatics::SetGlobalTimeDilation(Character->GetWorld(), 0.2f);
+	Character->CustomTimeDilation = 5.0f;
 }
 
 void UANS_MusouTotalWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
@@ -89,5 +105,6 @@ void UANS_MusouTotalWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload
 	}
 
 	SkillComp->SetIsMusouAttackStarted(false);
+	Character->SetIsInvincible(false);
 	//AnimInstance->StopAllMontages(1);
 }

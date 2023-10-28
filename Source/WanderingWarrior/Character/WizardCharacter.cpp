@@ -74,6 +74,8 @@ void AWizardCharacter::AttackCheck()
 	{
 		MagicBall->FlyToTargetLocation(GetActorLocation() + TraceVector);
 	}
+
+	PlayRandomAttackShoutSound();
 }
 
 void AWizardCharacter::BeginPlay()

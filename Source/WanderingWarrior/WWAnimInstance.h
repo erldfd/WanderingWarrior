@@ -10,21 +10,7 @@
 #include "WWAnimInstance.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHitByEnemyDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnStartNextComboDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnAnimMoveStartDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnAnimMoveEndDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnAttackHitCheckDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnJumpToGroundAnimEndDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnKickDamageDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnKickEndDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3DamageDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3ComboStartDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnChargeAttack3EndDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnInitIsDamaged);
-DECLARE_MULTICAST_DELEGATE(FOnMusouAttackCheckDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnMusouFinishAttackCheckDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnParryAttackCheckDelegate);
-DECLARE_MULTICAST_DELEGATE(FOnParryAttackStartDelegate);
+
 /**
  * 
  */
@@ -85,27 +71,6 @@ public:
 public:
 
 	FOnHitByEnemyDelegate OnHitByEnemyDelegate;
-	FOnStartNextComboDelegate OnStartNextComboDelegate;
-	FOnAnimMoveStartDelegate OnAnimMoveStartDelegate;
-	FOnAnimMoveEndDelegate OnAnimMoveEndDelegate;
-	FOnAttackHitCheckDelegate OnAttackHitcheckDelegate;
-
-	FOnJumpToGroundAnimEndDelegate OnJumpToGroundAnimEndDelegate;
-
-	FOnKickDamageDelegate OnKickDamageDelegate;
-	FOnKickEndDelegate OnKickEndDelegate;
-
-	FOnChargeAttack3DamageDelegate OnChargeAttack3DamageDelegate;
-	FOnChargeAttack3ComboStartDelegate OnChargeAttack3ComboStartDelegate;
-	FOnChargeAttack3EndDelegate OnChargeAttack3EndDelegate;
-
-	FOnInitIsDamaged OnInitIsDamaged;
-
-	FOnMusouAttackCheckDelegate OnMusouAttackCheckDelegate;
-	FOnMusouFinishAttackCheckDelegate OnMusouFinishAttackCheckDelegate;
-
-	FOnParryAttackCheckDelegate OnParryAttackCheckDelegate;
-	FOnParryAttackStartDelegate OnParryAttackStartDelegate;
 
 private:
 

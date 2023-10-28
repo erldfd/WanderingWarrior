@@ -22,7 +22,8 @@
 				"WanderingWarriorSettings",
 				"AIModule",
 				"UMG",
-				"CoreUObject"
+				"CoreUObject",
+				"LevelSequence"
 			]
 		}
 	],

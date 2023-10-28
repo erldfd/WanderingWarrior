@@ -5,94 +5,95 @@
 #include "CoreMinimal.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/IUserObjectListEntry.h"
 
 #include "InventorySlotWidget.generated.h"
 
-enum class ETabType : uint8;
-enum class EInventory : uint8;
+// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnDragDropEndedSignature, int32 /*DragStartSlotIndex*/, int32 /*DragEndSlotIndex*/)
 
-//param : SlotIndex
-DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonDownDelegate, int32);
-//param : SlotIndex
-DECLARE_DELEGATE_OneParam(FOnLeftMouseButtonUpDelegate, int32);
-//param : DragStartSlotIndex, DragEndSlotIndex, DragStartSlotTabType, DragEndSlotTabType
-DECLARE_DELEGATE_FourParams(FOnDragDropDelegate, int32, int32, int32, int32);
+// params : int32 SlotIndex
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeftMouseDoubleClickDetectedSignature, int32 /*SlotIndex*/);
 
-//param : DragStartSlotIndex, DragEndSlotIndex, DragStartInventory, DragEndInventory, DragStartSlotTabType, DragEndSlotTabType
-DECLARE_DELEGATE_SixParams(FOnDragDropInventoryItemDelegate, int32, int32, int32, int32, int32, int32);
-
-// param : SlotIndex
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMouseEnterSignature, int32);
-// param : SlotIndex
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMouseLeaveSignature, int32);
+// params : int32 SlotIndex
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDragDetectedSignature, int32 /*SlotIndex*/);
 /**
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API UInventorySlotWidget : public UUserWidget
+class WANDERINGWARRIOR_API UInventorySlotWidget : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 	
 public:
 
-	int GetSlotIndex();
+	UInventorySlotWidget(const FObjectInitializer& ObjectInitializer);
+
+	int32 GetSlotIndex() const;
 	void SetSlotIndex(int32 NewIndex);
 
-	class UImage& GetSlotImage();
-	void SetSlotImage(UImage& NewSlotImage);
+	void SetBrushSlotImageFromTexture(UTexture2D* NewTexture);
+	void SetBrushDragSlotImageFromTexture(UTexture2D* NewTexture);
 
-	class UImage& GetDragSlotImage();
-	void SetDragSlotImage(UImage& NewSlotImage);
+	bool GetIsEmpty() const;
+	void SetIsEmpty(bool bNewIsEmpty);
 
-	uint8 GetIsEmptySlotImage();
-	void SetIsEmptySlotImage(uint8 bIsEmpty);
+	void SetInventoryDragDropOperationTag(const FString& NewTag);
 
-	void SetTabTypeBelongTo(ETabType NewTabType);
-	void SetInventoryBelongTo(EInventory NewInventory);
-
-	uint8 GetbIsMouseEntered();
-
+	
 public:
 
-	FOnLeftMouseButtonDownDelegate OnLeftMouseButtonDownDelegate;
-	FOnLeftMouseButtonUpDelegate OnLeftMouseButtonUpDelegate;
-	FOnDragDropDelegate OnDragDropDelegate;
-	FOnDragDropInventoryItemDelegate OnDragDropInventoryItemDelegate;
-	FOnMouseEnterSignature OnMouseEnterSignature;
-	FOnMouseLeaveSignature OnMouseLeaveSignature;
+	
+
+	// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
+	FOnDragDropEndedSignature OnDragDropEndedSignature;
+
+	// params : int32 SlotIndex
+	FOnLeftMouseDoubleClickDetectedSignature OnLeftMouseDoubleClickDetectedSignature;
+
+	// params : int32 SlotIndex
+	FOnDragDetectedSignature OnDragDetectedSignature;
 
 protected:
 
-	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonDoubleClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
-	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	//virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
 private:
 
-	UPROPERTY()
-	TObjectPtr<class UInventoryDragDropOperation> InventoryDragDropOperation;
+	bool TryToDetectDoubleClick();
 
+private:
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrviateAccess = true))
 	int32 SlotIndex;
-	int32 StartDragSlotIndex;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UImage> SlotImage;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UImage> DragSlotImage;
+	
+	UPROPERTY()
+	TObjectPtr<class UDragDropOperation> InventoryDragDropOperation;
 
-	uint8 bIsEmptySlotImage : 1;
+	UPROPERTY()
+	uint8 bIsEmpty : 1;
 
-	FTimerHandle WaitForItemInfoTimeHandler;
+	FTimerHandle DoubleClickTimerHandle;
 
-	uint8 bIsMouseEntered : 1;
+	uint8 bShouldDetectDoubleClick : 1;
 };

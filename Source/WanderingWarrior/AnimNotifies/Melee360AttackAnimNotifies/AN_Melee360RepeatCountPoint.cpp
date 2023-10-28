@@ -3,7 +3,7 @@
 
 #include "AnimNotifies/Melee360AttackAnimNotifies/AN_Melee360RepeatCountPoint.h"
 
-#include "Character/PlayerCharacter.h"
+#include "Character/WWCharacter.h"
 #include "Components/WarriorSkillComponent.h"
 #include "WWEnumClassContainer.h"
 
@@ -22,20 +22,6 @@ void UAN_Melee360RepeatCountPoint::BranchingPointNotify(FBranchingPointNotifyPay
 		UE_LOG(LogTemp, Warning, TEXT("UAN_Melee360RepeatCountPoint::BranchingPointNotify, MeshComp == nullptr"));
 		return;
 	}
-
-	/*APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	if (Player == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UAN_Melee360RepeatCountPoint::BranchingPointNotify, Player == nullptr"));
-		return;
-	}
-
-	UWarriorSkillComponent* SkillComp = Player->GetSkillComponenet();
-	if (SkillComp == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UAN_Melee360RepeatCountPoint::BranchingPointNotify, SkillComp == nullptr"));
-		return;
-	}*/
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)

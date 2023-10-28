@@ -5,38 +5,30 @@
 
 #include "InGameWidget.h"
 #include "WWGameInstance.h"
-#include "ConversationWidget.h"
 #include "Components/CharacterStatComponent.h"
-#include "Character/PlayerCharacter.h"
+#include "Character/WWCharacter.h"
 #include "Character/NPCCharacter.h"
-#include "Inventory/InventoryComponent.h"
-#include "Inventory/CharacterQuickSlot.h"
-#include "Inventory/CharacterInventory.h"
-#include "Inventory/MarchantInventory.h"
-#include "Inventory/InventoryWidget.h"
-#include "ManagerClass/ConversationManager.h"
-#include "ManagerClass/InteractionManager.h"
-#include "ManagerClass/StoreManager.h"
 #include "Item/Weapon.h"
 #include "Item/MiscItem.h"
+#include "Inventory/InventoryWidget.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 
 AWWPlayerController::AWWPlayerController() : bIsInputModeGameOnly(true)
 {
-	static ConstructorHelpers::FClassFinder<UInGameWidget> WBP_InGameWidget(TEXT("/Game/UI/WBP_InGameWidget.WBP_InGameWidget_C"));
+	/*static ConstructorHelpers::FClassFinder<UInGameWidget> WBP_InGameWidget(TEXT("/Game/UI/WBP_InGameWidget.WBP_InGameWidget_C"));
 	if (WBP_InGameWidget.Succeeded())
 	{
 		InGameWidgetClass = WBP_InGameWidget.Class;
-	}
+	}*/
 }
 
 void AWWPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	PlayerCharacter = Cast<APlayerCharacter>(aPawn);
+	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(aPawn);
 	if (PlayerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, PlayerCharacter == nullptr"));
@@ -47,17 +39,46 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 
 	CharacterStat = PlayerCharacter->GetCharacterStatComponent();
 
-	InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
-	check(InGameWidget);
+	if (InGameWidget == nullptr)
+	{
+		InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
+	}
+	
+	if (InGameWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, InGameWidget == nullptr"));
+		return;
+	}
 
-	InGameWidget->AddToViewport();
+	if (InGameWidget->IsInViewport() == false)
+	{
+		InGameWidget->AddToViewport();
+	}
+	
+	/*if (BagWidget == nullptr)
+	{
+		BagWidget = CreateWidget<UInventoryWidget>(this, BagWidgetClass);
+	}
+	
+	if (BagWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, BagWidget == nullptr"));
+		return;
+	}
 
-	PlayerCharacter->GetQuickSlot()->SetInventoryWidget(*InGameWidget->GetQuickSlotWidget());
+	if (BagWidget->IsInViewport() == false)
+	{
+		BagWidget->AddToViewport();
+		BagWidget->SetVisibility(ESlateVisibility::Visible);
+		
+	}*/
 
-	UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
+	//PlayerCharacter->GetQuickSlot()->SetInventoryWidget(*InGameWidget->GetQuickSlotWidget());
 
-	PlayerInventory->SetInventoryWidget(*InGameWidget->GetInventoryWidget());
-	PlayerInventory->SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
+	//UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
+
+	//PlayerInventory->SetInventoryWidget(*InGameWidget->GetInventoryWidget());
+	//PlayerInventory->SetItemInfoWidget(*InGameWidget->GetInventoryItemInfoWidget());
 
 	//TempMarchantCharacter = Cast<ANPCCharacter>(UGameplayStatics::GetActorOfClass(this, ANPCCharacter::StaticClass()));
 	//if (TempMarchantCharacter)
@@ -74,11 +95,14 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 	//GameInstance.GetConversationManager().BindConversationWidgetSignature();
 	//GameInstance.GetStoreManager().SetStoreWidget(InGameWidget->GetMarchantInventoryWidget());
 
-	SetShowMouseCursor(false);
+	OriginalGlobalTimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
+	
+	//SetShowMouseCursor(true);
 
 	FInputModeGameOnly InputMode;
+	//FInputModeGameAndUI InputMode;
 	SetInputMode(InputMode);
-
+	
 	OnKeyEPressedSignature.AddUObject(this, &AWWPlayerController::OnInteraction);
 
 	if (OnKeyEPressedSignature.IsBound() == false)
@@ -98,6 +122,7 @@ void AWWPlayerController::SetGameModeGameAndUI()
 	SetShowMouseCursor(true);
 
 	FInputModeGameAndUI InputMode;
+	//InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 
 	bIsInputModeGameOnly = false;
@@ -143,6 +168,22 @@ void AWWPlayerController::SetInGameWidgetHide(bool HideWidget)
 	}
 }
 
+void AWWPlayerController::SetGameWorldPause(bool bShouldPause)
+{
+	SetPause(bShouldPause);
+	//if (bShouldPause)
+	//{
+	//	//OriginalGlobalTimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
+	//	//UGameplayStatics::SetGlobalTimeDilation(this, 0);
+	//	
+	//}
+	//else
+	//{
+	//	//UGameplayStatics::SetGlobalTimeDilation(this, OriginalGlobalTimeDilation);
+	//	//Pause();
+	//}
+}
+
 void AWWPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -163,14 +204,14 @@ void AWWPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("InventoryOpenAndClose", EInputEvent::IE_Released, this, &AWWPlayerController::OpenAndCloseInventory);
 
-	InputComponent->BindAction("Number1", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot0);
-	InputComponent->BindAction("Number2", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot1);
-	InputComponent->BindAction("Number3", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot2);
-	InputComponent->BindAction("Number4", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot3);
-	InputComponent->BindAction("Number5", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot4);
-	InputComponent->BindAction("Number6", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot5);
-	InputComponent->BindAction("Number7", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot6);
-	InputComponent->BindAction("Number8", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot7);
+	//InputComponent->BindAction("Number1", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot0);
+	//InputComponent->BindAction("Number2", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot1);
+	//InputComponent->BindAction("Number3", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot2);
+	//InputComponent->BindAction("Number4", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot3);
+	//InputComponent->BindAction("Number5", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot4);
+	//InputComponent->BindAction("Number6", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot5);
+	//InputComponent->BindAction("Number7", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot6);
+	//InputComponent->BindAction("Number8", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot7);
 
 	InputComponent->BindAction("KeyEPressed", EInputEvent::IE_Pressed, this, &AWWPlayerController::OnKeyEButtonPressed);
 }
@@ -193,80 +234,46 @@ void AWWPlayerController::OnMPChanged()
 
 void AWWPlayerController::OpenAndCloseInventory()
 {
-	UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
+	//UCharacterInventory* PlayerInventory = PlayerCharacter->GetInventory();
 
-	PlayerInventory->OpenAndCloseInventory();
+	//PlayerInventory->OpenAndCloseInventory();
 	
-	if (PlayerInventory->IsInventoryVisible())
-	{
-		SetShowMouseCursor(true);
+	//if (BagWidget == nullptr)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OpenAndCloseInventory, BagWidget == nullptr"));
+	//	return;
+	//}
 
-		FInputModeGameAndUI InputMode;
-		//InputMode.SetWidgetToFocus(InGameWidget->GetQuickSlotWidget()->TakeWidget());
-		//FInputModeUIOnly InputMode;
-		SetInputMode(InputMode);
+	//if (BagWidget->GetVisibility() == ESlateVisibility::Hidden)
+	//{
+	//	BagWidget->SetVisibility(ESlateVisibility::Visible);
+	//	SetShowMouseCursor(true);
+	//	UGameplayStatics::SetGlobalTimeDilation(this, 0);
+	//	FInputModeGameAndUI InputMode;
+	//	//InputMode.SetWidgetToFocus(InGameWidget->GetQuickSlotWidget()->TakeWidget());
+	//	//FInputModeUIOnly InputMode;
+	//	//InputMode.SetLockMouseToViewportBehavior // 마우스 잠금
+	//	InputMode.SetHideCursorDuringCapture(false); // 클릭시 커서가 사라져서 드래그가 안되는 것 방지
+	//	//InputMode.ShouldFlushInputOnViewportFocus();
+	//	SetInputMode(InputMode);
+	//	
+	//	bIsInputModeGameOnly = false;
+	//}
+	//else
+	//{
+	//	BagWidget->SetVisibility(ESlateVisibility::Hidden);
+	//	SetShowMouseCursor(false);
+	//	UGameplayStatics::SetGlobalTimeDilation(this, 1);
+	//	FInputModeGameOnly InputMode;
+	//	SetInputMode(InputMode);
 
-		bIsInputModeGameOnly = false;
-	}
-	else
-	{
-		SetShowMouseCursor(false);
-
-		FInputModeGameOnly InputMode;
-		SetInputMode(InputMode);
-
-		bIsInputModeGameOnly = true;
-	}
-}
-
-//void AWWPlayerController::OnMouseRightButtonClicked()
-//{
-//	UPlayerSkillComponent& PlayerSkill = PlayerCharacter->GetPlayerSkillComponenet();
-//	PlayerSkill.JumpToGroundSkillImplement();
-//}
-
-void AWWPlayerController::UseQuickSlot0()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(0);
-}
-
-void AWWPlayerController::UseQuickSlot1()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(1);
-}
-
-void AWWPlayerController::UseQuickSlot2()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(2);
-}
-
-void AWWPlayerController::UseQuickSlot3()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(3);
-}
-
-void AWWPlayerController::UseQuickSlot4()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(4);
-}
-
-void AWWPlayerController::UseQuickSlot5()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(5);
-}
-
-void AWWPlayerController::UseQuickSlot6()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(6);
-}
-
-void AWWPlayerController::UseQuickSlot7()
-{
-	PlayerCharacter->GetQuickSlot()->UseSlotItemFormSlotIndex(7);
+	//	bIsInputModeGameOnly = true;
+	//}
 }
 
 void AWWPlayerController::OnKeyEButtonPressed()
 {
+	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(GetPawn());
 	if (PlayerCharacter == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnKeyEButtonPressed, PlayerCharacter == nullptr"));
@@ -277,7 +284,7 @@ void AWWPlayerController::OnKeyEButtonPressed()
 	const FVector& Center = PlayerCharacter->GetActorLocation();
 	float DetectRadius = 200;
 
-	if (&World == nullptr)
+	if (World == nullptr)
 	{
 		return;
 	}
@@ -339,5 +346,5 @@ void AWWPlayerController::OnKeyEButtonPressed()
 
 void AWWPlayerController::OnInteraction(const TArray<FOverlapResult>& OverlapResults)
 {
-	Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this))->GetInteractionManager().AnalyzeInteraction(OverlapResults);
+	//Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this))->GetInteractionManager().AnalyzeInteraction(OverlapResults);
 }

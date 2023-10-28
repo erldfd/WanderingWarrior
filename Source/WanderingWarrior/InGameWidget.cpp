@@ -4,12 +4,8 @@
 #include "InGameWidget.h"
 
 #include "Components/CharacterStatComponent.h"
-#include "Inventory/InventoryWidget.h"
 #include "WWConstContainer.h"
 #include "WWEnumClassContainer.h"
-#include "ConversationWidget.h"
-#include "Inventory/InventoryItemInfoWidget.h"
-#include "Inventory/InventoryTabButtonWidget.h"
 
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
@@ -43,23 +39,23 @@ void UInGameWidget::SetMyMPBarPercent(float Percent)
 	MyMPBar->SetPercent(Percent);
 }
 
-UInventoryWidget* UInGameWidget::GetQuickSlotWidget()
-{
-	//check(QuickSlotWidget != nullptr);
-	return nullptr;
-}
+//UInventoryWidget* UInGameWidget::GetQuickSlotWidget()
+//{
+//	//check(QuickSlotWidget != nullptr);
+//	return nullptr;
+//}
+//
+//UInventoryWidget* UInGameWidget::GetInventoryWidget()
+//{
+//	check(InventoryWidget != nullptr);
+//	return InventoryWidget;
+//}
 
-UInventoryWidget* UInGameWidget::GetInventoryWidget()
-{
-	check(InventoryWidget != nullptr);
-	return InventoryWidget;
-}
-
-UInventoryWidget* UInGameWidget::GetMarchantInventoryWidget()
-{
-	//check(MarchantInventoryWidget);
-	return nullptr;
-}
+//UInventoryWidget* UInGameWidget::GetMarchantInventoryWidget()
+//{
+//	//check(MarchantInventoryWidget);
+//	return nullptr;
+//}
 
 UConversationWidget* UInGameWidget::GetConversationWidget()
 {
@@ -67,11 +63,11 @@ UConversationWidget* UInGameWidget::GetConversationWidget()
 	return nullptr;
 }
 
-UInventoryItemInfoWidget* UInGameWidget::GetInventoryItemInfoWidget()
-{
-	check(InventoryItemInfoWidget);
-	return InventoryItemInfoWidget;
-}
+//UInventoryItemInfoWidget* UInGameWidget::GetInventoryItemInfoWidget()
+//{
+//	check(InventoryItemInfoWidget);
+//	return InventoryItemInfoWidget;
+//}
 
 void UInGameWidget::NativeOnInitialized()
 {
@@ -80,17 +76,17 @@ void UInGameWidget::NativeOnInitialized()
 	ensure(MyHPBar != nullptr);
 	MyHPBar->SetPercent(1);
 
-	FInventoryWidgetSettings Settings;
-	Settings.TabCount = TabCount::INVENTORY_TAB_COUNT;
-	Settings.SlotCountByTab = SlotCount::WEAPON_TAB_SLOT_COUNT;
-	Settings.InventoryType = EInventory::CharacterInventory;
-	Settings.TabTypeArray.Init(ETabType::WeaponTab, TabCount::INVENTORY_TAB_COUNT);
-	
-	Settings.TabTypeArray[1] = ETabType::MiscTab;
+	//FInventoryWidgetSettings Settings;
+	//Settings.TabCount = TabCount::INVENTORY_TAB_COUNT;
+	//Settings.SlotCountByTab = SlotCount::WEAPON_TAB_SLOT_COUNT;
+	//Settings.InventoryType = EInventory::CharacterInventory;
+	//Settings.TabTypeArray.Init(ETabType::WeaponTab, TabCount::INVENTORY_TAB_COUNT);
+	//
+	//Settings.TabTypeArray[1] = ETabType::MiscTab;
 
-	ensure(InventoryWidget != nullptr);
-	InventoryWidget->SetInventoryType(EInventory::CharacterInventory);
-	InventoryWidget->InitInventoryWidget(Settings);
+	//ensure(InventoryWidget != nullptr);
+	//InventoryWidget->SetInventoryType(EInventory::CharacterInventory);
+	//InventoryWidget->InitInventoryWidget(Settings);
 
 	/*Settings.TabCount = TabCount::QUICKSLOT_TAB_COUNT;
 	Settings.SlotCountByTab = SlotCount::QUICK_SLOT_COUNT;
@@ -101,10 +97,10 @@ void UInGameWidget::NativeOnInitialized()
 	QuickSlotWidget->SetInventoryType(EInventory::CharacterQuickSlot);
 	QuickSlotWidget->InitInventoryWidget(Settings);*/
 
-	Settings.TabCount = TabCount::DEFUALT_TAB_COUNT;
-	Settings.SlotCountByTab = SlotCount::MARCHANT_SLOT_COUNT;
-	Settings.InventoryType = EInventory::MarchantInventory;
-	Settings.TabTypeArray.Init(ETabType::QuickSlotTab, TabCount::QUICKSLOT_TAB_COUNT);
+	//Settings.TabCount = TabCount::DEFUALT_TAB_COUNT;
+	//Settings.SlotCountByTab = SlotCount::MARCHANT_SLOT_COUNT;
+	//Settings.InventoryType = EInventory::MarchantInventory;
+	//Settings.TabTypeArray.Init(ETabType::QuickSlotTab, TabCount::QUICKSLOT_TAB_COUNT);
 
 	//ensure(MarchantInventoryWidget != nullptr);
 	//MarchantInventoryWidget->SetInventoryType(EInventory::MarchantInventory);
@@ -112,10 +108,10 @@ void UInGameWidget::NativeOnInitialized()
 
 	HideEnemyHPAndNameWidget();
 
-	FWidgetTransform Transform;
-	Transform.Translation = FVector2D(100, 100);
-	check(InventoryItemInfoWidget);
-	InventoryItemInfoWidget->SetRenderTransform(Transform);
+	//FWidgetTransform Transform;
+	//Transform.Translation = FVector2D(100, 100);
+	//check(InventoryItemInfoWidget);
+	//InventoryItemInfoWidget->SetRenderTransform(Transform);
 }
 
 void UInGameWidget::HideEnemyHPAndNameWidget()

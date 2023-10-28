@@ -29,8 +29,14 @@ private:
 	UFUNCTION()
 	void OnNewGameButtonClicked();
 
+	UFUNCTION()
+	void OnLoadGameButtonClicked();
+
 private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> NewGameButton;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> LoadGameButton;
 };

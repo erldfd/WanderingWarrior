@@ -33,9 +33,6 @@ AWeapon::AWeapon() : AttackDamage(1)
 	}
 	
 	BoxComponent->SetupAttachment(RootComponent);
-	//BoxComponent->SetBoxExtent(FVector(32, 32, 32));
-	//BoxComponent->SetRelativeScale3D(FVector(1, 0.625, 2.375));
-	//BoxComponent->SetRelativeLocation(FVector(0, 14, 43));
 }
 
 void AWeapon::BeginPlay()
@@ -45,53 +42,63 @@ void AWeapon::BeginPlay()
 
 void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OverlappedComponent : %s"), *OverlappedComponent->GetName());
-	if (Super::bIsFieldItem)
+	if (bIsFieldItem)
 	{
 		return;
 	}
 
-	AEnemyCharacter* EnemyCharacter = Cast<AEnemyCharacter>(OtherActor);
-	if (EnemyCharacter == nullptr)
+	if (bIsSwingStarted == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, EnemyCharacter == nullptr"));
 		return;
 	}
-
-	AWWGameMode* GameMode = Cast<AWWGameMode>(GetWorld()->GetAuthGameMode());
-	if(ensure(GameMode) == false) return;
-
-	UWWAnimInstance* PlayerAnimInstance = GameMode->GetPlayerAnimInstance();
-	if(ensure(PlayerAnimInstance) == false) return;
-
-	//bool IsAttacking = PlayerAnimInstance->GetIsAttacking();
 	
-	bool IsDetectedAttack = PlayerAnimInstance->GetIsAttackDetected();
-	UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Damaged : %d, DetectedAttack : %d"), EnemyCharacter->GetIsDamaged(), IsDetectedAttack);
-
-	if (true/*EnemyCharacter->GetIsDamaged() == false*//* &&*/ /*IsAttacking*//*IsDetectedAttack*/)
+	AActor* WeaponOwner = GetOwner();
+	if (WeaponOwner == nullptr)
 	{
-		//UGameplayStatics::SetGlobalTimeDilation(this, 0.5f);
-		EnemyCharacter->SetIsDamaged(true);
-
-		AActor* WeaponOwner = GetOwner();
-		if (ensure(WeaponOwner) == false) return;
-
-		AWWPlayerController* PlayerController = Cast<AWWPlayerController>(WeaponOwner->GetInstigatorController());
-		if (ensure(PlayerController) == false) return;
-
-		FVector MoveDir = EnemyCharacter->GetActorLocation() - WeaponOwner->GetActorLocation();
-		MoveDir.Normalize();
-
-		FDamageEvent DamageEvent;
-		EnemyCharacter->TakeDamageWithKnockback(AttackDamage, DamageEvent, PlayerController, WeaponOwner, MoveDir * 1000, 0.1f, true);
-
-		UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-		if (ensure(PlayerInGameWidget) == false) return;
-
-		PlayerInGameWidget->SetEnemyHPBarPercent(EnemyCharacter->GetCharacterStatComponent()->GetHPRatio());
-		PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(EnemyCharacter->GetCharacterName()));
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, Owner == nullptr"));
+		return;
 	}
+
+	if (WeaponOwner == OtherActor)
+	{
+		return;
+	}
+
+	AWWCharacter* OverlappedCharacter = Cast<AWWCharacter>(OtherActor);
+	if (OverlappedCharacter == nullptr)
+	{
+		return;
+	}
+
+	if (DamagedTargetSet.Contains(OverlappedCharacter))
+	{
+		return;
+	}
+
+	DamagedTargetSet.Emplace(OverlappedCharacter);
+
+	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(WeaponOwner->GetInstigatorController());
+	if (PlayerController == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, PlayerController == false"));
+		return;
+	}
+
+	FVector MoveDir = OverlappedCharacter->GetActorLocation() - WeaponOwner->GetActorLocation();
+	MoveDir.Normalize();
+
+	FDamageEvent DamageEvent;
+	OverlappedCharacter->TakeDamageWithKnockback(AttackDamage, DamageEvent, PlayerController, WeaponOwner, MoveDir * 1000, 0.1f, true);
+
+	UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+	if (PlayerInGameWidget == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, PlayerInGameWidget == false"));
+		return;
+	}
+
+	PlayerInGameWidget->SetEnemyHPBarPercent(OverlappedCharacter->GetCharacterStatComponent()->GetHPRatio());
+	PlayerInGameWidget->SetEnemyNameTextBlock(FText::FromName(OverlappedCharacter->GetCharacterName()));
 }
 
 void AWeapon::Tick(float DeltaTime)
@@ -104,20 +111,33 @@ void AWeapon::SetAttackDamage(float NewDamage)
 	AttackDamage = NewDamage;
 }
 
-void AWeapon::Use(const UWorld& World)
+void AWeapon::Use(AWWCharacter* ItemUser)
 {
-	check(&World);
-
-	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(World.GetFirstPlayerController());
-	check(PlayerController);
-
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
-	check(PlayerCharacter);
-
-	PlayerCharacter->EquipWeapon(this);
+	ItemUser->EquipWeapon(this);
 }
 
 void AWeapon::SetBoxComponentCollision(ECollisionEnabled::Type NewType)
 {
 	BoxComponent->SetCollisionEnabled(NewType);
+}
+
+void AWeapon::StartSwing()
+{
+	bIsSwingStarted = true;
+	SetActorEnableCollision(true);
+}
+
+void AWeapon::EndSwing()
+{
+	bIsSwingStarted = false;
+	SetActorEnableCollision(false);
+
+	int32 SetNum = DamagedTargetSet.Num();
+
+	if (SetNum > ExpectedNumElements)
+	{
+		ExpectedNumElements = SetNum;
+	}
+
+	DamagedTargetSet.Empty(ExpectedNumElements);
 }

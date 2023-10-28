@@ -16,16 +16,14 @@ AMiscItem::AMiscItem()
 
 }
 
-void AMiscItem::Use(const UWorld& World)
+void AMiscItem::Use(AWWCharacter* ItemUser)
 {
-	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(World.GetFirstPlayerController());
-	check(PlayerController);
-
-	APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(PlayerController->GetCharacter());
-	check(PlayerCharacter);
-
-	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(PlayerCharacter->GetCharacterStatComponent());
-	check(CharacterStat);
+	UCharacterStatComponent* CharacterStat = Cast<UCharacterStatComponent>(ItemUser->GetCharacterStatComponent());
+	if (CharacterStat == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AMiscItem::Use, CharacterStat == nullptr"));
+		return;
+	}
 
 	switch (MiscItemName)
 	{

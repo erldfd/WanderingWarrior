@@ -4,7 +4,6 @@
 
 #include "WanderingWarrior.h"
 
-#include "WWAnimInstance.h"
 
 #include "GameFramework/GameModeBase.h"
 
@@ -22,11 +21,46 @@ public:
 
 	AWWGameMode();
 
-	UWWAnimInstance* GetPlayerAnimInstance();
-	void SetPlayerAnimInstance(class UWWAnimInstance* NewAnimInstance);
+	virtual void BeginPlay() override;
+
+	void AddAndShowComboCount();
+
+	void AddKillCount();
+
+//	UFUNCTION(Exec)
+//	void SaveCurrentGame();
+//
+//	//UFUNCTION(Exec)
+//	void SaveCurrentGame(const FString& SlotName, int32 UserIndex);
+//
+//	UFUNCTION(Exec)
+//	void LoadGame();
+//
+//	//UFUNCTION(Exec)
+//	void LoadGame(const FString& SlotName, int32 UserIndex);
+//
+//private:
+//
+//	UFUNCTION()
+//	void OnCurrentGameSaved(const FString& SlotName, const int32 UserIndex, bool bIsSucceeded);
+//
+//	UFUNCTION()
+//	void OnLoadGame(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData);
+
+	UFUNCTION(Exec)
+	void StreamPlease();
 
 private:
 
+	UFUNCTION()
+	void OnStreamLevelCompleted();
+	
+private:
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UComboCountWidget> ComboCountWidgetClass;
+
 	UPROPERTY()
-	TObjectPtr<class UWWAnimInstance> PlayerAnimInstance;
+	TObjectPtr<class UComboCountWidget> ComboCountWidget;
+	
 };

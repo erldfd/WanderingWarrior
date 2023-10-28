@@ -164,6 +164,8 @@ private:
 	void OnAnimMoveStart();
 	void OnAnimMoveEnd();
 
+	void OnDead();
+
 private:
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = true))
@@ -194,4 +196,80 @@ private:
 	uint8 bIsInvincible : 1;
 
 	int32 GuardStartCheckCount;
+
+	FTimerHandle DeathTimeHandle;
+
+	//SoundSection
+public:
+
+	void PlayDeathSound();
+
+	void PlayRandomHurtSound();
+
+	void PlayRandomAttackShoutSound();
+
+private:
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
+	TObjectPtr<USoundBase> DeathSound;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
+	TArray<TObjectPtr<USoundBase>> HurtSoundArray;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
+	TArray<TObjectPtr<USoundBase>> AttackShoutSoundArray;
+
+// inventorySection
+public:
+
+	TObjectPtr<class UInventoryComponent> GetInventoryComponent() const;
+
+protected:
+
+	void OpenAndCloseInventory();
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true), Category = "Inventory")
+	TObjectPtr<class UInventoryComponent> InventoryComponent;
+
+
+	// input Section
+private:
+
+	void Look(const struct FInputActionValue& Value);
+
+private:
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> InventoryAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> JumpAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> MoveAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> LookAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> ChargeAttackAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> MusouAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> GuardAction;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputMappingContext> CharacterInput;
+
+	// save section
+public:
+
+	void OnInventoryDataSaved(bool bIsSaveSucceeded);
 };

@@ -8,7 +8,6 @@
 
 #include "SkillComponentBase.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class WANDERINGWARRIOR_API USkillComponentBase : public UActorComponent
 {
@@ -47,6 +46,10 @@ public:
 	virtual void DamageMusouAttack();
 	virtual void DamageMusouFinishAttack();
 	virtual void DamageParryAttack();
+
+protected:
+
+	void UpdateAndDisplayDamagedEnemyWidgets(float HPRatio, const FText& EnemyName);
 
 protected:
 

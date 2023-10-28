@@ -4,6 +4,10 @@
 #include "Components/SkillComponentBase.h"
 
 #include "Data/SkillDataAsset.h"
+#include "Controller/WWPlayerController.h"
+#include "InGameWidget.h"
+#include "Character/PlayerCharacter.h"
+#include "Components/CharacterStatComponent.h"
 
 // Sets default values for this component's properties
 USkillComponentBase::USkillComponentBase()
@@ -117,5 +121,25 @@ void USkillComponentBase::DamageMusouFinishAttack()
 
 void USkillComponentBase::DamageParryAttack()
 {
+}
+
+void USkillComponentBase::UpdateAndDisplayDamagedEnemyWidgets(float HPRatio, const FText& EnemyName)
+{
+	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
+	if (PlayerController == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("USkillComponentBase::UpdateAndDisplayDamagedEnemyWidgets, PlayerController == false"));
+		return;
+	}
+
+	UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
+	if (PlayerInGameWidget == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("USkillComponentBase::UpdateAndDisplayDamagedEnemyWidgets, PlayerInGameWidget == false"));
+		return;
+	}
+
+	PlayerInGameWidget->SetEnemyHPBarPercent(HPRatio);
+	PlayerInGameWidget->SetEnemyNameTextBlock(EnemyName);
 }
 

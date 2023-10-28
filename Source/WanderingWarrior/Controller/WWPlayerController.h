@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetInGameWidgetHide(bool HideWidget);
 
+	// bShouldPause == true, Timedilation is set to 0-ish, else return to original time dilation.
+	void SetGameWorldPause(bool bShouldPause);
+
 public:
 
 	FOnKeyEPressedSignature OnKeyEPressedSignature;
@@ -49,14 +52,14 @@ private:
 
 	void OpenAndCloseInventory();
 
-	void UseQuickSlot0();
-	void UseQuickSlot1();
-	void UseQuickSlot2();
-	void UseQuickSlot3();
-	void UseQuickSlot4();
-	void UseQuickSlot5();
-	void UseQuickSlot6();
-	void UseQuickSlot7();
+	//void UseQuickSlot0();
+	//void UseQuickSlot1();
+	//void UseQuickSlot2();
+	//void UseQuickSlot3();
+	//void UseQuickSlot4();
+	//void UseQuickSlot5();
+	//void UseQuickSlot6();
+	//void UseQuickSlot7();
 
 	void OnKeyEButtonPressed();
 
@@ -65,7 +68,13 @@ private:
 
 private:
 
+	/*UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UBagWidget> BagWidgetClass;
+
 	UPROPERTY()
+	TObjectPtr<class UBagWidget> BagWidget;*/
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
 	TSubclassOf<class UInGameWidget> InGameWidgetClass;
 
 	UPROPERTY()
@@ -74,11 +83,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UCharacterStatComponent> CharacterStat;
 
-	UPROPERTY()
-	TObjectPtr<class APlayerCharacter> PlayerCharacter;
+	/*UPROPERTY()
+	TObjectPtr<class APlayerCharacter> PlayerCharacter;*/
 
 	UPROPERTY()
 	TObjectPtr<class ANPCCharacter> TempMarchantCharacter;
 
 	uint8 bIsInputModeGameOnly : 1;
+
+	float OriginalGlobalTimeDilation;
 };

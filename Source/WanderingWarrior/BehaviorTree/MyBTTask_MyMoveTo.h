@@ -23,8 +23,31 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+//protected:
+//
+//	virtual EBTNodeResult::Type PerformMoveTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+//
+//private:
+//
+//	bool ShouldSurroundTarget(const UBehaviorTreeComponent& OwnerComp);
+
 private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess))
 	float AttackRange;
+
+	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess))
+	//float SearchAgainInterval;
+
+	//// if target is in this range, start to surround target
+	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess))
+	//float SurroundingStartRange;
+
+	float ElapsedTime;
+
+	//UPROPERTY(EditAnywhere, Category = Blackboard)
+	//struct FBlackboardKeySelector TargetPos;
+
+	/*UPROPERTY()
+	uint8 bShouldChaseTargetPos : 1;*/
 };

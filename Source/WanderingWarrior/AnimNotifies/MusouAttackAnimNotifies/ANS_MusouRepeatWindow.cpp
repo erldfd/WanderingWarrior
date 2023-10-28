@@ -3,13 +3,28 @@
 
 #include "AnimNotifies/MusouAttackAnimNotifies/ANS_MusouRepeatWindow.h"
 
-#include "Character/PlayerCharacter.h"
+#include "Character/WWCharacter.h"
 #include "Components/WarriorSkillComponent.h"
 #include "WWEnumClassContainer.h"
+
+#include "Kismet/GameplayStatics.h"
 
 void UANS_MusouRepeatWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& BranchingPointPayload)
 {
 	Super::BranchingPointNotifyBegin(BranchingPointPayload);
+
+	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
+
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouRepeatWindow::BranchingPointNotifyBegin, Character == nullptr"));
+		return;
+	}
+
+	UGameplayStatics::SetGlobalTimeDilation(Character->GetWorld(), 1.0f);
+	Character->CustomTimeDilation = 1.0f;
+	Character->bUseControllerRotationYaw = true;
 }
 
 void UANS_MusouRepeatWindow::BranchingPointNotifyTick(FBranchingPointNotifyPayload& BranchingPointPayload, float FrameDeltaTime)
@@ -17,14 +32,15 @@ void UANS_MusouRepeatWindow::BranchingPointNotifyTick(FBranchingPointNotifyPaylo
 	Super::BranchingPointNotifyTick(BranchingPointPayload, FrameDeltaTime);
 	
 	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
-	APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	if (Player == nullptr)
+	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
+	if (Character == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouRepeatWindow::BranchingPointNotifyTick, Character == nullptr"));
 		return;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("UANS_MusouRepeatWindow::BranchingPointNotifyTick, Consistent : %d"), Player->GetConsistentMusou());
-	Player->SetIsConsistentMusou(false);
 	
+	Character->SetIsConsistentMusou(false);
+	Character->AddActorWorldOffset(Character->GetActorForwardVector() * 700 * FrameDeltaTime, true);
 }
 
 void UANS_MusouRepeatWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& BranchingPointPayload)
@@ -32,27 +48,11 @@ void UANS_MusouRepeatWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayloa
 	Super::BranchingPointNotifyEnd(BranchingPointPayload);
 
 	USkeletalMeshComponent* MeshComp = BranchingPointPayload.SkelMeshComponent;
-	/*APlayerCharacter* Player = Cast<APlayerCharacter>(MeshComp->GetOwner());
-	if (Player == nullptr)
-	{
-		return;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("UANS_MusouRepeatWindow::BranchingPointNotifyEnd, Consistent : %d"), Player->GetIsConsistentMusou());
-	if (Player->GetIsConsistentMusou())
-	{
-		return;
-	}
-
-	UWarriorSkillComponent* SkillComp = Player->GetSkillComponenet();
-	if (SkillComp == nullptr)
-	{
-		return;
-	}*/
 
 	AWWCharacter* Character = Cast<AWWCharacter>(MeshComp->GetOwner());
 	if (Character == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouRepeatWindow::BranchingPointNotifyEnd, Player == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UANS_MusouRepeatWindow::BranchingPointNotifyEnd, Character == nullptr"));
 		return;
 	}
 
@@ -68,12 +68,11 @@ void UANS_MusouRepeatWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayloa
 		return;
 	}
 
-	/*UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(MeshComp->GetAnimInstance());
-	if (AnimInstance == nullptr)
+	if (Character->GetIsConsistentMusou())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UANS_KickSkillWindow::NotifyEnd, AnimInstance == nullptr"));
 		return;
-	}*/
+	}
 
 	SkillComp->ReadyToPlayMusouFinalAttack();
+	Character->bUseControllerRotationYaw = false;
 }

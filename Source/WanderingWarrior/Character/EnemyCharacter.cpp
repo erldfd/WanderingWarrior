@@ -18,7 +18,7 @@
 AEnemyCharacter::AEnemyCharacter() : bIsDamaged(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
-	Super::bWIllSweepAttack = true;
+	bWIllSweepAttack = true;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("EnemyProfile"));
 
 	Tags.Init("", 1);
@@ -28,26 +28,6 @@ AEnemyCharacter::AEnemyCharacter() : bIsDamaged(false)
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
-	if (GameMode == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::BeginPlay, GameMode == false"));
-		return;
-	}
-
-	UWWAnimInstance* PlayerAnimInstance = GameMode->GetPlayerAnimInstance();
-	if (PlayerAnimInstance == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AEnemyCharacter::BeginPlay, PlayerAnimInstance == false"));
-		return;
-	}
-
-	PlayerAnimInstance->OnInitIsDamaged.AddLambda([this]()->void {
-		
-		SetIsDamaged(false);
-	
-	});
 }
 
 float AEnemyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

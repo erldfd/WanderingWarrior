@@ -34,20 +34,39 @@ public:
 	const struct FItemDataRow& GetWeaponData(EWeaponName Name) const;
 	const struct FItemDataRow& GetMiscItemData(EMiscItemName Name) const;
 
-	class UInventoryManager& GetInventoryManager();
+	//class UInventoryManager& GetInventoryManager();
 
-	class UCreditManager& GetCreditManagner();
+	/*class UCreditManager& GetCreditManagner();
 
 	class UConversationManager& GetConversationManager();
 
 	class UInteractionManager& GetInteractionManager();
 
-	class UStoreManager& GetStoreManager();
+	class UStoreManager& GetStoreManager();*/
 
 	UFUNCTION(BlueprintCallable)
 	bool GetAllowStart();
 	UFUNCTION(BlueprintCallable)
 	void SetAllowStart(bool NewAllowStart);
+
+	UFUNCTION(Exec)
+	void SaveCurrentGame();
+	void SaveCurrentGame(const FString& SlotName, int32 UserIndex);
+
+	UFUNCTION(Exec)
+	void LoadGame();
+	void LoadGame(const FString& SlotName, int32 UserIndex);
+	void LoadGameInternal(const FString& SlotName, int32 UserIndex);
+
+	UFUNCTION(Exec)
+	void PrintCurrentLevelName();
+
+	UFUNCTION(Exec)
+	void StreamLevel();
+	void StreamLevel(const FName& LevelName);
+
+	void OnStreamLevelCompleted();
+
 public:
 
 	UPROPERTY()
@@ -56,7 +75,9 @@ public:
 private:
 
 	UFUNCTION()
-	void OnStartConversation(ANPCCharacter* InteractionActor);
+	void OnCurrentGameSaved(const FString& SlotName, const int32 UserIndex, bool bIsSucceeded);
+	//UFUNCTION()
+	//void OnStartConversation(ANPCCharacter* InteractionActor);
 
 private:
 
@@ -70,18 +91,24 @@ private:
 
 	TArray<struct FItemDataRow*> MiscItemDataArray;
 
-	UPROPERTY()
-	TObjectPtr<class UInventoryManager> InventoryManager;
+	//UPROPERTY()
+	//TObjectPtr<class UInventoryManager> InventoryManager;
+
+	//UPROPERTY()
+	//TObjectPtr<class UCreditManager> CreditMamager;
+
+	//UPROPERTY()
+	//TObjectPtr<class UConversationManager> ConversationManager;
+
+	//UPROPERTY()
+	//TObjectPtr<class UInteractionManager> InteractionManager;
+
+	//UPROPERTY()
+	//TObjectPtr<class UStoreManager> StoreManager;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> LoadingWidgetClass;
 
 	UPROPERTY()
-	TObjectPtr<class UCreditManager> CreditMamager;
-
-	UPROPERTY()
-	TObjectPtr<class UConversationManager> ConversationManager;
-
-	UPROPERTY()
-	TObjectPtr<class UInteractionManager> InteractionManager;
-
-	UPROPERTY()
-	TObjectPtr<class UStoreManager> StoreManager;
+	TObjectPtr<UUserWidget> LoadingWidget;
 };

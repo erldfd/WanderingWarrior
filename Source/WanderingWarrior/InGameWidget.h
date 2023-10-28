@@ -23,13 +23,13 @@ public:
 	void SetMyHPBarPercent(float Percent);
 	void SetMyMPBarPercent(float Percent);
 
-	class UInventoryWidget* GetQuickSlotWidget();
-	class UInventoryWidget* GetInventoryWidget();
-	class UInventoryWidget* GetMarchantInventoryWidget();
+	//class UInventoryWidget* GetQuickSlotWidget();
+	//class UInventoryWidget* GetInventoryWidget();
+	//class UInventoryWidget* GetMarchantInventoryWidget();
 
 	class UConversationWidget* GetConversationWidget();
 
-	class UInventoryItemInfoWidget* GetInventoryItemInfoWidget();
+	//class UInventoryItemInfoWidget* GetInventoryItemInfoWidget();
 
 protected:
 
@@ -56,8 +56,8 @@ private:
 	//UPROPERTY(meta = (BindWidget))
 	//TObjectPtr<class UInventoryWidget> QuickSlotWidget;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UInventoryWidget> InventoryWidget;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<class UInventoryWidget> InventoryWidget;
 
 	/*UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UInventoryWidget> MarchantInventoryWidget;
@@ -67,6 +67,6 @@ private:
 
 	FTimerHandle HideEnemyHPAndNameWidgetTimerHandle;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UInventoryItemInfoWidget> InventoryItemInfoWidget;
+	//UPROPERTY(meta = (BindWidget))
+	//TObjectPtr<class UInventoryItemInfoWidget> InventoryItemInfoWidget;
 };
