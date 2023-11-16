@@ -8,6 +8,8 @@
 
 #include "InventorySlotWidgetData.generated.h"
 
+enum class EInventory : uint8;
+
 // params : UInventorySlotWidgetData* UpdatedInventorySlotWidgetData, UInventorySlotWidget* EntryWidget
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnTileViewItemUpdateSignature, class UInventorySlotWidgetData* /*UpdatedInventorySlotWidgetData*/, class UInventorySlotWidget* /*EntryWidget*/);
 /**
@@ -42,5 +44,4 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UTexture2D> SlotTexture;
-	
 };

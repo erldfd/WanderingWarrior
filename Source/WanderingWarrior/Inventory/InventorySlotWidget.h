@@ -9,8 +9,10 @@
 
 #include "InventorySlotWidget.generated.h"
 
-// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnDragDropEndedSignature, int32 /*DragStartSlotIndex*/, int32 /*DragEndSlotIndex*/)
+enum class EInventory : uint8;
+
+// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex, EInventory InventoryTypeOrigin 
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnDragDropEndedSignature, int32 /*DragStartSlotIndex*/, int32 /*DragEndSlotIndex*/, const EInventory& /*InventoryTypeOrigin*/);
 
 // params : int32 SlotIndex
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeftMouseDoubleClickDetectedSignature, int32 /*SlotIndex*/);
@@ -34,16 +36,22 @@ public:
 
 	void SetBrushSlotImageFromTexture(UTexture2D* NewTexture);
 	void SetBrushDragSlotImageFromTexture(UTexture2D* NewTexture);
+	void MakeDragSlotImageEqualToSlotImage();
 
-	bool GetIsEmpty() const;
-	void SetIsEmpty(bool bNewIsEmpty);
+	int32 GetSlotItemCount() const;
+	void SetSlotItemCount(int32 NewSlotItemCount);
+
+	bool IsEmpty() const;
 
 	void SetInventoryDragDropOperationTag(const FString& NewTag);
+	void SetInventoryDragDropOperationSlotIndex(int32 NewSlotIndex);
+	void SetInventoryDragDropOperationInventoryType(const EInventory& NewInventoryType);
 
-	
+	// get inventory type where belong to 
+	const EInventory GetInventoryType();
+	void SetInventoryType(const EInventory& NewInventoryType);
+
 public:
-
-	
 
 	// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
 	FOnDragDropEndedSignature OnDragDropEndedSignature;
@@ -87,13 +95,18 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UImage> DragSlotImage;
 	
-	UPROPERTY()
-	TObjectPtr<class UDragDropOperation> InventoryDragDropOperation;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UTextBlock> SlotItemCountTextBlock;
 
 	UPROPERTY()
-	uint8 bIsEmpty : 1;
+	TObjectPtr<class UInventoryDragDropOperation> InventoryDragDropOperation;
+
+	int32 SlotItemCount;
 
 	FTimerHandle DoubleClickTimerHandle;
 
 	uint8 bShouldDetectDoubleClick : 1;
+
+	EInventory InventoryType;
+
 };

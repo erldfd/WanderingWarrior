@@ -89,6 +89,16 @@ void UInventorySlot::SetSlotItemCount(int32 NewSlotItemCount)
     SlotItemCount = NewSlotItemCount;
 }
 
+const EInventory& UInventorySlot::GetInventoryType() const
+{
+    return InventoryType;
+}
+
+void UInventorySlot::SetInventoryType(const EInventory& NewInventoryType)
+{
+    InventoryType = NewInventoryType;
+}
+
 void UInventorySlot::UseWeaponItem()
 {
     if (Owner == nullptr)

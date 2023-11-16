@@ -14,6 +14,7 @@
 #include "Data/SkillDataAsset.h"
 #include "Components/WarriorSkillComponent.h"
 #include "Inventory/InventoryComponent.h"
+#include "MiniMapCaptureComponent2D.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -27,7 +28,6 @@
 #include "Engine/DecalActor.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "MotionWarpingComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -62,13 +62,9 @@ APlayerCharacter::APlayerCharacter()
 	ActionCamera->SetupAttachment((USceneComponent*)BodyCapsuleComponent);
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PlayerProfile"));
 
-	//PlayerSkillComponent = CreateDefaultSubobject<UPlayerSkillComponent>(TEXT("PlayerSkill"));
 	SkillComponent = CreateDefaultSubobject<UWarriorSkillComponent>(TEXT("Skill"));
 
 	Tags.Init("Player", 1);
-
-	//Inventory = CreateDefaultSubobject<UCharacterInventory>(TEXT("NewInventory"));
-	//QuickSlot = CreateDefaultSubobject<UCharacterQuickSlot>(TEXT("NewQuickSlot"));
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &APlayerCharacter::OnHitToSomething);
 	if (GetCapsuleComponent()->OnComponentHit.IsBound() == false)
@@ -98,17 +94,19 @@ void APlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	//TempSwapSlot = NewObject<UInventorySlotData>(this);
-
-	/*AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
-	if (GameMode == nullptr)
+	InventoryComponent = Cast<UInventoryComponent>(GetComponentByClass(UInventoryComponent::StaticClass()));
+	if (InventoryComponent == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::PostInitializeComponents, GameMode == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::PostInitializeComponents, InventoryComponent == nullptr"));
 		return;
 	}
 
-	GameMode->SetPlayerAnimInstance(GetAnimInstance());*/
-	//Super::AnimInstance->OnStartNextComboDelegate.AddUObject(this, &APlayerCharacter::OnStartNextCombo);
+	MinimapCaptureComp = Cast<UMiniMapCaptureComponent2D>(GetComponentByClass(UMiniMapCaptureComponent2D::StaticClass()));
+	if (MinimapCaptureComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::PostInitializeComponents, MinimapCaptureComp == nullptr"));
+		return;
+	}
 }
 
 void APlayerCharacter::BeginPlay()
@@ -149,9 +147,24 @@ void APlayerCharacter::BeginPlay()
 	AWeapon& Weapon = GameInstance->SpawnWeapon(EWeaponName::WhiteSword);
 	EquipWeapon(&Weapon);
 
-	InventoryComponent->ObtainItem(30, GameInstance->GetWeaponData(EWeaponName::WhiteSword));
-	InventoryComponent->ObtainItem(3, GameInstance->GetWeaponData(EWeaponName::BlackSword));
-	InventoryComponent->ObtainItem(2, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
+	if (InventoryComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::BeginPlay, InventoryComponent == nullptr"));
+		return;
+	}
+
+	if (::IsValid(InventoryComponent) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::BeginPlay, ::IsValid(InventoryComponent) == false"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::BeginPlay, Name : %s"), *GetName());
+
+	InventoryComponent->ObtainItem(0, EInventory::CharacterInventory, GameInstance->GetWeaponData(EWeaponName::WhiteSword));
+	InventoryComponent->ObtainItem(1, EInventory::CharacterInventory, GameInstance->GetWeaponData(EWeaponName::BlackSword));
+	InventoryComponent->ObtainItem(2, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
+	InventoryComponent->ObtainItem(1, EInventory::CharacterQuickSlot, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
 }
 
 void APlayerCharacter::Tick(float DeltaTime)

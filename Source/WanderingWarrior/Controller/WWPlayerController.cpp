@@ -34,7 +34,7 @@ void AWWPlayerController::OnPossess(APawn* aPawn)
 		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, PlayerCharacter == nullptr"));
 		return;
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess, Pawn Name : %s"), *aPawn->GetName());
 	PlayerCharacter->SetIsPlayer(true);
 
 	CharacterStat = PlayerCharacter->GetCharacterStatComponent();
@@ -122,7 +122,7 @@ void AWWPlayerController::SetGameModeGameAndUI()
 	SetShowMouseCursor(true);
 
 	FInputModeGameAndUI InputMode;
-	//InputMode.SetHideCursorDuringCapture(false);
+	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 
 	bIsInputModeGameOnly = false;
@@ -173,13 +173,13 @@ void AWWPlayerController::SetGameWorldPause(bool bShouldPause)
 	SetPause(bShouldPause);
 	//if (bShouldPause)
 	//{
-	//	//OriginalGlobalTimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
-	//	//UGameplayStatics::SetGlobalTimeDilation(this, 0);
+	//	OriginalGlobalTimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
+	//	UGameplayStatics::SetGlobalTimeDilation(this, 0);
 	//	
 	//}
 	//else
 	//{
-	//	//UGameplayStatics::SetGlobalTimeDilation(this, OriginalGlobalTimeDilation);
+	//	UGameplayStatics::SetGlobalTimeDilation(this, OriginalGlobalTimeDilation);
 	//	//Pause();
 	//}
 }
@@ -202,7 +202,7 @@ void AWWPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("InventoryOpenAndClose", EInputEvent::IE_Released, this, &AWWPlayerController::OpenAndCloseInventory);
+	//InputComponent->BindAction("InventoryOpenAndClose", EInputEvent::IE_Released, this, &AWWPlayerController::OpenAndCloseInventory);
 
 	//InputComponent->BindAction("Number1", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot0);
 	//InputComponent->BindAction("Number2", EInputEvent::IE_Pressed, this, &AWWPlayerController::UseQuickSlot1);

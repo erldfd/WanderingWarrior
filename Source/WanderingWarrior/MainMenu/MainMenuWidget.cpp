@@ -16,33 +16,33 @@ void UMainMenuWidget::NativeOnInitialized()
 
 void UMainMenuWidget::OnNewGameButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("MainMenuWidget, OnNewGamebuttonClicked, NewGameButtonClicked"));
-
 	UWorld* World = GetWorld();
 	check(World);
 
-	UGameplayStatics::OpenLevel(World, "/Game/Maps/Jail",false);
+	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(World));
+	if (GameInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UMainMenuWidget::OnNewGameButtonClicked, GameInstance == nullptr"));
+		return;
+	}
 
-	/*UGameplayStatics::LoadStreamLevel(World, "/Game/Maps/TestLevel", true, true, FLatentActionInfo());
-	UGameplayStatics::UnloadStreamLevel(World, "/Game/Maps/MainMenuLevel", FLatentActionInfo(), true);*/
+	GameInstance->StartGame();
 }
 
 void UMainMenuWidget::OnLoadGameButtonClicked()
 {
-	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(this));
+	UWorld* World = GetWorld();
+	check(World);
+
+	UWWGameInstance* GameInstance = Cast<UWWGameInstance>(UGameplayStatics::GetGameInstance(World));
 	if (GameInstance == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UMainMenuWidget::OnLoadGameButtonClicked, GameInstance == nullptr"));
 		return;
 	}
-
-	//GameInstance->LoadGame();
-	UE_LOG(LogTemp, Warning, TEXT("UMainMenuWidget::OnLoadGameButtonClicked"));
-
-	UWorld* World = GetWorld();
-	check(World);
 	
-	UGameplayStatics::OpenLevel(World, "/Game/Maps/TestLevel", false);
+	//UGameplayStatics::OpenLevel(World, "/Game/Maps/BaseLevel", false);
+	GameInstance->LoadGame();
 
 	if (GEngine)
 	{

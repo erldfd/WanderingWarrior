@@ -8,11 +8,16 @@
 
 #include "InventoryWidget.generated.h"
 
-// params : int32 SlotIndex
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnTileViewItemUpdateInInventoryWidgetSignature, int32 /*SlotIndex*/);
+enum class EInventory : uint8;
 
-// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSlotDragDropEndedSignature, int32 /*DragStartSlotIndex*/, int32 /*DragEndSlotIndex*/);
+// params : int32 SlotIndex, EInventory InventoryType
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnTileViewItemUpdateInInventoryWidgetSignature, int32 /*SlotIndex*/, const EInventory& /*InventoryType*/);
+
+// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex, EInventory InventoryTypeFrom,  EInventory InventoryTypeTo
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnSlotDragDropEndedSignature, int32 /*DragStartSlotIndex*/, int32 /*DragEndSlotIndex*/, const EInventory& /*InventoryTypeFrom*/, const EInventory& /*InventoryTypeTo*/);
+
+// params : int32 SlotIndex, EInventory InventoryType
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLeftMouseDoubleClickSignature, int32 /*SlotIndex*/, const EInventory& /*InventoryType*/)
 /**
  * 
  */
@@ -31,13 +36,19 @@ public:
 
 	void ReceiveSlotItemCount(int32 SlotIndex, int32 NewSlotItemCount);
 
+	const EInventory& GetInventoryType() const;
+	void SetInventoryType(const EInventory& NewInventoryType);
+
 public:
 
-	// params : int32 SlotIndex
+	// params : int32 SlotIndex, EInventory InventoryType
 	FOnTileViewItemUpdateInInventoryWidgetSignature OnTileViewItemUpdateInInventoryWidgetSignature;
 
-	// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex
+	// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex, EInventory InventoryTypeFrom,  EInventory InventoryTypeTo
 	FOnSlotDragDropEndedSignature OnSlotDragDropEndedSignature;
+
+	// params : int32 SlotIndex, EInventory InventoryType
+	FOnLeftMouseDoubleClickSignature OnLeftMouseDoubleClickSignature;
 
 protected:
 
@@ -49,22 +60,31 @@ private:
 	void OnTileViewSlotUpdate(class UInventorySlotWidgetData* UpdatedSlotWidgetData, class UInventorySlotWidget* EntryWidget);
 
 	UFUNCTION()
-	void OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex);
+	void OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeOrigin);
 
 	UFUNCTION()
 	void OnDragDetectedAt(int32 DragStartSlotIndex);
 
+	UFUNCTION()
+	void OnLeftMouseButtonDoubleClick(int32 SlotIndex);
+
 private:
 
-	UPROPERTY(VisibleDefaultsOnly, meta = (AllowPrivateAccess = true), meta = (BindWidget))
-	TObjectPtr<class UInventoryTileView> InventoryTileView;
+	UPROPERTY(VisibleDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UTileView> InventoryTileView;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<class UInventorySlotWidget> InventorySlotWidgetClass;
+	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	//TSubclassOf<class UInventorySlotWidget> InventorySlotWidgetClass;
+	UPROPERTY()
+	TArray<TObjectPtr<class UInventorySlotWidget>> InventorySlotWidgetArray;
 
 	UPROPERTY()
 	int32 SlotCount;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UTexture2D> EmptySlotTexture;
+
+	EInventory InventoryType;
+
+	uint8 bIsUsingListView : 1;
 };

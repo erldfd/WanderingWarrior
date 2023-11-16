@@ -4,6 +4,8 @@
 
 #include "WanderingWarrior/WanderingWarrior.h"
 
+#include "MiniMapCaptureComponent2D.h"
+
 #include "GameFramework/Character.h"
 
 #include "WWCharacter.generated.h"
@@ -211,10 +213,13 @@ public:
 private:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
-	TObjectPtr<USoundBase> DeathSound;
+	TArray<TObjectPtr<USoundBase>> DeathSoundArray;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
 	TArray<TObjectPtr<USoundBase>> HurtSoundArray;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
+	TArray<TObjectPtr<USoundBase>> CutBySwordSoundArray;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "Sound")
 	TArray<TObjectPtr<USoundBase>> AttackShoutSoundArray;
@@ -223,6 +228,7 @@ private:
 public:
 
 	TObjectPtr<class UInventoryComponent> GetInventoryComponent() const;
+	void SetInventoryComponenet(TObjectPtr<class UInventoryComponent> NewInventoryComponent);
 
 protected:
 
@@ -272,4 +278,17 @@ private:
 public:
 
 	void OnInventoryDataSaved(bool bIsSaveSucceeded);
+
+
+	// minimap section
+public:
+
+	void AddToMinimap(AActor* NewActor);
+	void AddAllActorsToMinimap();
+	void AddAllActorsToMinimap(FExceptConditionSignature ExceptCondition);
+
+protected:
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Minimap)
+	TObjectPtr<class UMiniMapCaptureComponent2D> MinimapCaptureComp;
 };

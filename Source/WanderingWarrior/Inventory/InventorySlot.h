@@ -9,6 +9,9 @@
 
 #include "InventorySlot.generated.h"
 
+enum class EInventory : uint8;
+struct FItemDataRow;
+
 /**
  * 
  */
@@ -34,6 +37,9 @@ public:
 	int32 GetSlotItemCount() const;
 	void SetSlotItemCount(int32 NewSlotItemCount);
 
+	const EInventory& GetInventoryType() const;
+	void SetInventoryType(const EInventory& NewInventoryType);
+
 private:
 
 	void UseWeaponItem();
@@ -50,4 +56,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class AWWCharacter> Owner;
+
+	EInventory InventoryType;
 };

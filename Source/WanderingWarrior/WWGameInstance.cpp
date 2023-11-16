@@ -13,6 +13,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/InventorySlot.h"
 #include "WWSaveGame.h"
+#include "MiniMapCaptureComponent2D.h"
 
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
@@ -65,18 +66,6 @@ void UWWGameInstance::Init()
 	Super::Init();
 
 	TSubclassOf<UConversationScriptData> ConversationData = UConversationScriptData::StaticClass();
-	//ConversationManager = NewObject<UConversationManager>(this);
-	//ConversationManager->SetConversationScriptDataArray(ConversationData.GetDefaultObject()->GetConversationScriptDataRowArray());
-
-	////InventoryManager = NewObject<UInventoryManager>(this);
-	////InventoryManager->InitManager();
-
-	//CreditMamager = NewObject<UCreditManager>(this);
-
-	//InteractionManager = NewObject<UInteractionManager>(this);
-	//InteractionManager->OnStartConversationSignature.AddUObject(this, &UWWGameInstance::OnStartConversation);
-
-	//StoreManager = NewObject<UStoreManager>(this);
 }
 
 AWeapon& UWWGameInstance::SpawnWeapon(EWeaponName Name)
@@ -140,36 +129,6 @@ const FItemDataRow& UWWGameInstance::GetMiscItemData(EMiscItemName Name) const
 
 	return *MiscItemDataArray[Index];
 }
-
-//UInventoryManager& UWWGameInstance::GetInventoryManager()
-//{
-//	check(InventoryManager);
-//	return *InventoryManager;
-//}
-
-//UCreditManager& UWWGameInstance::GetCreditManagner()
-//{
-//	check(CreditMamager);
-//	return *CreditMamager;
-//}
-//
-//UConversationManager& UWWGameInstance::GetConversationManager()
-//{
-//	check(ConversationManager);
-//	return *ConversationManager;
-//}
-//
-//UInteractionManager& UWWGameInstance::GetInteractionManager()
-//{
-//	check(InteractionManager);
-//	return *InteractionManager;
-//}
-//
-//UStoreManager& UWWGameInstance::GetStoreManager()
-//{
-//	check(StoreManager);
-//	return *StoreManager;
-//}
 
 bool UWWGameInstance::GetAllowStart()
 {
@@ -249,7 +208,7 @@ void UWWGameInstance::SaveCurrentGame(const FString& SlotName, int32 UserIndex)
 		SavedDelegate.BindUObject(this, &UWWGameInstance::OnCurrentGameSaved);
 
 		SaveGameInstance->ReceiveInventoryData(SlotDataArray);
-		SaveGameInstance->ReceiveCurrnetLevelPath(FName(World->GetName()));
+		SaveGameInstance->ReceiveCurrnetLevelPath(RecentlyLoadedLevelPath);
 
 		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, SlotName, UserIndex, SavedDelegate);
 	}
@@ -286,155 +245,77 @@ void UWWGameInstance::LoadGame(const FString& SlotName, int32 UserIndex)
 		return;
 	}
 
-	//LoadingWidget = CreateWidget<UUserWidget>(this, LoadingWidgetClass);
-	//if (::IsValid(LoadingWidget) == false || LoadingWidget == nullptr)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("LoadingWidget is weird"));
-	//	return;
-	//}
+	/*UWWSaveGame**/ LoadedDataFromSave = Cast<UWWSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex));
+	if (LoadedDataFromSave == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGame, LoadadData == nullptr"));
 
-	//LoadingWidget->AddToViewport();
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("Load Failed.. LoadedData == nullptr"));
+		}
+
+		return;
+	}
+
+	UGameplayStatics::OpenLevel(World, "BaseLevel");
+	PreviousLevelPath = TEXT("BaseLevel");
+	RecentlyLoadedLevelPath = TEXT("BaseLevel");
 
 	FTimerHandle TimerHandle;
+	TimerHandle.Invalidate();
 	FTimerManager& Timer = World->GetTimerManager();
 	Timer.SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()->void {
-		
-		LoadGameInternal(SlotName, UserIndex);
-		}), 0.5f, false);
+
+		LoadGameInternal(LoadedDataFromSave);
+		}), 2.0f, false);
 }
 
-void UWWGameInstance::LoadGameInternal(const FString& SlotName, int32 UserIndex)
+void UWWGameInstance::LoadGameInternal(UWWSaveGame* LoadedData)
 {
-	if (UWWSaveGame* LoadedData = Cast<UWWSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
+	if (LoadedData == nullptr)
 	{
-		TArray<FInventorySlotData>& DataArray = LoadedData->GetInventorySlotDataArray();
-
-		if (DataArray.IsValidIndex(0) == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGame, DataArray.IsValidIndex(0) == false"));
-
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Failed.., DataArray.IsValidIndex(0) == false")));
-			}
-
-			return;
-		}
-
-		AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
-		if (PlayerCharacter == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGame, PlayerCharacter == nullptr"));
-
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Failed.., PlayerCharacter == nullptr")));
-			}
-
-			return;
-		}
-
-		UInventoryComponent* Inventory = PlayerCharacter->GetInventoryComponent();
-		if (Inventory == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGame, Inventory == nullptr"));
-
-			if (GEngine)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Failed.., Inventory == nullptr")));
-			}
-
-			return;
-		}
-
-		int32 CurrentInventorySlotCount = Inventory->GetInventorySlotArray().Num();
-		int32 LoadedInventorySlotCount = DataArray.Num();
-		int32 SlotCount;
-
-		if (CurrentInventorySlotCount < LoadedInventorySlotCount)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGame, CurrentInventorySlotCount < LoadedInventorySlotCount, so data might not be fully loaded."));
-			SlotCount = CurrentInventorySlotCount;
-		}
-		else
-		{
-			SlotCount = LoadedInventorySlotCount;
-		}
-
-		UGameplayStatics::OpenLevel(this, LoadedData->GetSavedLevelPath());
-		
-		/*FLatentActionInfo Info;
-		Info.CallbackTarget = this;
-		Info.ExecutionFunction = TEXT("OnStreamLevelCompleted");
-		UGameplayStatics::LoadStreamLevel(this, TEXT("/Game/Maps/TestLevel"), true, true, Info);*/
-
-		for (int32 i = 0; i < SlotCount; ++i)
-		{
-			if (DataArray[i].SlotItemCount == 0)
-			{
-				Inventory->DeleteItem(i);
-				continue;
-			}
-
-			FItemDataRow& ItemData = DataArray[i].ItemData;
-			Inventory->ObtainItem(i, ItemData);
-		}
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGameInternal, LoadadData == nullptr"));
 
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Succeeded")));
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("Load Failed.. LoadedData == nullptr"));
 		}
 
 		return;
 	}
-}
 
-void UWWGameInstance::PrintCurrentLevelName()
-{
-	UWorld* World = GetWorld();
-	if (World == nullptr)
+	TArray<FInventorySlotData>& InventoryDataArray = LoadedData->GetInventorySlotDataArray();
+	if (TryLoadInventroyData(InventoryDataArray) == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::PrintCurrentLevelName, World == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGameInternal, Loading InventoryData is failed.."));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("Loading InventoryData is failed.."));
+		}
+
+		return;
+	}
+
+	if (TryStreamLevel(LoadedData->GetSavedLevelPath()) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::LoadGameInternal, LevelStream Failed"));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("LevelStream Failed.."));
+		}
+
 		return;
 	}
 
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, FString::Printf(TEXT("CurrentLevelName : %s"), *World->GetName()));
-		UE_LOG(LogTemp, Warning, TEXT("CurrentLevelName : %s"), *World->GetName());
-	}
-}
-
-void UWWGameInstance::StreamLevel()
-{
-	StreamLevel(TEXT("Jail"));
-}
-
-void UWWGameInstance::StreamLevel(const FName& LevelName)
-{
-	ULevelStreaming* Streaming = UGameplayStatics::GetStreamingLevel(this, LevelName);
-	if (Streaming == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::StreamLevel, Streaming == nullptr"));
-
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, TEXT("Streaming failed"));
-		}
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Succeeded")));
 	}
 
-	FLatentActionInfo Info;
-	UGameplayStatics::LoadStreamLevel(this, LevelName, true, true, Info);
-}
-
-void UWWGameInstance::OnStreamLevelCompleted()
-{
-	UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::OnStreamLevelCompleted"));
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, TEXT("LevelStreamCompleted"));
-	}
+	return;
 }
 
 void UWWGameInstance::OnCurrentGameSaved(const FString& SlotName, const int32 UserIndex, bool bIsSucceeded)
@@ -449,12 +330,282 @@ void UWWGameInstance::OnCurrentGameSaved(const FString& SlotName, const int32 Us
 	PlayerCharacter->OnInventoryDataSaved(bIsSucceeded);
 }
 
-//void UWWGameInstance::OnStartConversation(ANPCCharacter* InteractionActor)
+bool UWWGameInstance::TryLoadInventroyData(TArray<FInventorySlotData>& LoadedInventoryData)
+{
+	if (LoadedInventoryData.IsValidIndex(0) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryLoadInventroyData, DataArray.IsValidIndex(0) == false"));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Failed.., DataArray.IsValidIndex(0) == false")));
+		}
+
+		return false;
+	}
+
+	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	if (PlayerCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryLoadInventroyData, PlayerCharacter == nullptr"));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Failed.., PlayerCharacter == nullptr")));
+		}
+
+		return false;
+	}
+
+	UInventoryComponent* Inventory = PlayerCharacter->GetInventoryComponent();
+	if (Inventory == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryLoadInventroyData, Inventory == nullptr"));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, FString::Printf(TEXT("Load Failed.., Inventory == nullptr")));
+		}
+
+		return false;
+	}
+
+	int32 CurrentInventorySlotCount = Inventory->GetInventorySlotArray().Num();
+	int32 LoadedInventorySlotCount = LoadedInventoryData.Num();
+	int32 SlotCount;
+
+	if (CurrentInventorySlotCount < LoadedInventorySlotCount)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryLoadInventroyData, CurrentInventorySlotCount < LoadedInventorySlotCount, so data might not be fully loaded."));
+		SlotCount = CurrentInventorySlotCount;
+	}
+	else
+	{
+		SlotCount = LoadedInventorySlotCount;
+	}
+
+	for (int32 i = 0; i < SlotCount; ++i)
+	{
+		if (LoadedInventoryData[i].SlotItemCount == 0)
+		{
+			Inventory->DeleteItem(i, EInventory::CharacterInventory);
+			continue;
+		}
+
+		FItemDataRow& ItemData = LoadedInventoryData[i].ItemData;
+		Inventory->ObtainItem(i, EInventory::CharacterInventory, ItemData);
+	}
+
+	return true;
+}
+
+bool UWWGameInstance::TryStreamLevel(const FName& LoadedLevelPath)
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryStreamLevel, World == nullptr"));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("UWWGameInstance::TryStreamLevel, World == nullptr"));
+		}
+
+		return false;
+	}
+
+	ULevelStreaming* Streaming = UGameplayStatics::GetStreamingLevel(World, LoadedLevelPath);
+	if (Streaming == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryStreamLevel, Streaming == nullptr, Path : %s"), *LoadedLevelPath.ToString());
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("Load Failed.. Streaming == nullptr"));
+		}
+
+		return false;
+	}
+
+	if (LoadingWidget)
+	{
+		LoadingWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+
+	PreviousLevelPath = RecentlyLoadedLevelPath;
+	RecentlyLoadedLevelPath = LoadedLevelPath;
+	
+	FScriptDelegate OnLoadedDelegate;
+	OnLoadedDelegate.BindUFunction(this, TEXT("OnLevelLoaded"));
+
+	Streaming->OnLevelLoaded.AddUnique(OnLoadedDelegate);
+	
+	FLatentActionInfo Info;
+	UGameplayStatics::LoadStreamLevel(this, LoadedLevelPath, true, true, Info);
+
+	return true;
+}
+
+void UWWGameInstance::StartGame()
+{
+	UWorld* World = GetWorld();
+	if (World == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::StartGame, World == nullptr"))
+		return;
+	}
+
+	UGameplayStatics::OpenLevel(World, TEXT("BaseLevel"));
+	PreviousLevelPath = TEXT("BaseLevel");
+	RecentlyLoadedLevelPath = TEXT("BaseLevel");
+
+	FTimerHandle TimerHandle;
+	TimerHandle.Invalidate();
+	FTimerManager& Timer = World->GetTimerManager();
+	Timer.SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]()->void {
+
+		TryStreamLevel(TEXT("Jail"));
+		}), 2.0f, false);
+}
+
+void UWWGameInstance::AddToMinimap(AActor* NewActor)
+{
+	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if (PlayerController == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::AddToMinimap, PlayerController == nullptr"));
+		return;
+	}
+	
+	AWWCharacter* Player = Cast<AWWCharacter>(PlayerController->GetPawn());
+	if (Player == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::AddToMinimap, Player == nullptr"));
+		return;
+	}
+	
+	Player->AddToMinimap(NewActor);
+}
+
+//AWWCharacter* UWWGameInstance::SpawnCharacter(AWWCharacter* Class, const FTransform& Transform)
 //{
-//	int32 StartIndex = InteractionActor->GetConversationIndex();
+//	AWWCharacter* NewCharacter = GetWorld()->SpawnActor<AWWCharacter>(Transform.GetLocation(),Transform.GetRotation().Rotator());
+//	if (NewCharacter == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::SpawnCharacter, NewCharacter == nullptr"));
+//		return nullptr;
+//	}
 //
-//	ConversationManager->SetConversationNPC(*InteractionActor);
-//	ConversationManager->OpenConversationWidget();
-//	ConversationManager->SetNPCConversation(StartIndex);
-//	ConversationManager->OpenNPCConversationWidget();
+//	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+//	if (PlayerController == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::SpawnCharacter, PlayerController == nullptr, But Implemented SpawnActor"));
+//		return NewCharacter;
+//	}
+//
+//	AWWCharacter* Player = Cast<AWWCharacter>(PlayerController->GetPawn());
+//	if (Player == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::SpawnCharacter, Player == nullptr, But Implemented SpawnActor"));
+//		return NewCharacter;
+//	}
+//
+//	Player->AddToMinimap(NewCharacter);
+//	return NewCharacter;
 //}
+
+void UWWGameInstance::OnLevelLoaded()
+{
+	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	if (PlayerCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::OnLevelLoaded, PlayerCharacter == nullptr"));
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("Load Failed.., PlayerCharacter == nullptr")));
+		}
+
+		return;
+	}
+
+	if (LevelStartPositionMap.Contains(RecentlyLoadedLevelPath) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::OnLevelLoaded, This Key is invalid : %s"), *RecentlyLoadedLevelPath.ToString());
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("UWWGameInstance::OnLevelLoaded, This Key is invalid : %s"), *RecentlyLoadedLevelPath.ToString()));
+		}
+
+		return;
+	}
+
+	if (LevelStartPositionMap.Contains(RecentlyLoadedLevelPath) == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::OnLevelLoaded, This Key is invalid : %s"), *RecentlyLoadedLevelPath.ToString());
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("UWWGameInstance::OnLevelLoaded, This Key is invalid : %s"), *RecentlyLoadedLevelPath.ToString()));
+		}
+
+		return;
+	}
+
+	PlayerCharacter->SetActorLocation(LevelStartPositionMap[RecentlyLoadedLevelPath]);
+	PlayerCharacter->SetActorRotation(LevelStartRotationMap[RecentlyLoadedLevelPath]);
+
+	if (PreviousLevelPath == TEXT("BaseLevel"))
+	{
+		LoadingWidget->SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	SaveCurrentGame();
+	UnLoadLevel(PreviousLevelPath);
+
+	FTimerHandle TimeHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimeHandle, FTimerDelegate::CreateLambda([&]()->void {
+
+		FExceptConditionSignature ExceptCondition;
+		ExceptCondition.BindLambda([](AActor* Actor)->bool {
+
+			ABrush* Brush = Cast<ABrush>(Actor);
+
+			return (Brush != nullptr);
+
+			});
+
+		PlayerCharacter->AddAllActorsToMinimap(ExceptCondition);
+
+		}), 1, false, 3.0f);
+}
+
+void UWWGameInstance::PrintCurrentWorld()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%s"), *GetWorld()->GetName()));
+	}
+}
+
+void UWWGameInstance::UnLoadLevel(const FName& LevelPath)
+{
+	ULevelStreaming* Streaming = UGameplayStatics::GetStreamingLevel(GetWorld() , LevelPath);
+	if (Streaming == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::UnLoadLevel, UnloadFailed %s"), *LevelPath.ToString());
+		return;
+	}
+
+	UGameplayStatics::UnloadStreamLevel(GetWorld(), LevelPath, FLatentActionInfo(), true);
+
+	if (LoadingWidget == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::UnLoadLevel, LoadingWidget == nullptr"));
+		return;
+	}
+
+	LoadingWidget->SetVisibility(ESlateVisibility::Hidden);
+}

@@ -53,8 +53,8 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 	GetMesh()->SetGenerateOverlapEvents(true);
 	MaxHeightInAir = 100000;
 
-	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("INVENTORY"));
-	check(InventoryComponent);
+	//InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("INVENTORY"));
+	//check(InventoryComponent);
 }
 
 void AWWCharacter::PostInitializeComponents()
@@ -583,13 +583,15 @@ void AWWCharacter::OnDead()
 
 void AWWCharacter::PlayDeathSound()
 {
-	if (DeathSound == nullptr)
+	int32 RandomInt = FMath::RandRange(0, DeathSoundArray.Num() - 1);
+
+	if (DeathSoundArray.IsValidIndex(RandomInt) == false || DeathSoundArray[RandomInt] == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PlayDeathSound, DeathSound == nullptr"));
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PlayRandomHurtSound, DeathSoundArray.IsValidIndex(RandomInt) == false || DeathSoundArray[RandomInt] == nullptr"));
 		return;
 	}
 
-	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSoundArray[RandomInt], GetActorLocation());
 }
 
 void AWWCharacter::PlayRandomHurtSound()
@@ -603,6 +605,16 @@ void AWWCharacter::PlayRandomHurtSound()
 	}
 
 	UGameplayStatics::PlaySoundAtLocation(this, HurtSoundArray[RandomInt], GetActorLocation());
+
+	RandomInt = FMath::RandRange(0, CutBySwordSoundArray.Num() - 1);
+
+	if (CutBySwordSoundArray.IsValidIndex(RandomInt) == false || CutBySwordSoundArray[RandomInt] == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PlayRandomHurtSound, CutBySwordSoundArray.IsValidIndex(RandomInt) == false || CutBySwordSoundArray[RandomInt] == nullptr"));
+		return;
+	}
+
+	UGameplayStatics::PlaySoundAtLocation(this, CutBySwordSoundArray[RandomInt], GetActorLocation());
 }
 
 void AWWCharacter::PlayRandomAttackShoutSound()
@@ -628,8 +640,19 @@ TObjectPtr<class UInventoryComponent> AWWCharacter::GetInventoryComponent() cons
 	return InventoryComponent;
 }
 
+void AWWCharacter::SetInventoryComponenet(TObjectPtr<class UInventoryComponent> NewInventoryComponent)
+{
+	InventoryComponent = NewInventoryComponent;
+}
+
 void AWWCharacter::OpenAndCloseInventory()
 {
+	if (InventoryComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::OpenAndCloseInventory, InventoryComponent == nullptr"));
+		return;
+	}
+
 	InventoryComponent->OpenAndCloseInventory();
 }
 
@@ -656,6 +679,39 @@ void AWWCharacter::OnInventoryDataSaved(bool bIsSaveSucceeded)
 	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::OnInventoryDataSaved, SaveSucceeded? : %d"), bIsSaveSucceeded);
 }
 
+void AWWCharacter::AddToMinimap(AActor* NewActor)
+{
+	if (MinimapCaptureComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::AddToMinimap, MinimapCaptureComp == nullptr"));
+		return;
+	}
+
+	MinimapCaptureComp->AddToMinimap(NewActor);
+}
+
+void AWWCharacter::AddAllActorsToMinimap()
+{
+	if (MinimapCaptureComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::AddAllActorsToMinimap, MinimapCaptureComp == nullptr"));
+		return;
+	}
+
+	MinimapCaptureComp->AddAllActorsToMinimap();
+}
+
+void AWWCharacter::AddAllActorsToMinimap(FExceptConditionSignature ExceptCondition)
+{
+	if (MinimapCaptureComp == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::AddAllActorsToMinimap, MinimapCaptureComp == nullptr"));
+		return;
+	}
+
+	MinimapCaptureComp->AddAllActorsToMinimap(ExceptCondition);
+}
+
 void AWWCharacter::TestAction()
 {
 	UE_LOG(LogTemp, Warning, TEXT("TestAction"));
@@ -678,7 +734,6 @@ void AWWCharacter::DoChargeAttack()
 		return;
 	}
 
-	
 	if (bIsSkillStarted == false && GetComboCount() == 0)
 	{
 		PlayChargeAttack1();

@@ -39,4 +39,6 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> LoadGameButton;
+
+	FTimerHandle TimerHandle;
 };

@@ -4,14 +4,17 @@
 #include "Inventory/InventorySlotWidget.h"
 
 #include "InventorySlotWidgetData.h"
+#include "InventoryDragDropOperation.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/PanelWidget.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
+#include "Kismet/GameplayStatics.h"
 
 UInventorySlotWidget::UInventorySlotWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	bIsEmpty = true;
+
 }
 
 int32 UInventorySlotWidget::GetSlotIndex() const
@@ -59,14 +62,60 @@ void UInventorySlotWidget::SetBrushDragSlotImageFromTexture(UTexture2D* NewTextu
 	DragSlotImage->SetBrushFromTexture(NewTexture);
 }
 
-bool UInventorySlotWidget::GetIsEmpty() const
+void UInventorySlotWidget::MakeDragSlotImageEqualToSlotImage()
 {
-	return bIsEmpty;
+	if (SlotImage == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::MakeDragSlotImageEqualToSlotImage, SlotImage == nullptr"));
+		return;
+	}
+
+	if (DragSlotImage == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::MakeDragSlotImageEqualToSlotImage, DragSlotImage == nullptr"));
+		return;
+	}
+
+	UTexture2D* SlotTexture = Cast<UTexture2D>(SlotImage->Brush.GetResourceObject());
+	if (SlotTexture == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::MakeDragSlotImageEqualToSlotImage, SlotTexture == nullptr"));
+		return;
+	}
+
+	DragSlotImage->SetBrushFromTexture(SlotTexture);
 }
 
-void UInventorySlotWidget::SetIsEmpty(bool bNewIsEmpty)
+int32 UInventorySlotWidget::GetSlotItemCount() const
 {
-	bIsEmpty = bNewIsEmpty;
+	return SlotItemCount;
+}
+
+void UInventorySlotWidget::SetSlotItemCount(int32 NewSlotItemCount)
+{
+	if (SlotItemCountTextBlock == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetSlotItemCount, SlotItemCountTextBlock == nullptr"));
+		return;
+	}
+
+	SlotItemCount = NewSlotItemCount;
+
+	SlotItemCountTextBlock->SetText(FText::FromString(FString::FromInt(SlotItemCount)));
+
+	if (SlotItemCount == 0)
+	{
+		SlotItemCountTextBlock->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		SlotItemCountTextBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	}
+}
+
+bool UInventorySlotWidget::IsEmpty() const
+{
+	return (SlotItemCount == 0);
 }
 
 void UInventorySlotWidget::SetInventoryDragDropOperationTag(const FString& NewTag)
@@ -78,18 +127,60 @@ void UInventorySlotWidget::SetInventoryDragDropOperationTag(const FString& NewTa
 
 	if (InventoryDragDropOperation->IsValidLowLevel() == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetSlotIndex, InventoryDragDropOperation->IsValidLowLevel() == false"));
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetInventoryDragDropOperationTag, InventoryDragDropOperation->IsValidLowLevel() == false"));
 		return;
 	}
 
 	InventoryDragDropOperation->Tag = NewTag;
 }
 
+void UInventorySlotWidget::SetInventoryDragDropOperationSlotIndex(int32 NewSlotIndex)
+{
+	if (InventoryDragDropOperation == nullptr)
+	{
+		return;
+	}
+
+	if (InventoryDragDropOperation->IsValidLowLevel() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetInventoryDragDropOperationSlotIndex, InventoryDragDropOperation->IsValidLowLevel() == false"));
+		return;
+	}
+
+	InventoryDragDropOperation->SlotIndex = NewSlotIndex;
+}
+
+void UInventorySlotWidget::SetInventoryDragDropOperationInventoryType(const EInventory& NewInventoryType)
+{
+	if (InventoryDragDropOperation == nullptr)
+	{
+		return;
+	}
+
+	if (InventoryDragDropOperation->IsValidLowLevel() == false)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetInventoryDragDropOperationInventoryType, InventoryDragDropOperation->IsValidLowLevel() == false"));
+		return;
+	}
+
+	InventoryDragDropOperation->InventoryType = NewInventoryType;
+}
+
+const EInventory UInventorySlotWidget::GetInventoryType()
+{
+	return InventoryType;
+}
+
+void UInventorySlotWidget::SetInventoryType(const EInventory& NewInventoryType)
+{
+	InventoryType = NewInventoryType;
+}
+
 void UInventorySlotWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	InventoryDragDropOperation = NewObject<UDragDropOperation>(this);
+	InventoryDragDropOperation = NewObject<UInventoryDragDropOperation>(this);
 	if (InventoryDragDropOperation == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeConstruct, InventoryDragDropOperation == nullptr"));
@@ -111,11 +202,13 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	
 	FEventReply Reply;
-	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnMouseButtonDown, Drag Start, SlotIndex : %d"), SlotIndex);
-	if (bIsEmpty)
+	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnMouseButtonDown, SlotIndex : %d"), SlotIndex);
+	if (IsEmpty())
 	{
 		return Reply.NativeReply;
 	}
+
+	UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 	
 	return Reply.NativeReply;
 }
@@ -123,25 +216,24 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 FReply UInventorySlotWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
-	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnMouseButtonUp, SlotIndex : %d"), SlotIndex);
-	FEventReply Reply;
 
-	
+	FEventReply Reply;
 
 	if (TryToDetectDoubleClick())
 	{
 		NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);
 		return Reply.NativeReply;
 	}
-	
+
 	return Reply.NativeReply;
 }
 
 FReply UInventorySlotWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseMove(InGeometry, InMouseEvent);
-	FEventReply Reply;
 
+	FEventReply Reply;
+	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnMouseMove, SlotIndex : %d"), SlotIndex);
 	return Reply.NativeReply;
 }
 
@@ -151,7 +243,6 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDoubleClick(const FGeometry& InG
 	
 	Reply.NativeReply = Super::NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);
 
-	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnMouseButtonDoubleClick")); // why doesnt work..
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		OnLeftMouseDoubleClickDetectedSignature.Broadcast(SlotIndex);
@@ -164,12 +255,10 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
-	if (bIsEmpty)
+	if (IsEmpty())
 	{
 		return;
 	}
-
-	
 
 	if (InventoryDragDropOperation == nullptr)
 	{
@@ -189,7 +278,7 @@ void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, con
 
 	DragSlotImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	OutOperation->DefaultDragVisual = DragSlotImage;
-	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnDragDetected, DragDropOperation Tag : %s"), *InventoryDragDropOperation->Tag);
+	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnDragDetected, DragDropOperation SlotIndex : %d"), InventoryDragDropOperation->SlotIndex);
 }
 
 void UInventorySlotWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -211,7 +300,14 @@ bool UInventorySlotWidget::NativeOnDragOver(const FGeometry& InGeometry, const F
 
 bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	int32 DragStartIndex = FCString::Atoi(*InOperation->Tag);
+	UInventoryDragDropOperation* InInventoryOperation = Cast<UInventoryDragDropOperation>(InOperation);
+	if (InInventoryOperation == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnDrop, InOperation == nullptr"));
+		return false;
+	}
+
+	int32 DragStartIndex = InInventoryOperation->SlotIndex;
 	int32 DragEndIndex = SlotIndex;
 
 	if (DragStartIndex == DragEndIndex)
@@ -226,8 +322,8 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	}
 
 	InOperation->DefaultDragVisual->SetVisibility(ESlateVisibility::Hidden);
+	OnDragDropEndedSignature.Broadcast(DragStartIndex, DragEndIndex, InInventoryOperation->InventoryType);
 
-	OnDragDropEndedSignature.Broadcast(DragStartIndex, DragEndIndex);
 	return true;
 }
 
@@ -243,14 +339,12 @@ void UInventorySlotWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 	}
 
 	SetSlotIndex(WidgetData->GetSlotIndex());
-
-	bool bIsEmptySlot = (WidgetData->GetSlotItemCount() == 0);
-	SetIsEmpty(bIsEmptySlot);
+	SetSlotItemCount(WidgetData->GetSlotItemCount());
 
 	SetBrushSlotImageFromTexture(WidgetData->GetSlotTexture());
 
 	WidgetData->OnTileViewItemUpdateSignature.Broadcast(WidgetData, this);
-	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnListItemObjectSet, WidgetData Texture : %s, Index : %d"), *WidgetData->GetSlotTexture()->GetName(), WidgetData->GetSlotIndex());
+	//UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnListItemObjectSet, WidgetData Texture : %s, Index : %d"), *WidgetData->GetSlotTexture()->GetName(), WidgetData->GetSlotIndex());
 }
 
 bool UInventorySlotWidget::TryToDetectDoubleClick()

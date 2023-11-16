@@ -12,6 +12,7 @@
 
 enum class EWeaponName : uint8;
 enum class EMiscItemName : uint8;
+struct FInventorySlotData;
 /**
  * 
  */
@@ -34,16 +35,6 @@ public:
 	const struct FItemDataRow& GetWeaponData(EWeaponName Name) const;
 	const struct FItemDataRow& GetMiscItemData(EMiscItemName Name) const;
 
-	//class UInventoryManager& GetInventoryManager();
-
-	/*class UCreditManager& GetCreditManagner();
-
-	class UConversationManager& GetConversationManager();
-
-	class UInteractionManager& GetInteractionManager();
-
-	class UStoreManager& GetStoreManager();*/
-
 	UFUNCTION(BlueprintCallable)
 	bool GetAllowStart();
 	UFUNCTION(BlueprintCallable)
@@ -56,16 +47,22 @@ public:
 	UFUNCTION(Exec)
 	void LoadGame();
 	void LoadGame(const FString& SlotName, int32 UserIndex);
-	void LoadGameInternal(const FString& SlotName, int32 UserIndex);
+	void LoadGameInternal(class UWWSaveGame* LoadedData);
 
-	UFUNCTION(Exec)
-	void PrintCurrentLevelName();
+	// return value => Stream succeeded : true, failed : false
+	UFUNCTION(Exec, BlueprintCallable)
+	bool TryStreamLevel(const FName& LoadedLevelPath);
 
-	UFUNCTION(Exec)
-	void StreamLevel();
-	void StreamLevel(const FName& LevelName);
+	UFUNCTION(Exec, BlueprintCallable)
+	void UnLoadLevel(const FName& LevelPath);
 
-	void OnStreamLevelCompleted();
+	void StartGame();
+
+	//UFUNCTION(BlueprintCallable)
+	//class AWWCharacter* SpawnCharacter(class AWWCharacter* Class, const FTransform& Transform);
+
+	UFUNCTION(BlueprintCallable)
+	void AddToMinimap(AActor* NewActor);
 
 public:
 
@@ -79,6 +76,15 @@ private:
 	//UFUNCTION()
 	//void OnStartConversation(ANPCCharacter* InteractionActor);
 
+	// return value => loadsucceeded : true, failed : false
+	bool TryLoadInventroyData(TArray<FInventorySlotData>& LoadedInventoryData);
+
+	UFUNCTION()
+	void OnLevelLoaded();
+
+	UFUNCTION(Exec)
+	void PrintCurrentWorld();
+
 private:
 
 	UPROPERTY()
@@ -91,24 +97,22 @@ private:
 
 	TArray<struct FItemDataRow*> MiscItemDataArray;
 
-	//UPROPERTY()
-	//TObjectPtr<class UInventoryManager> InventoryManager;
+	/*UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> LoadingWidgetClass;*/
+	// Set from BaseLevelBlueprint
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
+	TObjectPtr<UUserWidget> LoadingWidget;
 
-	//UPROPERTY()
-	//TObjectPtr<class UCreditManager> CreditMamager;
-
-	//UPROPERTY()
-	//TObjectPtr<class UConversationManager> ConversationManager;
-
-	//UPROPERTY()
-	//TObjectPtr<class UInteractionManager> InteractionManager;
-
-	//UPROPERTY()
-	//TObjectPtr<class UStoreManager> StoreManager;
+	// FName : Level Path, FVector : PayerStartPosition
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TMap<FName, FVector> LevelStartPositionMap;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<UUserWidget> LoadingWidgetClass;
+	TMap<FName, FRotator> LevelStartRotationMap;
+
+	FName RecentlyLoadedLevelPath;
+	FName PreviousLevelPath;
 
 	UPROPERTY()
-	TObjectPtr<UUserWidget> LoadingWidget;
+	class UWWSaveGame* LoadedDataFromSave;
 };

@@ -6,7 +6,6 @@
 #include "InventorySlotWidget.h"
 #include "InventorySlotWidgetData.h"
 #include "InventoryTileView.h"
-#include "Inventory/InventoryComponent.h"
 #include "Character/WWCharacter.h"
 
 int32 UInventoryWidget::GetSlotCount() const
@@ -27,19 +26,45 @@ void UInventoryWidget::SetSlotCount(int32 NewSlotCount)
 
 void UInventoryWidget::SetBrushSlotImageFromTexture(int32 SlotIndex, UTexture2D* NewTexture)
 {
-	UInventorySlotWidgetData* SlotWidgetData = Cast<UInventorySlotWidgetData>(InventoryTileView->GetItemAt(SlotIndex));
-	if (SlotWidgetData == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::SetBrushSlotImageFromTexture, SlotWidgetData == nullptr"));
-		return;
-	}
-
 	if (EmptySlotTexture == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::SetBrushSlotImageFromTexture, EmptySlotTexture == nullptr"));
 		return;
 	}
 
+	if (bIsUsingListView == false)
+	{
+		if (InventorySlotWidgetArray.IsValidIndex(SlotIndex) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::SetBrushSlotImageFromTexture, InventorySlotWidgetArray.IsValidIndex(%d) == false"), SlotIndex);
+			return;
+		}
+
+		UInventorySlotWidget* SlotWidget = InventorySlotWidgetArray[SlotIndex];
+		if (SlotWidget == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::SetBrushSlotImageFromTexture, SlotWidget == nullptr"));
+			return;
+		}
+
+		if (NewTexture)
+		{
+			SlotWidget->SetBrushSlotImageFromTexture(NewTexture);
+		}
+		else
+		{
+			SlotWidget->SetBrushSlotImageFromTexture(EmptySlotTexture);
+		}
+
+		return;
+	}
+
+	UInventorySlotWidgetData* SlotWidgetData = Cast<UInventorySlotWidgetData>(InventoryTileView->GetItemAt(SlotIndex));
+	if (SlotWidgetData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::SetBrushSlotImageFromTexture, SlotWidgetData == nullptr"));
+		return;
+	}
 
 	if (NewTexture)
 	{
@@ -73,6 +98,26 @@ void UInventoryWidget::SetBrushSlotImageFromTexture(int32 SlotIndex, UTexture2D*
 
 void UInventoryWidget::ReceiveSlotItemCount(int32 SlotIndex, int32 NewSlotItemCount)
 {
+	if (bIsUsingListView == false)
+	{
+		if (InventorySlotWidgetArray.IsValidIndex(SlotIndex) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::ReceiveSlotItemCount, InventorySlotWidgetArray.IsValidIndex(%d) == false"), SlotIndex);
+			return;
+		}
+
+		UInventorySlotWidget* SlotWidget = InventorySlotWidgetArray[SlotIndex];
+		if (SlotWidget == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::ReceiveSlotItemCount, SlotWidget == nullptr"));
+			return;
+		}
+
+		SlotWidget->SetSlotItemCount(NewSlotItemCount);
+
+		return;
+	}
+
 	UInventorySlotWidgetData* SlotWidgetData = Cast<UInventorySlotWidgetData>(InventoryTileView->GetItemAt(SlotIndex));
 	if (SlotWidgetData == nullptr)
 	{
@@ -89,64 +134,72 @@ void UInventoryWidget::ReceiveSlotItemCount(int32 SlotIndex, int32 NewSlotItemCo
 	}
 
 	bool bIsEmpty = (NewSlotItemCount == 0);
-	EntryWiget->SetIsEmpty(bIsEmpty);
+	EntryWiget->SetSlotItemCount(NewSlotItemCount);
+}
+
+const EInventory& UInventoryWidget::GetInventoryType() const
+{
+	return InventoryType;
+}
+
+void UInventoryWidget::SetInventoryType(const EInventory& NewInventoryType)
+{
+	InventoryType = NewInventoryType;
 }
 
 void UInventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	InventoryTileView = Cast<UTileView>(GetWidgetFromName(TEXT("TileViewInventory")));
+
 	if (InventoryTileView == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::NativeConstruct, InventoryTileView == nullptr"));
+		bIsUsingListView = false;
+
+		InventorySlotWidgetArray.Empty(SlotCount);
+
+		for (int32 i = 0; i < SlotCount; ++i)
+		{
+			FString SlotWidgetName = FString::Printf(TEXT("Slot_%d"), i);
+
+			UInventorySlotWidget* SlotWidget = Cast<UInventorySlotWidget>(GetWidgetFromName(FName(SlotWidgetName)));
+			if (SlotWidget == nullptr)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::NativeConstruct, Can't Find Slot Widget %d"), i);
+
+				if (GEngine)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, FString::Printf(TEXT("UInventoryWidget::NativeConstruct, Can't Find Slot Widget %d"), i));
+				}
+
+				return;
+			}
+
+			SlotWidget->SetSlotIndex(i);
+			SlotWidget->SetBrushSlotImageFromTexture(EmptySlotTexture);
+			SlotWidget->SetSlotItemCount(0);
+			SlotWidget->OnDragDropEndedSignature.AddUObject(this, &UInventoryWidget::OnDragDropEnded);
+			SlotWidget->OnLeftMouseDoubleClickDetectedSignature.AddUObject(this, &UInventoryWidget::OnLeftMouseButtonDoubleClick);
+			SlotWidget->OnDragDetectedSignature.AddUObject(this, &UInventoryWidget::OnDragDetectedAt);
+			
+			InventorySlotWidgetArray.Emplace(SlotWidget);
+		}
+
 		return;
 	}
 
-	if (InventorySlotWidgetClass == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::NativeConstruct, InventorySlotWidgetClass == nullptr"));
-		return;
-	}
+	bIsUsingListView = true;
 
 	for (int i = 0; i < SlotCount; ++i)
 	{
 		UInventorySlotWidgetData* NewItem = NewObject<UInventorySlotWidgetData>(this);
-		//UInventorySlotWidgetData* NewItem = CreateWidget<UInventorySlotWidgetData>(this, InventorySlotWidgetClass);
 		NewItem->SetSlotIndex(i);
 		NewItem->SetSlotTexture(*EmptySlotTexture);
-		//NewItem->SetBrushNewImageFromTexture(EmptySlotTexture);
 		NewItem->OnTileViewItemUpdateSignature.AddUObject(this, &UInventoryWidget::OnTileViewSlotUpdate);
 
 		InventoryTileView->AddItem(NewItem);
-		
-		/*UInventorySlotWidget* Entry = Cast<UInventorySlotWidget>(InventoryTileView->GetEntryWidgetFromItem(NewItem));
-		if (Entry == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::NativeConstruct, Entry == nullptr, SlotIndex : %d"), i);
-			continue;
-		}
-
-		if (Entry->OnTileViewItemUpdateSignature.IsBound() == false)
-		{
-			Entry->OnTileViewItemUpdateSignature.AddUObject(this, &UInventoryWidget::OnTileViewSlotUpdate);
-			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::NativeConstruct, Entry delegate Bound"));
-		}*/
-		
 	}
-
-	//const TArray<UUserWidget*> EntryWidgetArray = InventoryTileView->GetDisplayedEntryWidgets();
-
-	//for (auto& EntryWidget : EntryWidgetArray)
-	//{
-	//	UInventorySlotWidget* EntrySlot = Cast<UInventorySlotWidget>(EntryWidget);
-	//	
-	//	if (EntrySlot->OnDragDropEndedSignature.IsBound())
-	//	{
-	//		continue;
-	//	}
-
-	//	EntrySlot->OnDragDropEndedSignature.AddUObject(this, &UInventoryWidget::OnDragDropEnded);
-	//}
 }
 
 void UInventoryWidget::OnTileViewSlotUpdate(UInventorySlotWidgetData* UpdatedSlotWidgetData, UInventorySlotWidget* EntryWidget)
@@ -157,7 +210,7 @@ void UInventoryWidget::OnTileViewSlotUpdate(UInventorySlotWidgetData* UpdatedSlo
 		return;
 	}
 
-	OnTileViewItemUpdateInInventoryWidgetSignature.Broadcast(UpdatedSlotWidgetData->GetSlotIndex());
+	OnTileViewItemUpdateInInventoryWidgetSignature.Broadcast(UpdatedSlotWidgetData->GetSlotIndex(), InventoryType);
 
 	if (EntryWidget == nullptr)
 	{
@@ -172,38 +225,44 @@ void UInventoryWidget::OnTileViewSlotUpdate(UInventorySlotWidgetData* UpdatedSlo
 
 	if (EntryWidget->OnLeftMouseDoubleClickDetectedSignature.IsBound() == false)
 	{
-		AWWCharacter* OwningCharacter = Cast<AWWCharacter>(GetOwningPlayerPawn());
-		if (OwningCharacter == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnTileViewSlotUpdate, OwningCharacter == nullptr"));
-			return;
-		}
-
-		UInventoryComponent* InventoryComponent = OwningCharacter->GetInventoryComponent();
-		if (InventoryComponent == nullptr)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnTileViewSlotUpdate, InventoryComponent == nullptr"));
-			return;
-		}
-
-		EntryWidget->OnLeftMouseDoubleClickDetectedSignature.AddUObject(InventoryComponent, &UInventoryComponent::OnLeftMouseButtonDoubleClickDetected);
-		UE_LOG(LogTemp, Warning, TEXT("EntryWidget->OnLeftMouseDoubleClickDetectedSignature is Bound? : %d"), EntryWidget->OnLeftMouseDoubleClickDetectedSignature.IsBound());
+		EntryWidget->OnLeftMouseDoubleClickDetectedSignature.AddUObject(this, &UInventoryWidget::OnLeftMouseButtonDoubleClick);
 	}
 
 	if (EntryWidget->OnDragDetectedSignature.IsBound() == false)
 	{
 		EntryWidget->OnDragDetectedSignature.AddUObject(this, &UInventoryWidget::OnDragDetectedAt);
-		UE_LOG(LogTemp, Warning, TEXT("EntryWidget->OnDragDetectedSignature is Bound? : %d"), EntryWidget->OnDragDetectedSignature.IsBound());
 	}
 }
 
-void UInventoryWidget::OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex)
+void UInventoryWidget::OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeOrigin)
 {
-	OnSlotDragDropEndedSignature.Broadcast(DragStartSlotIndex, DragEndSlotIndex);
+	OnSlotDragDropEndedSignature.Broadcast(DragStartSlotIndex, DragEndSlotIndex, InventoryTypeOrigin, InventoryType);
 }
 
 void UInventoryWidget::OnDragDetectedAt(int32 DragStartSlotIndex)
 {
+	if (bIsUsingListView == false)
+	{
+		if (InventorySlotWidgetArray.IsValidIndex(DragStartSlotIndex) == false)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnDragDetectedAt, InventorySlotWidgetArray.IsValidIndex(%d) == false"), DragStartSlotIndex);
+			return;
+		}
+
+		UInventorySlotWidget* SlotWidget = InventorySlotWidgetArray[DragStartSlotIndex];
+		if (SlotWidget == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnDragDetectedAt, SlotWidget == nullptr"));
+			return;
+		}
+
+		SlotWidget->MakeDragSlotImageEqualToSlotImage();
+		SlotWidget->SetInventoryDragDropOperationSlotIndex(DragStartSlotIndex);
+		SlotWidget->SetInventoryDragDropOperationInventoryType(InventoryType);
+
+		return;
+	}
+
 	if (InventoryTileView == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnDragDetected, InventoryTileView == nullptr"));
@@ -225,6 +284,12 @@ void UInventoryWidget::OnDragDetectedAt(int32 DragStartSlotIndex)
 	}
 
 	EntryWidget->SetBrushDragSlotImageFromTexture(WidgetData->GetSlotTexture());
-	EntryWidget->SetInventoryDragDropOperationTag(FString::FromInt(DragStartSlotIndex));
-	UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnDragDetectedAt"));
+	//EntryWidget->SetInventoryDragDropOperationTag(FString::FromInt(DragStartSlotIndex));
+	EntryWidget->SetInventoryDragDropOperationSlotIndex(DragStartSlotIndex);
+	EntryWidget->SetInventoryDragDropOperationInventoryType(InventoryType);
+}
+
+void UInventoryWidget::OnLeftMouseButtonDoubleClick(int32 SlotIndex)
+{
+	OnLeftMouseDoubleClickSignature.Broadcast(SlotIndex, InventoryType);
 }

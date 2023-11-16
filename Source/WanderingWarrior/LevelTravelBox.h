@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "LevelSequenceDirector.h"
-#include "TestLCDirector.generated.h"
+#include "Engine/TriggerBox.h"
+#include "LevelTravelBox.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WANDERINGWARRIOR_API UTestLCDirector : public ULevelSequenceDirector
+class WANDERINGWARRIOR_API ALevelTravelBox : public ATriggerBox
 {
 	GENERATED_BODY()
 	
