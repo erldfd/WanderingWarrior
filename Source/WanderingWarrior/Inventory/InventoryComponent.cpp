@@ -66,21 +66,36 @@ void UInventoryComponent::BeginPlay()
 	//InventoryWidgetClassArray.Emplace(InventoryWidgetClass);
 	//InventoryWidgetClassArray.Emplace(QuickSlotWidgetClass);
 
-	if (InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false)
+	//if (InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::BeginPlay, InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false"));
+	//	return;
+	//}
+
+	//InventoryWidgetArray.Empty(InventoryWidgetCount);
+
+	//CreateInventoryWidget(InventoryWidgetClassArray[int(EInventory::CharacterInventory)], EInventory::CharacterInventory, SlotCount);
+	//CreateInventoryWidget(InventoryWidgetClassArray[int(EInventory::CharacterQuickSlot)], EInventory::CharacterQuickSlot, QuickSlotCount);
+
+	CreateInventoryWidget(InventoryWidgetClass, EInventory::CharacterInventory, SlotCount, InventoryWidget, 1);
+	CreateInventoryWidget(QuickSlotWidgetClass, EInventory::CharacterQuickSlot, QuickSlotCount, QuickSlotWidget, 0);
+
+	/*if (InventoryWidgetArray[int(EInventory::CharacterQuickSlot)])
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::BeginPlay, InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false"));
-		return;
+		InventoryWidgetArray[int(EInventory::CharacterQuickSlot)]->SetVisibility(ESlateVisibility::Hidden);
+		InventoryWidgetArray[0]->SetVisibility(ESlateVisibility::Hidden);
+
+	}*/
+
+	if (InventoryWidget)
+	{
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+		InventoryWidget->SetPositionInViewport(FVector2D(0, 200));
 	}
 
-	InventoryWidgetArray.Empty(InventoryWidgetCount);
-
-	CreateInventoryWidget(InventoryWidgetClassArray[int(EInventory::CharacterInventory)], EInventory::CharacterInventory, SlotCount);
-	CreateInventoryWidget(InventoryWidgetClassArray[int(EInventory::CharacterQuickSlot)], EInventory::CharacterQuickSlot, QuickSlotCount);
-
-	if (InventoryWidgetArray[int(EInventory::CharacterQuickSlot)])
+	if (QuickSlotWidget)
 	{
-		InventoryWidgetArray[int(EInventory::CharacterQuickSlot)]->SetVisibility(ESlateVisibility::Visible);
-		InventoryWidgetArray[0]->SetVisibility(ESlateVisibility::Visible);
+		QuickSlotWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -94,8 +109,9 @@ void UInventoryComponent::UseSlotItem(int32 SlotIndex, const EInventory& Invento
 		return;
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, Before SlotItemCount : %d"), Slot->GetSlotItemCount());
 	Slot->UseSlotItem();
-
+	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, After SlotItemCount : %d"), Slot->GetSlotItemCount());
 	if (Slot->IsEmpty() == false)
 	{
 		return;
@@ -141,9 +157,16 @@ void UInventoryComponent::ObtainItem(int32 SlotIndex, const EInventory& Inventor
 		return;
 	}
 
-	Slot->SetSlotItemData(ItemData);
-	Slot->SetSlotItemCount(Slot->GetSlotItemCount() + 1);
-
+	if (Slot->GetSlotItemData().Name.ToString() == ItemData.Name.ToString())
+	{
+		Slot->SetSlotItemCount(Slot->GetSlotItemCount() + 1);
+	}
+	else
+	{
+		Slot->SetSlotItemData(ItemData);
+		Slot->SetSlotItemCount(1);
+	}
+	
 	UInventoryWidget* CurrentInventoryWidget = nullptr;
 
 	if (GetInventoryWidget(InventoryType, CurrentInventoryWidget) == false)
@@ -234,38 +257,41 @@ void UInventoryComponent::SetSlotItem(const EInventory& InventoryType, int32 Slo
 	CurrentInventoryWidget->ReceiveSlotItemCount(SlotIndex, Slot->GetSlotItemCount());
 }
 
-void UInventoryComponent::OnUpdateSlotWhenScrollTileView(int32 SlotIndex)
-{
-	if (InventorySlotArray.IsValidIndex(SlotIndex) == false || InventorySlotArray[SlotIndex] == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView, SlotIndex is not valid"));
-		return;
-	}
-
-	/*if (InventoryWidget == nullptr)
-	{
-		return;
-	}*/
-
-	UInventorySlot* Slot = InventorySlotArray[SlotIndex];
-
-	/*UInventoryWidget* InventoryWidgetTo;
-
-	if (GetInventoryWidget(InventoryTypeTo, InventoryWidgetTo) == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, Fail to GetInventoryWidget"));
-		return;
-	}*/
-
-	if (Slot->IsEmpty())
-	{
-		InventoryWidgetArray[0]->SetBrushSlotImageFromTexture(SlotIndex);
-	}
-	else
-	{
-		InventoryWidgetArray[0]->SetBrushSlotImageFromTexture(SlotIndex, Slot->GetSlotItemData().SlotTexture);
-	}
-}
+//void UInventoryComponent::OnUpdateSlotWhenScrollTileView(int32 SlotIndex)
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView"));
+//	//if (InventorySlotArray.IsValidIndex(SlotIndex) == false || InventorySlotArray[SlotIndex] == nullptr)
+//	//{
+//	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView, SlotIndex is not valid"));
+//	//	return;
+//	//}
+//
+//	if (InventoryWidget == nullptr)
+//	{
+//		return;
+//	}
+//
+//	UInventorySlot* Slot = InventorySlotArray[SlotIndex];
+//
+//	//UInventoryWidget* InventoryWidgetTo;
+//
+//	//if (GetInventoryWidget(InventoryTypeTo, InventoryWidgetTo) == false)
+//	//{
+//	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, Fail to GetInventoryWidget"));
+//	//	return;
+//	//}
+//
+//	if (Slot->IsEmpty())
+//	{
+//		InventoryWidget->SetBrushSlotImageFromTexture(SlotIndex);
+//	}
+//	else
+//	{
+//		InventoryWidget->SetBrushSlotImageFromTexture(SlotIndex, Slot->GetSlotItemData().SlotTexture);
+//	}
+//
+//	InventoryWidget->UpdateEntryWidgetInventoryType(SlotIndex);
+//}
 
 void UInventoryComponent::OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo)
 {
@@ -463,7 +489,47 @@ void UInventoryComponent::InitSlotArray(int32 NewSlotCount, const EInventory& In
 	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::InitSlotArray, Owner : %s ------------------------------------------"), *GetOwner()->GetName());
 }
 
-void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass, const EInventory& InventoryType, int32 NewSlotCount)
+//void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass, const EInventory& InventoryType, int32 NewSlotCount)
+//{
+//	UWorld* World = GetWorld();
+//	if (World == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, World == nullptr"));
+//		return;
+//	}
+//
+//	if (InInventoryWidgetClass == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, InventoryWidgetClass == nullptr"));
+//		return;
+//	}
+//
+//	UInventoryWidget* NewInventoryWidget = CreateWidget<UInventoryWidget>(World, InInventoryWidgetClass);
+//	
+//	if (NewInventoryWidget == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, NewInventoryWidget == nullptr"));
+//		return;
+//	}
+//
+//	NewInventoryWidget->SetSlotCount(NewSlotCount);
+//	NewInventoryWidget->AddToViewport();
+//	NewInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+//	NewInventoryWidget->SetInventoryType(InventoryType);
+//	NewInventoryWidget->OnSlotDragDropEndedSignature.AddUObject(this, &UInventoryComponent::OnDragDropEnded);
+//	NewInventoryWidget->OnLeftMouseDoubleClickSignature.AddUObject(this, &UInventoryComponent::OnLeftMouseButtonDoubleClickDetected);
+//
+//	InventoryWidgetArray.Emplace(NewInventoryWidget);
+//	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Current InventoryWidgetArray ----------------------------"));
+//	//for (auto& Widget : InventoryWidgetArray)
+//	//{
+//	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, %s"), *Widget->GetName());
+//	//}
+//
+//	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Owner : %s ------------------------------------------"), *GetOwner()->GetName());
+//}
+
+void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass, const EInventory& InventoryType, int32 NewSlotCount, TObjectPtr<UInventoryWidget>& OutInventoryWidget, int32 ZOrder)
 {
 	UWorld* World = GetWorld();
 	if (World == nullptr)
@@ -479,7 +545,7 @@ void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInvento
 	}
 
 	UInventoryWidget* NewInventoryWidget = CreateWidget<UInventoryWidget>(World, InInventoryWidgetClass);
-	
+
 	if (NewInventoryWidget == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, NewInventoryWidget == nullptr"));
@@ -487,13 +553,15 @@ void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInvento
 	}
 
 	NewInventoryWidget->SetSlotCount(NewSlotCount);
-	NewInventoryWidget->AddToViewport();
+	NewInventoryWidget->AddToViewport(ZOrder);
 	NewInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 	NewInventoryWidget->SetInventoryType(InventoryType);
 	NewInventoryWidget->OnSlotDragDropEndedSignature.AddUObject(this, &UInventoryComponent::OnDragDropEnded);
 	NewInventoryWidget->OnLeftMouseDoubleClickSignature.AddUObject(this, &UInventoryComponent::OnLeftMouseButtonDoubleClickDetected);
 
-	InventoryWidgetArray.Emplace(NewInventoryWidget);
+	OutInventoryWidget = NewInventoryWidget;
+
+	//InventoryWidgetArray.Emplace(NewInventoryWidget);
 	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Current InventoryWidgetArray ----------------------------"));
 	//for (auto& Widget : InventoryWidgetArray)
 	//{
@@ -525,17 +593,26 @@ bool UInventoryComponent::GetInventorySlot(int32 SlotIndex, const EInventory& In
 	return ((OutInventorySlot != nullptr) && (::IsValid(OutInventorySlot)));
 }
 
-bool UInventoryComponent::GetInventoryWidget(const EInventory& InventoryType, UInventoryWidget*& OutInvntoryWidget)
+bool UInventoryComponent::GetInventoryWidget(const EInventory& InventoryType, UInventoryWidget*& OutInventoryWidget)
 {
-	if (InventoryWidgetArray.IsValidIndex(int(InventoryType)) == false || InventoryWidgetArray[int(InventoryType)] == nullptr)
+	/*if (InventoryWidgetArray.IsValidIndex(int(InventoryType)) == false || InventoryWidgetArray[int(InventoryType)] == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::GetInventoryWidget, Fail to Get InventoryWiget : %d"), int(InventoryType));
 		return false;
+	}*/
+
+	if (InventoryType == EInventory::CharacterInventory && InventoryWidget)
+	{
+		OutInventoryWidget = InventoryWidget;
+	}
+	else if (QuickSlotWidget)
+	{
+		OutInventoryWidget = QuickSlotWidget;
 	}
 
-	OutInvntoryWidget = InventoryWidgetArray[int(InventoryType)];
+	//OutInventoryWidget = InventoryWidgetArray[int(InventoryType)];
 
-	return (OutInvntoryWidget != nullptr && ::IsValid(OutInvntoryWidget));
+	return (OutInventoryWidget != nullptr && ::IsValid(OutInventoryWidget));
 }
 
 void UInventoryComponent::OnLeftMouseButtonDoubleClickDetected(int32 SlotIndex, const EInventory& InInventoryType)
@@ -550,10 +627,15 @@ const TArray<TObjectPtr<class UInventorySlot>>& UInventoryComponent::GetInventor
 
 void UInventoryComponent::OpenAndCloseInventory()
 {
-	if (InventoryWidgetArray.IsValidIndex(0) == false || InventoryWidgetArray[0] == nullptr)
+	//if (InventoryWidgetArray.IsValidIndex(0) == false || InventoryWidgetArray[0] == nullptr)
+	//{
+	//	AWWCharacter* CompOwner = Cast<AWWCharacter>(GetOwner());
+	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OpenAndCloseInventory, InventoryWidget == nullptr, Owner : %s, is player : %d, Location : %s"), *CompOwner->GetName(), CompOwner->GetIsPlayer(), *CompOwner->GetActorLocation().ToString());
+	//	return;
+	//}
+
+	if (InventoryWidget == nullptr)
 	{
-		AWWCharacter* CompOwner = Cast<AWWCharacter>(GetOwner());
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OpenAndCloseInventory, InventoryWidget == nullptr, Owner : %s, is player : %d, Location : %s"), *CompOwner->GetName(), CompOwner->GetIsPlayer(), *CompOwner->GetActorLocation().ToString());
 		return;
 	}
 
@@ -564,19 +646,31 @@ void UInventoryComponent::OpenAndCloseInventory()
 		return;
 	}
 
-	if (InventoryWidgetArray[0]->GetVisibility() == ESlateVisibility::Hidden)
+	if (InventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
 	{
-		InventoryWidgetArray[0]->SetVisibility(ESlateVisibility::Visible);
+		InventoryWidget->SetVisibility(ESlateVisibility::Visible);
 		PlayerController->SetShowMouseCursor(true);
 		PlayerController->SetGameModeGameAndUI();
 		PlayerController->SetGameWorldPause(true);
 	}
 	else
 	{
-		InventoryWidgetArray[0]->SetVisibility(ESlateVisibility::Hidden);
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		PlayerController->SetShowMouseCursor(false);
 		PlayerController->SetGameModeGameOnly();
 		PlayerController->SetGameWorldPause(false);
+	}
+}
+
+void UInventoryComponent::SetHideQuickSlot(bool bShouldHide)
+{
+	if (bShouldHide)
+	{
+		QuickSlotWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		QuickSlotWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 

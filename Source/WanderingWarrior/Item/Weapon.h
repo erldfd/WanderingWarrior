@@ -19,7 +19,7 @@ public:
 
 	void SetAttackDamage(float NewDamage);
 
-	virtual void Use(class AWWCharacter* ItemUser) override;
+	virtual bool Use(class AWWCharacter* ItemUser) override;
 
 	void SetBoxComponentCollision(ECollisionEnabled::Type NewType);
 

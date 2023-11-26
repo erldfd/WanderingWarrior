@@ -11,6 +11,8 @@
 #include "Item/Weapon.h"
 #include "Item/MiscItem.h"
 #include "Inventory/InventoryWidget.h"
+#include "Inventory/InventoryComponent.h"
+#include "WWGameMode.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
@@ -27,7 +29,7 @@ AWWPlayerController::AWWPlayerController() : bIsInputModeGameOnly(true)
 void AWWPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-
+	UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::OnPossess"));
 	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(aPawn);
 	if (PlayerCharacter == nullptr)
 	{
@@ -150,15 +152,21 @@ void AWWPlayerController::SetGameModeUIOnly()
 	bIsInputModeGameOnly = false;
 }
 
-void AWWPlayerController::SetInGameWidgetHide(bool HideWidget)
+void AWWPlayerController::SetInGameWidgetHide(bool bShouldHideWidget)
 {
+	AWWGameMode* GameMode = Cast<AWWGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GameMode)
+	{
+		GameMode->SetHideComboCountWidget(bShouldHideWidget);
+	}
+
 	if (InGameWidget == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::SetInGameWidgetHide, InGameWidget == nullptr"));
 		return;
 	}
 
-	if (HideWidget)
+	if (bShouldHideWidget)
 	{
 		InGameWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
@@ -166,6 +174,22 @@ void AWWPlayerController::SetInGameWidgetHide(bool HideWidget)
 	{
 		InGameWidget->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (PlayerCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::SetInGameWidgetHide, Player == nullptr"));
+		return;
+	}
+
+	UInventoryComponent* Inventory = PlayerCharacter->GetInventoryComponent();
+	if (Inventory == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AWWPlayerController::SetInGameWidgetHide, Player == nullptr"));
+		return;
+	}
+
+	Inventory->SetHideQuickSlot(bShouldHideWidget);
 }
 
 void AWWPlayerController::SetGameWorldPause(bool bShouldPause)

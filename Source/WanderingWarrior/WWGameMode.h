@@ -27,33 +27,7 @@ public:
 
 	void AddKillCount();
 
-//	UFUNCTION(Exec)
-//	void SaveCurrentGame();
-//
-//	//UFUNCTION(Exec)
-//	void SaveCurrentGame(const FString& SlotName, int32 UserIndex);
-//
-//	UFUNCTION(Exec)
-//	void LoadGame();
-//
-//	//UFUNCTION(Exec)
-//	void LoadGame(const FString& SlotName, int32 UserIndex);
-//
-//private:
-//
-//	UFUNCTION()
-//	void OnCurrentGameSaved(const FString& SlotName, const int32 UserIndex, bool bIsSucceeded);
-//
-//	UFUNCTION()
-//	void OnLoadGame(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData);
-
-	UFUNCTION(Exec)
-	void StreamPlease();
-
-private:
-
-	UFUNCTION()
-	void OnStreamLevelCompleted();
+	void SetHideComboCountWidget(bool bShouldHide);
 	
 private:
 

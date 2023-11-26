@@ -6,6 +6,7 @@
 #include "WWEnumClassContainer.h"
 #include "WWGameInstance.h"
 #include "Item/Weapon.h"
+#include "Item/MiscItem.h"
 #include "Character/WWCharacter.h"
 #include "Components/CharacterStatComponent.h"
 
@@ -174,9 +175,17 @@ void UInventorySlot::UseMiscItem()
     FString ItemNameStr = SlotItemData.Name.ToString();
     EMiscItemName MiscItemName = EMiscItemName(ItemNameEnum->GetValueByName(FName(ItemNameStr)));
 
-    if (MiscItemName == EMiscItemName::HPPotion)
+    /*if (MiscItemName == EMiscItemName::HPPotion)
     {
         CharacterStat->SetHP(CharacterStat->GetHP() + 50);
+        SlotItemCount--;
+    }*/
+
+    AMiscItem& MiscItem = GameInstance->SpawnMiscItem(MiscItemName, FVector(), false);
+    bool bIsSucceeded = MiscItem.Use(Owner);
+
+    if (bIsSucceeded)
+    {
         SlotItemCount--;
     }
 }

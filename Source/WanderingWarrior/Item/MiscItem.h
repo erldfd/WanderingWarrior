@@ -22,7 +22,10 @@ public:
 
 	AMiscItem();
 
-	virtual void Use(class AWWCharacter* ItemUser) override;
+	virtual bool Use(class AWWCharacter* ItemUser) override;
+
+	EMiscItemName GetMiscItemName();
+	void SetMiscItemName(const EMiscItemName& NewMiscItemName);
 
 protected:
 

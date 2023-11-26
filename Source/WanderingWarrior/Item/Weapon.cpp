@@ -111,9 +111,10 @@ void AWeapon::SetAttackDamage(float NewDamage)
 	AttackDamage = NewDamage;
 }
 
-void AWeapon::Use(AWWCharacter* ItemUser)
+bool AWeapon::Use(AWWCharacter* ItemUser)
 {
 	ItemUser->EquipWeapon(this);
+	return true;
 }
 
 void AWeapon::SetBoxComponentCollision(ECollisionEnabled::Type NewType)

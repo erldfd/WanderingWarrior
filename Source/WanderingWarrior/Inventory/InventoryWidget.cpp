@@ -127,14 +127,14 @@ void UInventoryWidget::ReceiveSlotItemCount(int32 SlotIndex, int32 NewSlotItemCo
 
 	SlotWidgetData->SetSlotItemCount(NewSlotItemCount);
 
-	UInventorySlotWidget* EntryWiget = Cast<UInventorySlotWidget>(InventoryTileView->GetEntryWidgetFromItem(SlotWidgetData));
-	if (EntryWiget == nullptr)
+	UInventorySlotWidget* EntryWidget = Cast<UInventorySlotWidget>(InventoryTileView->GetEntryWidgetFromItem(SlotWidgetData));
+	if (EntryWidget == nullptr)
 	{
 		return;
 	}
 
 	bool bIsEmpty = (NewSlotItemCount == 0);
-	EntryWiget->SetSlotItemCount(NewSlotItemCount);
+	EntryWidget->SetSlotItemCount(NewSlotItemCount);
 }
 
 const EInventory& UInventoryWidget::GetInventoryType() const
@@ -145,6 +145,33 @@ const EInventory& UInventoryWidget::GetInventoryType() const
 void UInventoryWidget::SetInventoryType(const EInventory& NewInventoryType)
 {
 	InventoryType = NewInventoryType;
+
+	if (bIsUsingListView == false)
+	{
+		for (auto& SlotWidget : InventorySlotWidgetArray)
+		{
+			SlotWidget->SetInventoryType(NewInventoryType);
+		}
+	}
+}
+
+void UInventoryWidget::UpdateEntryWidgetInventoryType(int32 SlotIndex)
+{
+	UInventorySlotWidgetData* SlotWidgetData = Cast<UInventorySlotWidgetData>(InventoryTileView->GetItemAt(SlotIndex));
+	if (SlotWidgetData == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::UpdateEntryWidgetInventoryType, SlotWidgetData == nullptr"));
+		return;
+	}
+
+	UInventorySlotWidget* EntryWidget = Cast<UInventorySlotWidget>(InventoryTileView->GetEntryWidgetFromItem(SlotWidgetData));
+	if (EntryWidget == nullptr)
+	{
+		return;
+	}
+
+	EntryWidget->SetInventoryType(InventoryType);
+	UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::UpdateEntryWidgetInventoryType, EntryWidget Inventory Type Updated to %d"), EntryWidget->GetInventoryType());
 }
 
 void UInventoryWidget::NativeConstruct()
@@ -217,7 +244,7 @@ void UInventoryWidget::OnTileViewSlotUpdate(UInventorySlotWidgetData* UpdatedSlo
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnTileViewSlotUpdate, EntryWidget == nullptr"));
 		return;
 	}
-
+	
 	if (EntryWidget->OnDragDropEndedSignature.IsBound() == false)
 	{
 		EntryWidget->OnDragDropEndedSignature.AddUObject(this, &UInventoryWidget::OnDragDropEnded);
@@ -232,6 +259,9 @@ void UInventoryWidget::OnTileViewSlotUpdate(UInventorySlotWidgetData* UpdatedSlo
 	{
 		EntryWidget->OnDragDetectedSignature.AddUObject(this, &UInventoryWidget::OnDragDetectedAt);
 	}
+
+	EntryWidget->SetInventoryType(InventoryType);
+	UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::OnTileViewSlotUpdate, EntryWidget InventoryType Updated To %d"), EntryWidget->GetInventoryType());
 }
 
 void UInventoryWidget::OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeOrigin)

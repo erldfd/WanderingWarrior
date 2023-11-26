@@ -40,10 +40,26 @@ void UMiniMapCaptureComponent2D::AddAllActorsToMinimap(FExceptConditionSignature
 	}
 }
 
+void UMiniMapCaptureComponent2D::SetUseShowOnlyActors(bool bShouldUseShowOnlyActors)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UMiniMapCaptureComponent2D::SetUseShowOnlyActors, bShouldUseShowOnlyActors : %d"), bShouldUseShowOnlyActors);
+	if (bShouldUseShowOnlyActors)
+	{
+		PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+	}
+	else
+	{
+		PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_RenderScenePrimitives;
+	}
+
+	//CaptureScene();
+}
+
 void UMiniMapCaptureComponent2D::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("UMiniMapCaptureComponent2D::BeginPlay, bCaptureEveryFrame %d, bCaptureOnMovement %d, "), bCaptureEveryFrame, bCaptureOnMovement);
 	PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
 	
 	FTimerHandle TimeHandle;

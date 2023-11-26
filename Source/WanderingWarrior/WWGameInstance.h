@@ -30,7 +30,7 @@ public:
 	class AWeapon& SpawnWeapon(EWeaponName Name);
 	class AWeapon& SpawnWeapon(EWeaponName Name, const FVector& Location);
 
-	class AMiscItem& SpawnMiscItem(EMiscItemName Name, const FVector& Location);
+	class AMiscItem& SpawnMiscItem(EMiscItemName Name, const FVector& Location, bool bIsFieldItem);
 
 	const struct FItemDataRow& GetWeaponData(EWeaponName Name) const;
 	const struct FItemDataRow& GetMiscItemData(EMiscItemName Name) const;
@@ -58,11 +58,11 @@ public:
 
 	void StartGame();
 
-	//UFUNCTION(BlueprintCallable)
-	//class AWWCharacter* SpawnCharacter(class AWWCharacter* Class, const FTransform& Transform);
-
 	UFUNCTION(BlueprintCallable)
 	void AddToMinimap(AActor* NewActor);
+
+	UFUNCTION(Exec)
+	void ChangeMinimap();
 
 public:
 
@@ -73,8 +73,6 @@ private:
 
 	UFUNCTION()
 	void OnCurrentGameSaved(const FString& SlotName, const int32 UserIndex, bool bIsSucceeded);
-	//UFUNCTION()
-	//void OnStartConversation(ANPCCharacter* InteractionActor);
 
 	// return value => loadsucceeded : true, failed : false
 	bool TryLoadInventroyData(TArray<FInventorySlotData>& LoadedInventoryData);
@@ -97,8 +95,6 @@ private:
 
 	TArray<struct FItemDataRow*> MiscItemDataArray;
 
-	/*UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	TSubclassOf<UUserWidget> LoadingWidgetClass;*/
 	// Set from BaseLevelBlueprint
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	TObjectPtr<UUserWidget> LoadingWidget;

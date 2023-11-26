@@ -98,7 +98,7 @@ AWeapon& UWWGameInstance::SpawnWeapon(EWeaponName Name, const FVector& Location)
 	return NewWeapon;
 }
 
-AMiscItem& UWWGameInstance::SpawnMiscItem(EMiscItemName Name, const FVector& Location)
+AMiscItem& UWWGameInstance::SpawnMiscItem(EMiscItemName Name, const FVector& Location, bool bIsFieldItem)
 {
 	int Index = FMath::Clamp((int)Name, 0, MiscItemClassArray.Num());
 	check(MiscItemClassArray.IsValidIndex(Index));
@@ -109,7 +109,8 @@ AMiscItem& UWWGameInstance::SpawnMiscItem(EMiscItemName Name, const FVector& Loc
 	AMiscItem& NewItem = *GetWorld()->SpawnActor<AMiscItem>(MiscItemClassArray[Index], Transform);
 	NewItem.SetItemName(MiscItemDataArray[Index]->Name);
 	NewItem.SetItemSlotTexture(*MiscItemDataArray[Index]->SlotTexture);
-	NewItem.SetbIsFieldItem(true);
+	NewItem.SetbIsFieldItem(bIsFieldItem);
+	NewItem.SetMiscItemName(Name);
 
 	return NewItem;
 }
@@ -439,7 +440,7 @@ bool UWWGameInstance::TryStreamLevel(const FName& LoadedLevelPath)
 	OnLoadedDelegate.BindUFunction(this, TEXT("OnLevelLoaded"));
 
 	Streaming->OnLevelLoaded.AddUnique(OnLoadedDelegate);
-	
+
 	FLatentActionInfo Info;
 	UGameplayStatics::LoadStreamLevel(this, LoadedLevelPath, true, true, Info);
 
@@ -487,32 +488,17 @@ void UWWGameInstance::AddToMinimap(AActor* NewActor)
 	Player->AddToMinimap(NewActor);
 }
 
-//AWWCharacter* UWWGameInstance::SpawnCharacter(AWWCharacter* Class, const FTransform& Transform)
-//{
-//	AWWCharacter* NewCharacter = GetWorld()->SpawnActor<AWWCharacter>(Transform.GetLocation(),Transform.GetRotation().Rotator());
-//	if (NewCharacter == nullptr)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::SpawnCharacter, NewCharacter == nullptr"));
-//		return nullptr;
-//	}
-//
-//	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-//	if (PlayerController == nullptr)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::SpawnCharacter, PlayerController == nullptr, But Implemented SpawnActor"));
-//		return NewCharacter;
-//	}
-//
-//	AWWCharacter* Player = Cast<AWWCharacter>(PlayerController->GetPawn());
-//	if (Player == nullptr)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::SpawnCharacter, Player == nullptr, But Implemented SpawnActor"));
-//		return NewCharacter;
-//	}
-//
-//	Player->AddToMinimap(NewCharacter);
-//	return NewCharacter;
-//}
+void UWWGameInstance::ChangeMinimap()
+{
+	AWWCharacter* PlayerCharacter = Cast<AWWCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	if (PlayerCharacter == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::ChangeMinimap, PlayerCharacter == nullptr"));
+		return;
+	}
+
+	PlayerCharacter->UseShowOnlyActors(true);
+}
 
 void UWWGameInstance::OnLevelLoaded()
 {
@@ -565,21 +551,7 @@ void UWWGameInstance::OnLevelLoaded()
 	SaveCurrentGame();
 	UnLoadLevel(PreviousLevelPath);
 
-	FTimerHandle TimeHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimeHandle, FTimerDelegate::CreateLambda([&]()->void {
-
-		FExceptConditionSignature ExceptCondition;
-		ExceptCondition.BindLambda([](AActor* Actor)->bool {
-
-			ABrush* Brush = Cast<ABrush>(Actor);
-
-			return (Brush != nullptr);
-
-			});
-
-		PlayerCharacter->AddAllActorsToMinimap(ExceptCondition);
-
-		}), 1, false, 3.0f);
+	PlayerCharacter->UseShowOnlyActors(false);
 }
 
 void UWWGameInstance::PrintCurrentWorld()

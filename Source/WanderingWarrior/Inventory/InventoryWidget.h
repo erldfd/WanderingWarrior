@@ -39,6 +39,8 @@ public:
 	const EInventory& GetInventoryType() const;
 	void SetInventoryType(const EInventory& NewInventoryType);
 
+	void UpdateEntryWidgetInventoryType(int32 SlotIndex);
+
 public:
 
 	// params : int32 SlotIndex, EInventory InventoryType

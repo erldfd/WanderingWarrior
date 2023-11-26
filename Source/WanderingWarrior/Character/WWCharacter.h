@@ -234,6 +234,10 @@ protected:
 
 	void OpenAndCloseInventory();
 
+	void TriggerQuickSlot1();
+	void TriggerQuickSlot2();
+	void TriggerQuickSlot3();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true), Category = "Inventory")
@@ -272,6 +276,15 @@ private:
 	TObjectPtr<class UInputAction> GuardAction;
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> QuickSlotUseAction1;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> QuickSlotUseAction2;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
+	TObjectPtr<class UInputAction> QuickSlotUseAction3;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Inputs)
 	TObjectPtr<class UInputMappingContext> CharacterInput;
 
 	// save section
@@ -286,9 +299,33 @@ public:
 	void AddToMinimap(AActor* NewActor);
 	void AddAllActorsToMinimap();
 	void AddAllActorsToMinimap(FExceptConditionSignature ExceptCondition);
+	void UseShowOnlyActors(bool bShouldUseShowOnlyActors);
 
 protected:
 
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = Minimap)
 	TObjectPtr<class UMiniMapCaptureComponent2D> MinimapCaptureComp;
+
+	//drink section
+
+public:
+
+	bool Drink(class AMiscItem* DrinkableItem);
+
+	bool GetIsDrinking();
+	void SetIsDrinking(bool bNewIsDrinking);
+
+	class AMiscItem* GetCurrentDrinkingItem() const;
+
+protected:
+
+	UPROPERTY(EditAnywhere, Category = Montage)
+	TObjectPtr<UAnimMontage> DrinkingMontage;
+
+	uint8 bIsDrinking : 1;
+
+private:
+
+	UPROPERTY()
+	TObjectPtr<class AMiscItem> CurrentDrinkingItem;
 };

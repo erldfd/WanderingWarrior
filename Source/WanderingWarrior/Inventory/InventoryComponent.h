@@ -49,10 +49,12 @@ public:
 
 	void OpenAndCloseInventory();
 
+	void SetHideQuickSlot(bool bShouldHide);
+
 private:
 
-	UFUNCTION()
-	void OnUpdateSlotWhenScrollTileView(int32 SlotIndex);
+	//UFUNCTION()
+	//void OnUpdateSlotWhenScrollTileView(int32 SlotIndex);
 
 	UFUNCTION()
 	void OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo);
@@ -66,16 +68,16 @@ private:
 
 	void InitSlotArray(int32 NewSlotCount, const EInventory& InventoryType);
 
-	void CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass,  const EInventory& InventoryType, int32 NewSlotCount);
+	//void CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass,  const EInventory& InventoryType, int32 NewSlotCount);
+	void CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass, const EInventory& InventoryType, int32 NewSlotCount, TObjectPtr<class UInventoryWidget>& OutInventoryWidget, int32 ZOrder);
 
 	// Getting Inventory Slot succeeded : true, or false
 	bool GetInventorySlot(int32 SlotIndex, const EInventory& InventoryType, UInventorySlot*& OutInventorySlot);
 
 	// Getting InventoryWidget succeeded : true, or false
-	bool GetInventoryWidget(const EInventory& InventoryType, UInventoryWidget*& OutInvntoryWidget);
+	bool GetInventoryWidget(const EInventory& InventoryType, class UInventoryWidget*& OutInventoryWidget);
 
 private:
-
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	int32 InventoryWidgetCount;
@@ -83,23 +85,20 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	int32 SlotCount;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	TArray<int32> SlotCountArray;
+	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	//TArray<TSubclassOf<class UInventoryWidget>> InventoryWidgetClassArray;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	TArray<TSubclassOf<class UInventoryWidget>> InventoryWidgetClassArray;
-
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true))
-	TArray<TObjectPtr<class UInventoryWidget>> InventoryWidgetArray;
+	//UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = true))
+	//TArray<TObjectPtr<class UInventoryWidget>> InventoryWidgetArray;
 
 	UPROPERTY()
 	TArray<FInventorySlotArrayContainer> InventorySlotArrays;
 
-	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	//TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
 
-	//UPROPERTY()
-	//TObjectPtr<class UInventoryWidget> InventoryWidget;
+	UPROPERTY()
+	TObjectPtr<class UInventoryWidget> InventoryWidget;
 
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlot>> InventorySlotArray;
@@ -110,11 +109,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
 	int32 QuickSlotCount;
 
-	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
-	//TSubclassOf<class UInventoryWidget> QuickSlotWidgetClass;
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UInventoryWidget> QuickSlotWidgetClass;
 
-	//UPROPERTY()
-	//TObjectPtr<class UInventoryWidget> QuickSlotWidget;
+	UPROPERTY()
+	TObjectPtr<class UInventoryWidget> QuickSlotWidget;
 
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlot>> QuickSlotArray;

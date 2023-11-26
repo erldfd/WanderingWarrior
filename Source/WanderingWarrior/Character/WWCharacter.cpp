@@ -10,6 +10,7 @@
 #include "Components/SkillComponentBase.h"
 #include "Components/WarriorSkillComponent.h"
 #include "Item/Weapon.h"
+#include "Item/MiscItem.h"
 #include "PlayerCharacter.h"
 #include "WWGameMode.h"
 #include "Inventory/InventoryComponent.h"
@@ -23,9 +24,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/GameplayStatics.h"
-
-
-//#include "EnhancedInputSubsystems.h"
 
 // 옆에서 초기화 할 때는 protected private 순으로 적어줘야 warning이 안뜨나보다
 AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSweepAttack(false), AttackDamageWithoutWeapon(0.2),
@@ -52,35 +50,25 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
 	GetMesh()->SetGenerateOverlapEvents(true);
 	MaxHeightInAir = 100000;
-
-	//InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("INVENTORY"));
-	//check(InventoryComponent);
 }
 
 void AWWCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	//UWWAnimInstance* AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
 	AnimInstance = Cast<UWWAnimInstance>(GetMesh()->GetAnimInstance());
 	if (AnimInstance == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::PostInitializeComponents, AnimInstance == nullptr"));
 		return;
 	}
-
-	//AnimInstance->OnAnimMoveStartDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveStart);
-	//AnimInstance->OnAnimMoveEndDelegate.AddUObject(this, &AWWCharacter::OnAnimMoveEnd);
-	//AnimInstance->OnAttackHitcheckDelegate.AddUObject(this, &AWWCharacter::AttackCheck);
-	//AnimInstance->SetAttackAnimRate(AttackAnimRate);
-	
 	//GetCharacterMovement()->GravityScale = 0;
 }
 
 void AWWCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	UE_LOG(LogTemp, Warning, TEXT("APlayerCharacter::BeginPlay"));
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController == nullptr)
 	{
@@ -297,7 +285,7 @@ void AWWCharacter::Tick(float DeltaTime)
 void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::SetupPlayerInputComponent, IsPlayer : %d"), bIsPlayer);
 	UEnhancedInputComponent* EnhancedInputComponenet = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponenet->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &AWWCharacter::OpenAndCloseInventory);
@@ -316,6 +304,10 @@ void AWWCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponenet->BindAction(MusouAction, ETriggerEvent::Triggered, this, &AWWCharacter::DoMusouAttack);
 
 	EnhancedInputComponenet->BindAction(GuardAction, ETriggerEvent::Triggered, this, &AWWCharacter::DoGuard);
+
+	EnhancedInputComponenet->BindAction(QuickSlotUseAction1, ETriggerEvent::Triggered, this, &AWWCharacter::TriggerQuickSlot1);
+	EnhancedInputComponenet->BindAction(QuickSlotUseAction2, ETriggerEvent::Triggered, this, &AWWCharacter::TriggerQuickSlot2);
+	EnhancedInputComponenet->BindAction(QuickSlotUseAction3, ETriggerEvent::Triggered, this, &AWWCharacter::TriggerQuickSlot3);
 
 }
 
@@ -398,7 +390,7 @@ void AWWCharacter::AttackCheck()
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5;
 
-	DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
+	//DrawDebugCapsule(GetWorld(), Center, HalfHeight, AttackRadius, CapsuleRotation, DrawColor, false, DebugLifeTime);
 
 #endif
 
@@ -458,6 +450,39 @@ void AWWCharacter::EquipWeapon(AWeapon* Weapon)
 		Weapon->SetOwner(this);
 		CurrentWeapon = Weapon;
 	}
+}
+
+bool AWWCharacter::Drink(AMiscItem* DrinkableItem)
+{
+	USkillComponentBase* SkillComp = GetSkillComponent();
+
+	if (SkillComp && SkillComp->IsSkillStarted() || GetIsAttacking())
+	{
+		return false;
+	}
+
+	bool bIsPlayingHitMontage = AnimInstance->GetIsPlayingCharacterHitMontage();
+	bool bIsHitAndFly = AnimInstance->GetHitAndFly();
+	bool bIsInAir = GetMovementComponent()->IsFalling();
+
+	if (AnimInstance->GetIsDead() || bIsPlayingHitMontage || bIsHitAndFly || bIsInAir || bIsDrinking)
+	{
+		return false;
+	}
+
+	check(DrinkableItem);
+
+	FName WeaponSocket(TEXT("hand_lSocket"));
+	
+	DrinkableItem->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+	DrinkableItem->SetOwner(this);
+	CurrentDrinkingItem = DrinkableItem;
+
+	float DrinkingSpeed = 2.0f;
+	bIsDrinking = true;
+	PlayAnimMontage(DrinkingMontage, DrinkingSpeed);
+
+	return true;
 }
 
 void AWWCharacter::Launch(FVector Velocity, float MaxHeight)
@@ -521,6 +546,11 @@ UAnimMontage* AWWCharacter::GetAttackMontage() const
 AWeapon* AWWCharacter::GetCurrentWeapon() const
 {
 	return CurrentWeapon;
+}
+
+AMiscItem* AWWCharacter::GetCurrentDrinkingItem() const
+{
+	return CurrentDrinkingItem;
 }
 
 bool AWWCharacter::GetIsInvincible()
@@ -656,6 +686,36 @@ void AWWCharacter::OpenAndCloseInventory()
 	InventoryComponent->OpenAndCloseInventory();
 }
 
+void AWWCharacter::TriggerQuickSlot1()
+{
+	if (InventoryComponent == nullptr)
+	{
+		return;
+	}
+
+	InventoryComponent->UseSlotItem(0, EInventory::CharacterQuickSlot);
+}
+
+void AWWCharacter::TriggerQuickSlot2()
+{
+	if (InventoryComponent == nullptr)
+	{
+		return;
+	}
+
+	InventoryComponent->UseSlotItem(1, EInventory::CharacterQuickSlot);
+}
+
+void AWWCharacter::TriggerQuickSlot3()
+{
+	if (InventoryComponent == nullptr)
+	{
+		return;
+	}
+
+	InventoryComponent->UseSlotItem(2, EInventory::CharacterQuickSlot);
+}
+
 void AWWCharacter::Look(const FInputActionValue& Value)
 {
 	if (GetIsPlayer() == false)
@@ -710,6 +770,21 @@ void AWWCharacter::AddAllActorsToMinimap(FExceptConditionSignature ExceptConditi
 	}
 
 	MinimapCaptureComp->AddAllActorsToMinimap(ExceptCondition);
+}
+
+void AWWCharacter::UseShowOnlyActors(bool bShouldUseShowOnlyActors)
+{
+	MinimapCaptureComp->SetUseShowOnlyActors(bShouldUseShowOnlyActors);
+}
+
+bool AWWCharacter::GetIsDrinking()
+{
+	return bIsDrinking;
+}
+
+void AWWCharacter::SetIsDrinking(bool bNewIsDrinking)
+{
+	bIsDrinking = bNewIsDrinking;
 }
 
 void AWWCharacter::TestAction()
@@ -948,16 +1023,6 @@ void AWWCharacter::SetWillPlayChargeAttack3(bool bNewWillPlayChargeAttack3)
 {
 	bWillPlayChargeAttack3 = bNewWillPlayChargeAttack3;
 }
-
-//bool AWWCharacter::GetIsGuarding() const
-//{
-//	return bIsGuarding;
-//}
-//
-//void AWWCharacter::SetIsGuarding(bool bNewIsGuarding)
-//{
-//	bIsGuarding = bNewIsGuarding;
-//}
 
 bool AWWCharacter::GetIsMusouAttackStarted() const
 {

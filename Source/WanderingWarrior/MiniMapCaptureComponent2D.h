@@ -22,6 +22,7 @@ public:
 	void AddToMinimap(AActor* NewActor);
 	void AddAllActorsToMinimap();
 	void AddAllActorsToMinimap(FExceptConditionSignature ExceptCondition);
+	void SetUseShowOnlyActors(bool bShouldUseShowOnlyActors);
 
 protected:
 

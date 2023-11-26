@@ -98,6 +98,9 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UTextBlock> SlotItemCountTextBlock;
 
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UProgressBar> CooldownProgressBar;
+
 	UPROPERTY()
 	TObjectPtr<class UInventoryDragDropOperation> InventoryDragDropOperation;
 

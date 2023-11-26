@@ -10,6 +10,7 @@
 #include "Components/PanelWidget.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 
 UInventorySlotWidget::UInventorySlotWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -310,11 +311,12 @@ bool UInventorySlotWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	int32 DragStartIndex = InInventoryOperation->SlotIndex;
 	int32 DragEndIndex = SlotIndex;
 
-	if (DragStartIndex == DragEndIndex)
+	if (DragStartIndex == DragEndIndex && InventoryType == InInventoryOperation->InventoryType)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnDrop, Drop Canceled. DragStartIndex : %d, DragEndIndex : %d, DragStartType : %d, DragEndType : %d"), DragStartIndex, DragEndIndex, InInventoryOperation->InventoryType, InventoryType);
 		return false;
 	}
-
+	
 	if (OnDragDropEndedSignature.IsBound() == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnDrop, OnDragDropEndedSignature.IsBound() == false, SlotIndex : %d, Name : %s"), SlotIndex, *GetName());
@@ -375,5 +377,4 @@ bool UInventorySlotWidget::TryToDetectDoubleClick()
 	bShouldDetectDoubleClick = false;
 
 	return bIsDetectSucceeded;
-	
 }

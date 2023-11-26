@@ -33,7 +33,7 @@ public:
 	class UTexture2D* GetItemSlotTexture();
 	void SetItemSlotTexture(class UTexture2D& NewTexture);
 
-	virtual void Use(class AWWCharacter* ItemUser) PURE_VIRTUAL(AAItem::Use, );
+	virtual bool Use(class AWWCharacter* ItemUser) PURE_VIRTUAL(AAItem::Use, return false;);
 
 	int GetMaxItemCount();
 	// Max Count = 1000

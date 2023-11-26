@@ -30,7 +30,7 @@ public:
 	void SetGameModeUIOnly();
 
 	UFUNCTION(BlueprintCallable)
-	void SetInGameWidgetHide(bool HideWidget);
+	void SetInGameWidgetHide(bool bShouldHideWidget);
 
 	// bShouldPause == true, Timedilation is set to 0-ish, else return to original time dilation.
 	void SetGameWorldPause(bool bShouldPause);
