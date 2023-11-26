@@ -436,13 +436,13 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 			UpdateAndDisplayDamagedEnemyWidgets(DamagedCharacter->GetCharacterStatComponent()->GetHPRatio(), FText::FromName(DamagedCharacter->GetCharacterName()));
 		}
 
-		DrawDebugSphere(World, FVector(Center.X, Center.Y, Center.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugSphere(World, FVector(Center.X, Center.Y, Center.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(JumpToGrundRadius, JumpToGrundRadius, 1), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugSphere(World, FVector(Center.X, Center.Y, Center.Z - 88), JumpToGrundRadius, 16, FColor::Red, false, 1, 0, 1);
+	//DrawDebugSphere(World, FVector(Center.X, Center.Y, Center.Z - 88), JumpToGrundRadius, 16, FColor::Red, false, 1, 0, 1);
 }
 
 void UWarriorSkillComponent::DamageKickAttack()
@@ -522,12 +522,12 @@ void UWarriorSkillComponent::DamageKickAttack()
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
-		DrawDebugBox(World, SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
+		//DrawDebugBox(World, SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugBox(World, SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
+	//DrawDebugBox(World, SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
 }
 
 void UWarriorSkillComponent::DamageMelee360Attack()
@@ -613,13 +613,13 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
-		DrawDebugSphere(World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugSphere(World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(Radius, Radius, 1), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugSphere(World, Center, Radius, 16, FColor::Red, false, 1, 0, 1);
+	//DrawDebugSphere(World, Center, Radius, 16, FColor::Red, false, 1, 0, 1);
 }
 
 void UWarriorSkillComponent::DamageMusouAttackInternal()
@@ -874,12 +874,12 @@ void UWarriorSkillComponent::DamageParryAttackInternal()
 			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), JumpToGrundRadius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
-		DrawDebugBox(GetWorld(), SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
+		//DrawDebugBox(GetWorld(), SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugBox(World, SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
+	//DrawDebugBox(World, SkillLocation, FVector(Extent * 0.5f), OwnerCharacter->GetActorRotation().Quaternion(), FColor::Red, false, 1, 0, 1);
 }
 
 int32 UWarriorSkillComponent::GetMelee360AttackRepeatCount() const

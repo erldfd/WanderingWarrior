@@ -308,13 +308,13 @@ void UWizardSkillComponent::DamageWizardSkill3JumpAttack()
 
 		}
 
-		DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(JumpToGrundRadius, JumpToGrundRadius, 1), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Red, false, 1, 0, 1);
+	//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Red, false, 1, 0, 1);
 }
 
 void UWizardSkillComponent::DamageWizardSkill1()
@@ -407,13 +407,13 @@ void UWizardSkillComponent::DamageWizardSkill1()
 
 		}
 
-		DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Blue, false, 1, 0, 1);
+		//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Blue, false, 1, 0, 1);
 		//DrawDebugBox(World, Center, FVector(JumpToGrundRadius, JumpToGrundRadius, 1), FColor::Green, false, 1, 0, 1);
 
 		return;
 	}
 
-	DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Red, false, 1, 0, 1);
+	//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), WizardSkill1Radius, 16, FColor::Red, false, 1, 0, 1);
 }
 
 void UWizardSkillComponent::DamageWizardSkill2()
@@ -612,7 +612,7 @@ void UWizardSkillComponent::DamageWizardMusouAttack()
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5;
 
-	DrawDebugSphere(World, Center, DetectRadius, 16, DrawColor, false, DebugLifeTime);
+	//DrawDebugSphere(World, Center, DetectRadius, 16, DrawColor, false, DebugLifeTime);
 
 	if (bResult)
 	{
@@ -690,7 +690,7 @@ void UWizardSkillComponent::DamageWizardMusouFinalAttack()
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5;
 
-	DrawDebugSphere(World, Center, DetectRadius, 16, DrawColor, false, DebugLifeTime);
+	//DrawDebugSphere(World, Center, DetectRadius, 16, DrawColor, false, DebugLifeTime);
 
 	if (bResult)
 	{
