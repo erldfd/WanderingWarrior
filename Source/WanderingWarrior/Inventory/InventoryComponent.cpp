@@ -12,6 +12,7 @@
 #include "WWGameInstance.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
 
 UInventoryComponent::UInventoryComponent()
 {
@@ -49,19 +50,25 @@ void UInventoryComponent::BeginPlay()
 		return;
 	}
 
-	CreateInventoryWidget(InventoryWidgetClass, EInventory::CharacterInventory, SlotCount, InventoryWidget, 1);
-	CreateInventoryWidget(QuickSlotWidgetClass, EInventory::CharacterQuickSlot, QuickSlotCount, QuickSlotWidget, 0);
+	CreateInventoryWidget(InventoryWidgetClass, EInventory::CharacterInventory, SlotCount, InventoryWidget, 2);
+	CreateInventoryWidget(QuickSlotWidgetClass, EInventory::CharacterQuickSlot, QuickSlotCount, QuickSlotWidget, 1);
 
 	if (InventoryWidget)
 	{
 		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-		InventoryWidget->SetPositionInViewport(FVector2D(0, 200));
+		//InventoryWidget->SetPositionInViewport(FVector2D(0, 200));
 	}
 
 	if (QuickSlotWidget)
 	{
 		QuickSlotWidget->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	UWorld* World = GetWorld();
+	check(World);
+	BackgroundWidget = CreateWidget<UUserWidget>(World, BackgroundWidgetClass);
+	BackgroundWidget->AddToViewport(0);
+	BackgroundWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UInventoryComponent::UseSlotItem(int32 SlotIndex, const EInventory& InventoryType)
@@ -439,6 +446,7 @@ void UInventoryComponent::OpenAndCloseInventory()
 		PlayerController->SetShowMouseCursor(true);
 		PlayerController->SetGameModeGameAndUI();
 		PlayerController->SetGameWorldPause(true);
+		BackgroundWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
 	else
 	{
@@ -446,6 +454,7 @@ void UInventoryComponent::OpenAndCloseInventory()
 		PlayerController->SetShowMouseCursor(false);
 		PlayerController->SetGameModeGameOnly();
 		PlayerController->SetGameWorldPause(false);
+		BackgroundWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

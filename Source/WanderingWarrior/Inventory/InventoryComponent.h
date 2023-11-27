@@ -113,4 +113,9 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<class UInventorySlot>> QuickSlotArray;
 		
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true))
+	TSubclassOf<class UUserWidget> BackgroundWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> BackgroundWidget;
 };

@@ -194,18 +194,18 @@ void AWWPlayerController::SetInGameWidgetHide(bool bShouldHideWidget)
 
 void AWWPlayerController::SetGameWorldPause(bool bShouldPause)
 {
+	if (bShouldPause)
+	{
+		OriginalGlobalTimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
+		UGameplayStatics::SetGlobalTimeDilation(this, 0);
+		
+	}
+	else
+	{
+		UGameplayStatics::SetGlobalTimeDilation(this, OriginalGlobalTimeDilation);
+	}
+
 	SetPause(bShouldPause);
-	//if (bShouldPause)
-	//{
-	//	OriginalGlobalTimeDilation = UGameplayStatics::GetGlobalTimeDilation(this);
-	//	UGameplayStatics::SetGlobalTimeDilation(this, 0);
-	//	
-	//}
-	//else
-	//{
-	//	UGameplayStatics::SetGlobalTimeDilation(this, OriginalGlobalTimeDilation);
-	//	//Pause();
-	//}
 }
 
 void AWWPlayerController::BeginPlay()
