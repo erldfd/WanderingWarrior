@@ -102,37 +102,39 @@ void UInventoryComponent::BeginPlay()
 void UInventoryComponent::UseSlotItem(int32 SlotIndex, const EInventory& InventoryType)
 {
 	UInventorySlot* Slot = nullptr;
-
 	if (GetInventorySlot(SlotIndex, InventoryType, Slot) == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, Fail to GetInventorySlot"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, Before SlotItemCount : %d"), Slot->GetSlotItemCount());
-	Slot->UseSlotItem();
-	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, After SlotItemCount : %d"), Slot->GetSlotItemCount());
-	if (Slot->IsEmpty() == false)
+	if (Slot->IsEmpty())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, Slot is Empty......"));
 		return;
 	}
 
-	UInventoryWidget* CurrentInventoryWidget = nullptr;
+	Slot->UseSlotItem();
 
+	UInventoryWidget* CurrentInventoryWidget = nullptr;
 	if (GetInventoryWidget(InventoryType, CurrentInventoryWidget) == false)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ObtainItem, Fail to GetInventoryWidget"));
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, Fail to GetInventoryWidget ? : %d"), CurrentInventoryWidget == nullptr);
 		return;
 	}
 
 	if (CurrentInventoryWidget == nullptr)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, CurrentInventoryWidget == nullptr"));
 		return;
 	}
 
-	CurrentInventoryWidget->SetBrushSlotImageFromTexture(SlotIndex);
+	if (Slot->IsEmpty())
+	{
+		CurrentInventoryWidget->SetBrushSlotImageFromTexture(SlotIndex);
+	}
+	
 	CurrentInventoryWidget->ReceiveSlotItemCount(SlotIndex, Slot->GetSlotItemCount());
-	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::UseSlotItem, SlotIndex : %d"), SlotIndex);
 }
 
 void UInventoryComponent::ObtainItem(int32 SlotIndex, const EInventory& InventoryType, const FItemDataRow& ItemData)
