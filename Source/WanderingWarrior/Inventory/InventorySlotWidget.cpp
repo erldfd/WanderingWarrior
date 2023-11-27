@@ -42,7 +42,6 @@ void UInventorySlotWidget::SetBrushSlotImageFromTexture(UTexture2D* NewTexture)
 		return;
 	}
 
-	//UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetBrushNewImageFromTexture, NewTexture : %s, SlotIndex : %d"), *NewTexture->GetName(), SlotIndex);
 	SlotImage->SetBrushFromTexture(NewTexture);
 }
 
@@ -107,10 +106,12 @@ void UInventorySlotWidget::SetSlotItemCount(int32 NewSlotItemCount)
 	if (SlotItemCount == 0)
 	{
 		SlotItemCountTextBlock->SetVisibility(ESlateVisibility::Hidden);
+		HideSlotImage(true);
 	}
 	else
 	{
 		SlotItemCountTextBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		HideSlotImage(false);
 	}
 }
 
@@ -175,6 +176,24 @@ const EInventory UInventorySlotWidget::GetInventoryType()
 void UInventorySlotWidget::SetInventoryType(const EInventory& NewInventoryType)
 {
 	InventoryType = NewInventoryType;
+}
+
+void UInventorySlotWidget::HideSlotImage(bool bShouldHide)
+{
+	if (SlotImage == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::SetBrushSlotImageFromTexture, SlotImage == nullptr"));
+		return;
+	}
+
+	if (bShouldHide)
+	{
+		SlotImage->SetColorAndOpacity(FLinearColor(1, 1, 1, 0));
+	}
+	else
+	{
+		SlotImage->SetColorAndOpacity(FLinearColor(1, 1, 1, 1));
+	}
 }
 
 void UInventorySlotWidget::NativeConstruct()
@@ -344,6 +363,7 @@ void UInventorySlotWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 	SetSlotItemCount(WidgetData->GetSlotItemCount());
 
 	SetBrushSlotImageFromTexture(WidgetData->GetSlotTexture());
+	HideSlotImage((SlotItemCount <= 0));
 
 	WidgetData->OnTileViewItemUpdateSignature.Broadcast(WidgetData, this);
 	//UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnListItemObjectSet, WidgetData Texture : %s, Index : %d"), *WidgetData->GetSlotTexture()->GetName(), WidgetData->GetSlotIndex());

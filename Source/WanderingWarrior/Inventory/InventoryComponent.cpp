@@ -21,17 +21,10 @@ UInventoryComponent::UInventoryComponent()
 	bWantsInitializeComponent = true;
 }
 
-void UInventoryComponent::InitializeComponent()
-{
-	Super::InitializeComponent();
-	
-}
-
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::BeginPlay, InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false"));
 	TempInventorySlot = NewObject<UInventorySlot>(this);
 	if (TempInventorySlot == nullptr)
 	{
@@ -56,36 +49,8 @@ void UInventoryComponent::BeginPlay()
 		return;
 	}
 
-	//InventoryWidgetClassArray.Empty(2);
-
-	/*if (InventoryWidgetClass == nullptr)
-	{
-		return;
-	}*/
-
-	//InventoryWidgetClassArray.Emplace(InventoryWidgetClass);
-	//InventoryWidgetClassArray.Emplace(QuickSlotWidgetClass);
-
-	//if (InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::BeginPlay, InventoryWidgetClassArray.IsValidIndex(int(EInventory::CharacterInventory)) == false"));
-	//	return;
-	//}
-
-	//InventoryWidgetArray.Empty(InventoryWidgetCount);
-
-	//CreateInventoryWidget(InventoryWidgetClassArray[int(EInventory::CharacterInventory)], EInventory::CharacterInventory, SlotCount);
-	//CreateInventoryWidget(InventoryWidgetClassArray[int(EInventory::CharacterQuickSlot)], EInventory::CharacterQuickSlot, QuickSlotCount);
-
 	CreateInventoryWidget(InventoryWidgetClass, EInventory::CharacterInventory, SlotCount, InventoryWidget, 1);
 	CreateInventoryWidget(QuickSlotWidgetClass, EInventory::CharacterQuickSlot, QuickSlotCount, QuickSlotWidget, 0);
-
-	/*if (InventoryWidgetArray[int(EInventory::CharacterQuickSlot)])
-	{
-		InventoryWidgetArray[int(EInventory::CharacterQuickSlot)]->SetVisibility(ESlateVisibility::Hidden);
-		InventoryWidgetArray[0]->SetVisibility(ESlateVisibility::Hidden);
-
-	}*/
 
 	if (InventoryWidget)
 	{
@@ -190,12 +155,6 @@ void UInventoryComponent::ObtainItem(int32 SlotIndex, const EInventory& Inventor
 
 void UInventoryComponent::DeleteItem(int32 SlotIndex, const EInventory& InventoryType)
 {
-	//if (InventorySlotArray.IsValidIndex(SlotIndex) == false || InventorySlotArray[SlotIndex] == nullptr)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::DeleteItem, SlotIndex is not valid, SlotIndex : %d"), SlotIndex);
-	//	return;
-	//}
-
 	UInventorySlot* Slot = InventorySlotArray[SlotIndex];
 
 	if (GetInventorySlot(SlotIndex, InventoryType, Slot) == false)
@@ -225,13 +184,6 @@ void UInventoryComponent::DeleteItem(int32 SlotIndex, const EInventory& Inventor
 
 void UInventoryComponent::SetSlotItem(const EInventory& InventoryType, int32 SlotIndex, const FItemDataRow& ItemData, int32 SlotItemCount)
 {
-
-	//if (InventorySlotArray.IsValidIndex(SlotIndex) == false || InventorySlotArray[SlotIndex] == nullptr)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ObtainItem, SlotIndex is not valid, SlotIndex : %d"), SlotIndex);
-	//	return;
-	//}
-
 	UInventorySlot* Slot = nullptr;
 	if (GetInventorySlot(SlotIndex, InventoryType, Slot) == false)
 	{
@@ -259,42 +211,6 @@ void UInventoryComponent::SetSlotItem(const EInventory& InventoryType, int32 Slo
 	CurrentInventoryWidget->ReceiveSlotItemCount(SlotIndex, Slot->GetSlotItemCount());
 }
 
-//void UInventoryComponent::OnUpdateSlotWhenScrollTileView(int32 SlotIndex)
-//{
-//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView"));
-//	//if (InventorySlotArray.IsValidIndex(SlotIndex) == false || InventorySlotArray[SlotIndex] == nullptr)
-//	//{
-//	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView, SlotIndex is not valid"));
-//	//	return;
-//	//}
-//
-//	if (InventoryWidget == nullptr)
-//	{
-//		return;
-//	}
-//
-//	UInventorySlot* Slot = InventorySlotArray[SlotIndex];
-//
-//	//UInventoryWidget* InventoryWidgetTo;
-//
-//	//if (GetInventoryWidget(InventoryTypeTo, InventoryWidgetTo) == false)
-//	//{
-//	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, Fail to GetInventoryWidget"));
-//	//	return;
-//	//}
-//
-//	if (Slot->IsEmpty())
-//	{
-//		InventoryWidget->SetBrushSlotImageFromTexture(SlotIndex);
-//	}
-//	else
-//	{
-//		InventoryWidget->SetBrushSlotImageFromTexture(SlotIndex, Slot->GetSlotItemData().SlotTexture);
-//	}
-//
-//	InventoryWidget->UpdateEntryWidgetInventoryType(SlotIndex);
-//}
-
 void UInventoryComponent::OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo)
 {
 	ExchangeOrMoveItem(DragStartSlotIndex, DragEndSlotIndex, InventoryTypeFrom, InventoryTypeTo);
@@ -302,96 +218,11 @@ void UInventoryComponent::OnDragDropEnded(int32 DragStartSlotIndex, int32 DragEn
 
 void UInventoryComponent::ExchangeOrMoveItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo)
 {
-
-	/*if (InventoryTypeFrom == InventoryTypeTo)
-	{
-		ExchangeOrMoveItemInternal(DragStartSlotIndex, DragEndSlotIndex);
-	}
-	else
-	{
-		ExchangeOrMoveItemInternal(DragStartSlotIndex, DragEndSlotIndex, InventoryTypeFrom, InventoryTypeTo);
-	}*/
 	ExchangeOrMoveItemInternal(DragStartSlotIndex, DragEndSlotIndex, InventoryTypeFrom, InventoryTypeTo);
-}
-
-void UInventoryComponent::ExchangeOrMoveItemInternal(int32 FirstSlotIndex, int32 SecondSlotIndex)
-{
-	/*if (InventorySlotArray.IsValidIndex(FirstSlotIndex) == false || InventorySlotArray[FirstSlotIndex] == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView, FirstSlotIndex is not valid"));
-		return;
-	}
-
-	if (InventorySlotArray.IsValidIndex(SecondSlotIndex) == false || InventorySlotArray[SecondSlotIndex] == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OnUpdateSlotWhenScrollTileView, SecondSlotIndex is not valid"));
-		return;
-	}
-
-	UInventorySlot* FirstSlot = InventorySlotArray[FirstSlotIndex];
-	UInventorySlot* SecondSlot = InventorySlotArray[SecondSlotIndex];
-
-	TempInventorySlot->SetSlotItemData(FirstSlot->GetSlotItemData());
-	TempInventorySlot->SetSlotItemCount(FirstSlot->GetSlotItemCount());
-
-	FirstSlot->SetSlotItemData(SecondSlot->GetSlotItemData());
-	FirstSlot->SetSlotItemCount(SecondSlot->GetSlotItemCount());
-
-	SecondSlot->SetSlotItemData(TempInventorySlot->GetSlotItemData());
-	SecondSlot->SetSlotItemCount(TempInventorySlot->GetSlotItemCount());
-
-	if (FirstSlot->IsEmpty())
-	{
-		InventoryWidget->SetBrushSlotImageFromTexture(FirstSlot->GetSlotIndex());
-	}
-	else
-	{
-		InventoryWidget->SetBrushSlotImageFromTexture(FirstSlot->GetSlotIndex(), FirstSlot->GetSlotItemData().SlotTexture);
-	}
-
-	if (SecondSlot->IsEmpty())
-	{
-		InventoryWidget->SetBrushSlotImageFromTexture(SecondSlot->GetSlotIndex());
-	}
-	else
-	{
-		InventoryWidget->SetBrushSlotImageFromTexture(SecondSlot->GetSlotIndex(), SecondSlot->GetSlotItemData().SlotTexture);
-	}
-
-	InventoryWidget->ReceiveSlotItemCount(FirstSlotIndex, FirstSlot->GetSlotItemCount());
-	InventoryWidget->ReceiveSlotItemCount(SecondSlotIndex, SecondSlot->GetSlotItemCount());*/
-	
 }
 
 void UInventoryComponent::ExchangeOrMoveItemInternal(int32 SlotIndexFrom, int32 SlotIndexTo, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo)
 {
-	/*if (InventorySlotArrays.IsValidIndex(int(InventoryTypeFrom)) == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, InventorySlotArrays.IsValidIndex(int(InventoryTypeFrom)) == false"));
-		return;
-	}
-
-	TArray<UInventorySlot*>& InventorySlotArrayFrom = InventorySlotArrays[int(InventoryTypeFrom)].InventorySlotArray;
-
-	if (InventorySlotArrayFrom.IsValidIndex(SlotIndexFrom) == false || InventorySlotArrayFrom[SlotIndexFrom] == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, SlotIndexFrom %d From %d is invalid"), SlotIndexFrom, InventoryTypeFrom);
-		return;
-	}
-
-	if (InventorySlotArrays.IsValidIndex(int(InventoryTypeTo)) == false)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, InventorySlotArrays.IsValidIndex(int(InventoryTypeTo)) == false"));
-		return;
-	}
-
-	TArray<UInventorySlot*>& InventorySlotArrayTo = InventorySlotArrays[int(InventoryTypeTo)].InventorySlotArray;
-
-	if (InventorySlotArrayFrom.IsValidIndex(SlotIndexTo) == false || InventorySlotArrayTo[SlotIndexTo] == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::ExchangeOrMoveItemInternal, SlotIndexTo %d To %d is invalid"), SlotIndexTo, InventoryTypeTo);
-		return;
-	}*/
 
 	UInventorySlot* SlotFrom = nullptr;
 
@@ -409,14 +240,37 @@ void UInventoryComponent::ExchangeOrMoveItemInternal(int32 SlotIndexFrom, int32 
 		return;
 	}
 
-	TempInventorySlot->SetSlotItemData(SlotFrom->GetSlotItemData());
-	TempInventorySlot->SetSlotItemCount(SlotFrom->GetSlotItemCount());
+	const FItemDataRow& SlotItemDataFrom = SlotFrom->GetSlotItemData();
+	const FItemDataRow& SlotItemDataTo = SlotTo->GetSlotItemData();
 
-	SlotFrom->SetSlotItemData(SlotTo->GetSlotItemData());
-	SlotFrom->SetSlotItemCount(SlotTo->GetSlotItemCount());
+	if (SlotItemDataFrom.Name.ToString() == SlotItemDataTo.Name.ToString())
+	{
+		int32 MaxItemCount = SlotItemDataTo.MaxItemCount;
 
-	SlotTo->SetSlotItemData(TempInventorySlot->GetSlotItemData());
-	SlotTo->SetSlotItemCount(TempInventorySlot->GetSlotItemCount());
+		int32 TotalItemCount = SlotFrom->GetSlotItemCount() + SlotTo->GetSlotItemCount();
+		
+		if (MaxItemCount >= TotalItemCount)
+		{
+			SlotTo->SetSlotItemCount(TotalItemCount);
+			SlotFrom->SetSlotItemCount(0);
+		}
+		else
+		{
+			SlotTo->SetSlotItemCount(MaxItemCount);
+			SlotFrom->SetSlotItemCount(TotalItemCount - MaxItemCount);
+		}
+	}
+	else
+	{
+		TempInventorySlot->SetSlotItemData(SlotFrom->GetSlotItemData());
+		TempInventorySlot->SetSlotItemCount(SlotFrom->GetSlotItemCount());
+
+		SlotFrom->SetSlotItemData(SlotTo->GetSlotItemData());
+		SlotFrom->SetSlotItemCount(SlotTo->GetSlotItemCount());
+
+		SlotTo->SetSlotItemData(TempInventorySlot->GetSlotItemData());
+		SlotTo->SetSlotItemCount(TempInventorySlot->GetSlotItemCount());
+	}
 
 	UInventoryWidget* InventoryWidgetFrom = nullptr;
 
@@ -464,6 +318,7 @@ void UInventoryComponent::InitSlotArray(int32 NewSlotCount, const EInventory& In
 		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::InitSlotArray, ComponentOwner == nullptr"));
 		return;
 	}
+
 	TArray<UInventorySlot*> SlotArray;
 	SlotArray.Empty(NewSlotCount);
 
@@ -481,55 +336,7 @@ void UInventoryComponent::InitSlotArray(int32 NewSlotCount, const EInventory& In
 	Container.InventorySlotArray = SlotArray;
 
 	InventorySlotArrays.Emplace(Container);
-
-	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::InitSlotArray, Current InventorySlotArrays ----------------------------"));
-	//for (auto& Slot : InventorySlotArrays)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::InitSlotArray, %s"), *Slot.InventorySlotArray[0]->GetName());
-	//}
-
-	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::InitSlotArray, Owner : %s ------------------------------------------"), *GetOwner()->GetName());
 }
-
-//void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass, const EInventory& InventoryType, int32 NewSlotCount)
-//{
-//	UWorld* World = GetWorld();
-//	if (World == nullptr)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, World == nullptr"));
-//		return;
-//	}
-//
-//	if (InInventoryWidgetClass == nullptr)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, InventoryWidgetClass == nullptr"));
-//		return;
-//	}
-//
-//	UInventoryWidget* NewInventoryWidget = CreateWidget<UInventoryWidget>(World, InInventoryWidgetClass);
-//	
-//	if (NewInventoryWidget == nullptr)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, NewInventoryWidget == nullptr"));
-//		return;
-//	}
-//
-//	NewInventoryWidget->SetSlotCount(NewSlotCount);
-//	NewInventoryWidget->AddToViewport();
-//	NewInventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-//	NewInventoryWidget->SetInventoryType(InventoryType);
-//	NewInventoryWidget->OnSlotDragDropEndedSignature.AddUObject(this, &UInventoryComponent::OnDragDropEnded);
-//	NewInventoryWidget->OnLeftMouseDoubleClickSignature.AddUObject(this, &UInventoryComponent::OnLeftMouseButtonDoubleClickDetected);
-//
-//	InventoryWidgetArray.Emplace(NewInventoryWidget);
-//	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Current InventoryWidgetArray ----------------------------"));
-//	//for (auto& Widget : InventoryWidgetArray)
-//	//{
-//	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, %s"), *Widget->GetName());
-//	//}
-//
-//	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Owner : %s ------------------------------------------"), *GetOwner()->GetName());
-//}
 
 void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInventoryWidget>& InInventoryWidgetClass, const EInventory& InventoryType, int32 NewSlotCount, TObjectPtr<UInventoryWidget>& OutInventoryWidget, int32 ZOrder)
 {
@@ -562,15 +369,6 @@ void UInventoryComponent::CreateInventoryWidget(const TSubclassOf<class UInvento
 	NewInventoryWidget->OnLeftMouseDoubleClickSignature.AddUObject(this, &UInventoryComponent::OnLeftMouseButtonDoubleClickDetected);
 
 	OutInventoryWidget = NewInventoryWidget;
-
-	//InventoryWidgetArray.Emplace(NewInventoryWidget);
-	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Current InventoryWidgetArray ----------------------------"));
-	//for (auto& Widget : InventoryWidgetArray)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, %s"), *Widget->GetName());
-	//}
-
-	//UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::CreateInventoryWidget, Owner : %s ------------------------------------------"), *GetOwner()->GetName());
 }
 
 bool UInventoryComponent::GetInventorySlot(int32 SlotIndex, const EInventory& InventoryType, UInventorySlot*& OutInventorySlot)
@@ -597,11 +395,6 @@ bool UInventoryComponent::GetInventorySlot(int32 SlotIndex, const EInventory& In
 
 bool UInventoryComponent::GetInventoryWidget(const EInventory& InventoryType, UInventoryWidget*& OutInventoryWidget)
 {
-	/*if (InventoryWidgetArray.IsValidIndex(int(InventoryType)) == false || InventoryWidgetArray[int(InventoryType)] == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::GetInventoryWidget, Fail to Get InventoryWiget : %d"), int(InventoryType));
-		return false;
-	}*/
 
 	if (InventoryType == EInventory::CharacterInventory && InventoryWidget)
 	{
@@ -611,8 +404,6 @@ bool UInventoryComponent::GetInventoryWidget(const EInventory& InventoryType, UI
 	{
 		OutInventoryWidget = QuickSlotWidget;
 	}
-
-	//OutInventoryWidget = InventoryWidgetArray[int(InventoryType)];
 
 	return (OutInventoryWidget != nullptr && ::IsValid(OutInventoryWidget));
 }
@@ -629,12 +420,6 @@ const TArray<TObjectPtr<class UInventorySlot>>& UInventoryComponent::GetInventor
 
 void UInventoryComponent::OpenAndCloseInventory()
 {
-	//if (InventoryWidgetArray.IsValidIndex(0) == false || InventoryWidgetArray[0] == nullptr)
-	//{
-	//	AWWCharacter* CompOwner = Cast<AWWCharacter>(GetOwner());
-	//	UE_LOG(LogTemp, Warning, TEXT("UInventoryComponent::OpenAndCloseInventory, InventoryWidget == nullptr, Owner : %s, is player : %d, Location : %s"), *CompOwner->GetName(), CompOwner->GetIsPlayer(), *CompOwner->GetActorLocation().ToString());
-	//	return;
-	//}
 
 	if (InventoryWidget == nullptr)
 	{

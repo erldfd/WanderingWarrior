@@ -327,7 +327,7 @@ void APlayerCharacter::OnHitToSomething(UPrimitiveComponent* HitComponent, AActo
 void APlayerCharacter::OnBeginOverlapWithSomething(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
-	if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
+	/*if (OtherActor->Tags.IsEmpty() || OtherActor->Tags.IsValidIndex(0) == false)
 	{
 		return;
 	}
@@ -336,7 +336,7 @@ void APlayerCharacter::OnBeginOverlapWithSomething(UPrimitiveComponent* Overlapp
 	{
 		bIsWet = true;
 		bIsInWater = true;
-	}
+	}*/
 }
 
 void APlayerCharacter::OnEndOverlapWithSomething(AActor* OverlappedActor, AActor* OtherActor)

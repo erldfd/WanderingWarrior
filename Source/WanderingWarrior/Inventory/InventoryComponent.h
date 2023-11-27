@@ -29,8 +29,6 @@ public:
 
 	UInventoryComponent();
 
-	virtual void InitializeComponent() override;
-
 protected:
 
 	virtual void BeginPlay() override;
@@ -61,9 +59,6 @@ private:
 
 	void ExchangeOrMoveItem(int32 DragStartSlotIndex, int32 DragEndSlotIndex, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo);
 
-	// Exchange between same inventoryType
-	void ExchangeOrMoveItemInternal(int32 FirstSlotIndex, int32 SecondSlotIndex);
-	// Exchange between other inventoryTypes
 	void ExchangeOrMoveItemInternal(int32 SlotIndexFrom, int32 SlotIndexTo, const EInventory& InventoryTypeFrom, const EInventory& InventoryTypeTo);
 
 	void InitSlotArray(int32 NewSlotCount, const EInventory& InventoryType);

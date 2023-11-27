@@ -51,6 +51,8 @@ public:
 	const EInventory GetInventoryType();
 	void SetInventoryType(const EInventory& NewInventoryType);
 
+	void HideSlotImage(bool bShouldHide);
+
 public:
 
 	// params : int32 DragStartSlotIndex, int32 DragEndSlotIndex

@@ -84,14 +84,15 @@ void UInventoryWidget::SetBrushSlotImageFromTexture(int32 SlotIndex, UTexture2D*
 	if (NewTexture)
 	{
 		EntryWiget->SetBrushSlotImageFromTexture(NewTexture);
+		EntryWiget->HideSlotImage(false);
 		EntryWiget->SetSlotIndex(SlotIndex);
 		
-		UE_LOG(LogTemp, Warning, TEXT("UInventoryWidget::SetBrushSlotImageFromTexture, SlotWidgetDataTexture : %s, Index : %d"), *SlotWidgetData->GetSlotTexture()->GetName(), SlotWidgetData->GetSlotIndex());
 		return;
 	}
 	else
 	{
 		EntryWiget->SetBrushSlotImageFromTexture(EmptySlotTexture);
+		EntryWiget->HideSlotImage(true);
 		EntryWiget->SetSlotIndex(SlotIndex);
 	}
 }
