@@ -228,7 +228,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 		return Reply.NativeReply;
 	}
 
-	UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
+	Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 
 	return Reply.NativeReply;
 }
@@ -274,7 +274,7 @@ FReply UInventorySlotWidget::NativeOnMouseButtonDoubleClick(const FGeometry& InG
 void UInventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
+	UE_LOG(LogTemp, Warning, TEXT("UInventorySlotWidget::NativeOnDragDetected"));
 	if (IsEmpty())
 	{
 		return;

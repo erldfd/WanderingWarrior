@@ -442,7 +442,7 @@ void UInventoryComponent::OpenAndCloseInventory()
 
 	if (InventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
 	{
-		InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+		InventoryWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		PlayerController->SetShowMouseCursor(true);
 		PlayerController->SetGameModeGameAndUI();
 		PlayerController->SetGameWorldPause(true);
