@@ -83,6 +83,8 @@ private:
 	UFUNCTION(Exec)
 	void PrintCurrentWorld();
 
+	void HideLoadingWidget();
+
 private:
 
 	UPROPERTY()
@@ -111,4 +113,10 @@ private:
 
 	UPROPERTY()
 	class UWWSaveGame* LoadedDataFromSave;
+
+	UPROPERTY()
+	TObjectPtr<class ULevelStreaming> CurrentStreaming;
+
+	UPROPERTY()
+	TObjectPtr<class ULevelStreaming> PreviousStreaming;
 };

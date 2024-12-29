@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Engine/TriggerBox.h"
-#include "LevelSequence/Public/LevelSequence.h"
+#include "LevelSequence.h"
 
 #include "SequencePlayerTriggerBox.generated.h"
 

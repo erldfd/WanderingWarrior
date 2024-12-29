@@ -14,6 +14,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/DamageEvents.h"
 
 AWeapon::AWeapon() : AttackDamage(1)
 {
@@ -78,9 +79,9 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	DamagedTargetSet.Emplace(OverlappedCharacter);
 
 	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(WeaponOwner->GetInstigatorController());
-	if (PlayerController == false)
+	if (PlayerController == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, PlayerController == false"));
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, PlayerController == nullptr"));
 		return;
 	}
 
@@ -91,9 +92,9 @@ void AWeapon::OnMeshBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	OverlappedCharacter->TakeDamageWithKnockback(AttackDamage, DamageEvent, PlayerController, WeaponOwner, MoveDir * 1000, 0.1f, true);
 
 	UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-	if (PlayerInGameWidget == false)
+	if (PlayerInGameWidget == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, PlayerInGameWidget == false"));
+		UE_LOG(LogTemp, Warning, TEXT("AWeapon::OnMeshBeginOverlap, PlayerInGameWidget == nullptr"));
 		return;
 	}
 

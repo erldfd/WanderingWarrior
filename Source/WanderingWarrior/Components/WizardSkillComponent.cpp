@@ -18,6 +18,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Engine/DamageEvents.h"
 
 UWizardSkillComponent::UWizardSkillComponent()
 {
@@ -285,17 +286,18 @@ void UWizardSkillComponent::DamageWizardSkill3JumpAttack()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *DamagedCharacter->GetName());
 
 			FDamageEvent DamageEvent;
-			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(WizardSkill3JumpDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, WizardSkill3HeightLimit);
+			float HeightLimit = WizardSkill3HeightLimit + OwnerCharacter->GetActorLocation().Z;
+			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(WizardSkill3JumpDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, HeightLimit);
 
 			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (PlayerController == false)
+			if (PlayerController == nullptr)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageWizardSkill3JumpAttack, PlayerController == false"));
 				continue;
 			}
 
 			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-			if (PlayerInGameWidget == false)
+			if (PlayerInGameWidget == nullptr)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageWizardSkill3JumpAttack, PlayerInGameWidget == false"));
 				continue;
@@ -384,17 +386,18 @@ void UWizardSkillComponent::DamageWizardSkill1()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *DamagedCharacter->GetName());
 			
 			FDamageEvent DamageEvent;
-			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(WizardSkill1Damage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, WizardSkill1HeightLimit);
+			float HeightLimit = WizardSkill1HeightLimit + OwnerCharacter->GetActorLocation().Z;
+			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(WizardSkill1Damage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, HeightLimit);
 
 			AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-			if (PlayerController == false)
+			if (PlayerController == nullptr)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageWizardSkill1, PlayerController == false"));
 				continue;
 			}
 
 			UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-			if (PlayerInGameWidget == false)
+			if (PlayerInGameWidget == nullptr)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UWarriorSkillComponent::DamageWizardSkill1, PlayerInGameWidget == false"));
 				continue;

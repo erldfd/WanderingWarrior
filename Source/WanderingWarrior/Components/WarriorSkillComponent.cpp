@@ -17,6 +17,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Engine/DamageEvents.h"
 
 UWarriorSkillComponent::UWarriorSkillComponent()
 {
@@ -389,7 +390,7 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 	//const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	//const FVector SkillLocation = Center + Direction * 150;
 
-	ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
+	/*ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
 
 	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
 	if (bIsEnemy)
@@ -404,6 +405,30 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 		FVector(Center.X, Center.Y, Center.Z - 88),
 		FQuat::Identity,
 		CollisionChannel,
+		FCollisionShape::MakeSphere(JumpToGrundRadius),
+		CollisionQueryParam
+	);*/
+
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
+
+	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
+	if (bIsEnemy)
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
+	}
+	else
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel4);
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel10);
+	}
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World->OverlapMultiByObjectType(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		CollisionObjectQueryParams,
 		FCollisionShape::MakeSphere(JumpToGrundRadius),
 		CollisionQueryParam
 	);
@@ -431,7 +456,8 @@ void UWarriorSkillComponent::DamageJumpToGrundSkill()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *DamagedCharacter->GetName());
 
 			FDamageEvent DamageEvent;
-			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, JumpToGrundHeightLimit);
+			float HeightLimit = JumpToGrundHeightLimit + OwnerCharacter->GetActorLocation().Z;
+			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(JumpToGrundDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, HeightLimit);
 
 			UpdateAndDisplayDamagedEnemyWidgets(DamagedCharacter->GetCharacterStatComponent()->GetHPRatio(), FText::FromName(DamagedCharacter->GetCharacterName()));
 		}
@@ -473,7 +499,7 @@ void UWarriorSkillComponent::DamageKickAttack()
 
 	SkillLocation = Center + Direction * KickAttackRange;
 
-	ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
+	/*ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
 
 	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
 	if (bIsEnemy)
@@ -488,6 +514,30 @@ void UWarriorSkillComponent::DamageKickAttack()
 		SkillLocation,
 		OwnerCharacter->GetActorRotation().Quaternion(),
 		CollisionChannel,
+		FCollisionShape::MakeBox(FVector(Extent * 0.5f)),
+		CollisionQueryParam
+	);*/
+
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
+
+	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
+	if (bIsEnemy)
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
+	}
+	else
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel4);
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel10);
+	}
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World->OverlapMultiByObjectType(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		CollisionObjectQueryParams,
 		FCollisionShape::MakeBox(FVector(Extent * 0.5f)),
 		CollisionQueryParam
 	);
@@ -515,7 +565,8 @@ void UWarriorSkillComponent::DamageKickAttack()
 			UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *DamagedCharacter->GetName());
 
 			FDamageEvent DamageEvent;
-			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, JumpToGrundHeightLimit);
+			float HeightLimit = JumpToGrundHeightLimit + OwnerCharacter->GetActorLocation().Z;
+			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), DamagedCharacter->GetActorUpVector() * 700, true, HeightLimit);
 			//float DamageTaken = DamagedCharacter->TakeDamageWithKnockback(KickAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), -DamagedCharacter->GetActorForwardVector() * 100, 0.1f, true);
 
 			UpdateAndDisplayDamagedEnemyWidgets(DamagedCharacter->GetCharacterStatComponent()->GetHPRatio(), FText::FromName(DamagedCharacter->GetCharacterName()));
@@ -554,24 +605,27 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 	// get forward vector
 	const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-	ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
-
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
 	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
 	if (bIsEnemy)
 	{
-		CollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
+	}
+	else
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel4);
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel10);
 	}
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
-	bool bResult = World->OverlapMultiByChannel(
-		OverlapResults,
-		Center,
-		FQuat::Identity,
-		CollisionChannel,
-		FCollisionShape::MakeSphere(Radius),
-		CollisionQueryParam
-	);
+	bool bResult = World->OverlapMultiByObjectType(
+			OverlapResults,
+			Center,
+			FQuat::Identity,
+			CollisionObjectQueryParams,
+			FCollisionShape::MakeSphere(Radius),
+			CollisionQueryParam);
 
 	if (bResult)
 	{
@@ -602,15 +656,15 @@ void UWarriorSkillComponent::DamageMelee360Attack()
 			float DirectionVectorMultiplier = 2;
 			Dir = Dir * DirectionVectorMultiplier;
 
-			float HeightLimit = Melee360AttackHeightLimit;
-			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit - DamagedCharacter->GetActorLocation().Z;
+			float HeightLimit = Melee360AttackHeightLimit + OwnerCharacter->GetActorLocation().Z;
+			Dir.Z = /*GetOwner()->GetActorLocation().Z +*/ HeightLimit - DamagedCharacter->GetActorLocation().Z;
 			//DamagedCharacter->Launch(Dir, HeightLimit);
 			UE_LOG(LogTemp, Warning, TEXT("Dir : %s, Target : %s, Damaged : %s"), *Dir.ToString(), *TargetLocation.ToString(), *DamagedCharacter->GetActorLocation().ToString());
 			FDamageEvent DamageEvent;
 			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(Melee360AttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
 
 			UpdateAndDisplayDamagedEnemyWidgets(DamagedCharacter->GetCharacterStatComponent()->GetHPRatio(), FText::FromName(DamagedCharacter->GetCharacterName()));
-			//DrawDebugSphere(World, FVector(SkillLocation.X, SkillLocation.Y, SkillLocation.Z - 88), Radius, 16, FColor::Blue, false, 1, 0, 1);
+			//DrawDebugSphere(World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
 		}
 
 		//DrawDebugSphere(World, Center, Radius, 16, FColor::Blue, false, 1, 0, 1);
@@ -640,24 +694,29 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 		return;
 	}
 
-	ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
 
 	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
 	if (bIsEnemy)
 	{
-		CollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
+	}
+	else
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel4);
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel10);
 	}
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
-	bool bResult = World->OverlapMultiByChannel(
+	
+	bool bResult = World->OverlapMultiByObjectType(
 		OverlapResults,
 		Center,
 		FQuat::Identity,
-		CollisionChannel,
+		CollisionObjectQueryParams,
 		FCollisionShape::MakeSphere(Radius),
-		CollisionQueryParam
-	);
+		CollisionQueryParam);
 
 	if (bResult)
 	{
@@ -688,8 +747,8 @@ void UWarriorSkillComponent::DamageMusouAttackInternal()
 			float DirectionVectorMultiplier = 2;
 			Dir = Dir * DirectionVectorMultiplier;
 
-			float HeightLimit = MusouAttackHeightLimit;
-			Dir.Z = OwnerCharacter->GetActorLocation().Z + HeightLimit - DamagedCharacter->GetActorLocation().Z;
+			float HeightLimit = MusouAttackHeightLimit + OwnerCharacter->GetActorLocation().Z;
+			Dir.Z = /*OwnerCharacter->GetActorLocation().Z + */HeightLimit - DamagedCharacter->GetActorLocation().Z;
 
 			FDamageEvent DamageEvent;
 			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
@@ -727,21 +786,26 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 		return;
 	}
 
-	ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
 
 	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
 	if (bIsEnemy)
 	{
-		CollisionChannel = ECollisionChannel::ECC_GameTraceChannel6;
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
+	}
+	else
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel4);
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel10);
 	}
 
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
-	bool bResult = World->OverlapMultiByChannel(
+	bool bResult = World->OverlapMultiByObjectType(
 		OverlapResults,
 		Center,
 		FQuat::Identity,
-		CollisionChannel,
+		CollisionObjectQueryParams,
 		FCollisionShape::MakeSphere(Radius),
 		CollisionQueryParam
 	);
@@ -775,8 +839,8 @@ void UWarriorSkillComponent::DamageMusouFinishAttackInternal()
 			float DirectionVectorMultiplier = 3;
 			Dir = Dir * DirectionVectorMultiplier;
 
-			float HeightLimit = 600;
-			Dir.Z = GetOwner()->GetActorLocation().Z + HeightLimit - DamagedCharacter->GetActorLocation().Z;
+			float HeightLimit = 600 + OwnerCharacter->GetActorLocation().Z;
+			Dir.Z = /*GetOwner()->GetActorLocation().Z + */HeightLimit - DamagedCharacter->GetActorLocation().Z;
 
 			FDamageEvent DamageEvent;
 			float DamageTaken = DamagedCharacter->TakeDamageWithLaunch(MusouAttackDamage, DamageEvent, GetOwner()->GetInstigatorController(), GetOwner(), Dir, true, HeightLimit);
@@ -821,7 +885,7 @@ void UWarriorSkillComponent::DamageParryAttackInternal()
 
 	SkillLocation = Center + Direction * ParryAttackRange;
 
-	ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
+	/*ECollisionChannel CollisionChannel = ECollisionChannel::ECC_GameTraceChannel7;
 
 	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
 	if (bIsEnemy)
@@ -836,6 +900,30 @@ void UWarriorSkillComponent::DamageParryAttackInternal()
 		SkillLocation,
 		OwnerCharacter->GetActorRotation().Quaternion(),
 		CollisionChannel,
+		FCollisionShape::MakeBox(FVector(Extent * 0.5f)),
+		CollisionQueryParam
+	);*/
+
+	FCollisionObjectQueryParams CollisionObjectQueryParams;
+
+	bool bIsEnemy = (OwnerCharacter->GetIsPlayer() == false);
+	if (bIsEnemy)
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel1);
+	}
+	else
+	{
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel4);
+		CollisionObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_GameTraceChannel10);
+	}
+
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(NAME_None, false, GetOwner());
+	bool bResult = World->OverlapMultiByObjectType(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		CollisionObjectQueryParams,
 		FCollisionShape::MakeBox(FVector(Extent * 0.5f)),
 		CollisionQueryParam
 	);

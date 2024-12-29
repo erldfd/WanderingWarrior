@@ -13,14 +13,18 @@ void UMiniMapCaptureComponent2D::AddToMinimap(AActor* NewActor)
 
 void UMiniMapCaptureComponent2D::AddAllActorsToMinimap()
 {
-	UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), ShowOnlyActors);
+	TArray<AActor*> outActors;
+	UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), outActors);
+	ShowOnlyActors = outActors;
 }
 
 void UMiniMapCaptureComponent2D::AddAllActorsToMinimap(FExceptConditionSignature ExceptCondition)
 {
 	ShowOnlyActors.Empty();
-	UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), ShowOnlyActors);
 
+	TArray<AActor*> outActors;
+	UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), outActors);
+	ShowOnlyActors = outActors;
 	UE_LOG(LogTemp, Warning, TEXT("UMiniMapCaptureComponent2D::AddAllActorsToMinimap"));
 
 	ShowOnlyActors.RemoveAllSwap([&](AActor* Actor)->bool {
@@ -85,9 +89,9 @@ void UMiniMapCaptureComponent2D::BeginPlay()
 			{
 				UE_LOG(LogTemp, Warning, TEXT("UMiniMapCaptureComponent2D::BeginPlay, BeforeShowOnlyActor : %s"), *ShowOnlyActor->GetName());
 			}
-
-			UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), ShowOnlyActors);
-
+			TArray<AActor*> outActors;
+			UGameplayStatics::GetAllActorsOfClass(this, AActor::StaticClass(), outActors);
+			ShowOnlyActors = outActors;
 			FExceptConditionSignature ExceptCondition;
 			ExceptCondition.BindLambda([](AActor* Actor)->bool {
 

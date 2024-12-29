@@ -386,7 +386,7 @@ bool UInventoryComponent::GetInventorySlot(int32 SlotIndex, const EInventory& In
 		return false;
 	}
 
-	TArray<UInventorySlot*>& InventorySlotArrayFrom = InventorySlotArrays[int(InventoryType)].InventorySlotArray;
+	TArray<TObjectPtr<UInventorySlot>>& InventorySlotArrayFrom = InventorySlotArrays[int(InventoryType)].InventorySlotArray;
 
 	if (InventorySlotArrayFrom.IsValidIndex(SlotIndex) == false || InventorySlotArrayFrom[SlotIndex] == nullptr)
 	{

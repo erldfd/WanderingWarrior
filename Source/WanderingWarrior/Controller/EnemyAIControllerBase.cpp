@@ -26,9 +26,14 @@ void AEnemyAIControllerBase::OnPossess(APawn* InPawn)
 
 	PossessedCharacter->SetIsPlayer(false);
 
+	RunBT();
+}
+
+void AEnemyAIControllerBase::RunBT()
+{
 	if (UseBlackboard(BBEnemyAI, (UBlackboardComponent*&)Blackboard))
 	{
-		Blackboard->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
+		Blackboard->SetValueAsVector(HomePosKey, GetPawn()->GetActorLocation());
 		if (RunBehaviorTree(BTEnemyAI) == false)
 		{
 			UE_LOG(LogTemp, Error, TEXT("AIController couldn't run behavior tree!"));

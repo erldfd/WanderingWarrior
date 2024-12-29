@@ -39,7 +39,7 @@ void UInventorySlot::UseSlotItem()
 
     FString ItemTypeStr = ItemTypeEnum->GetDisplayNameTextByValue(int64(EItemType::Weapon)).ToString();
 
-    if (ItemTypeStr == SlotItemData.ItemTypeTag.ToString())
+    if((int)SlotItemData.ItemType == (int)EItemType::Weapon)
     {
         UseWeaponItem();
     }

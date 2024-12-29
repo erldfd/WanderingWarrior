@@ -8,6 +8,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
+#include "Engine/DamageEvents.h"
 
 AMagicBall::AMagicBall()
 {

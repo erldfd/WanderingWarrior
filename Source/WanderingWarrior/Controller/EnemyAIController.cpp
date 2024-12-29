@@ -75,7 +75,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 	}
 
 	APawn* InPawn = GetPawn();
-	if (InPawn == false)
+	if (InPawn == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AEnemyAIController::Tick,  == false"));
 		return;

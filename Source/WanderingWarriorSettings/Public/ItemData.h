@@ -13,7 +13,7 @@
 // it same to ItemTypeTag literally
 
 UENUM()
-enum class EItemDataType
+enum class EItemDataType : uint8
 {
 	Weapon,
 	Misc
@@ -30,11 +30,11 @@ public:
 	FText Name;
 
 	// it same to EItemType literally
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	FGameplayTag ItemTypeTag;
-
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	EItemType ItemType;*/
+	FGameplayTag ItemTypeTag;*/
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	EItemDataType ItemType;
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	bool CanDamage;*/
 

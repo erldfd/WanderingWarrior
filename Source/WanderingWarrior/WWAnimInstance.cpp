@@ -93,6 +93,26 @@ void UWWAnimInstance::SetHitAndFly(bool bNewHitAndFly)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UWWAnimInstance::SetHitAndFly : %d"), bNewHitAndFly)
 	bIsHitAndFly = bNewHitAndFly;
+
+	AWWCharacter* Owner = Cast<AWWCharacter>(GetOwningActor());
+	if (Owner == nullptr)
+	{
+		return;
+	}
+
+	if (Owner->GetIsPlayer())
+	{
+		return;
+	}
+
+	if (bIsHitAndFly)
+	{
+		Owner->ChangeCollisionProfile(TEXT("HitAndFlyingEnemyProfile"));
+	}
+	else
+	{
+		Owner->ChangeCollisionProfile(TEXT("EnemyProfile"));
+	}
 }
 
 bool UWWAnimInstance::GetIsAttackDetected() const

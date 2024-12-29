@@ -28,6 +28,10 @@ public:
 
 protected:
 
+	virtual void RunBT();
+
+protected:
+
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UBehaviorTree> BTEnemyAI;
 

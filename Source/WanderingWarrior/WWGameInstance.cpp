@@ -415,14 +415,19 @@ bool UWWGameInstance::TryStreamLevel(const FName& LoadedLevelPath)
 		return false;
 	}
 
-	ULevelStreaming* Streaming = UGameplayStatics::GetStreamingLevel(World, LoadedLevelPath);
-	if (Streaming == nullptr)
+	if (CurrentStreaming != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryStreamLevel, Streaming == nullptr, Path : %s"), *LoadedLevelPath.ToString());
+		PreviousStreaming = CurrentStreaming;
+	}
+
+	CurrentStreaming = UGameplayStatics::GetStreamingLevel(World, LoadedLevelPath);
+	if (CurrentStreaming == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::TryStreamLevel, CurrentStreaming == nullptr, Path : %s"), *LoadedLevelPath.ToString());
 
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("Load Failed.. Streaming == nullptr"));
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Red, TEXT("Load Failed.. CurrentStreaming == nullptr"));
 		}
 
 		return false;
@@ -439,7 +444,11 @@ bool UWWGameInstance::TryStreamLevel(const FName& LoadedLevelPath)
 	FScriptDelegate OnLoadedDelegate;
 	OnLoadedDelegate.BindUFunction(this, TEXT("OnLevelLoaded"));
 
-	Streaming->OnLevelLoaded.AddUnique(OnLoadedDelegate);
+	FScriptDelegate OnUnloadedDelegate;
+	OnUnloadedDelegate.BindUFunction(this, TEXT("HideLoadingWidget"));
+
+	CurrentStreaming->OnLevelLoaded.AddUnique(OnLoadedDelegate);
+	CurrentStreaming->OnLevelUnloaded.AddUnique(OnUnloadedDelegate);
 
 	FLatentActionInfo Info;
 	UGameplayStatics::LoadStreamLevel(this, LoadedLevelPath, true, true, Info);
@@ -562,17 +571,9 @@ void UWWGameInstance::PrintCurrentWorld()
 	}
 }
 
-void UWWGameInstance::UnLoadLevel(const FName& LevelPath)
+void UWWGameInstance::HideLoadingWidget()
 {
-	ULevelStreaming* Streaming = UGameplayStatics::GetStreamingLevel(GetWorld() , LevelPath);
-	if (Streaming == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::UnLoadLevel, UnloadFailed %s"), *LevelPath.ToString());
-		return;
-	}
-
-	UGameplayStatics::UnloadStreamLevel(GetWorld(), LevelPath, FLatentActionInfo(), true);
-
+	UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::HideLoadingWidget"));
 	if (LoadingWidget == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UWWGameInstance::UnLoadLevel, LoadingWidget == nullptr"));
@@ -581,3 +582,17 @@ void UWWGameInstance::UnLoadLevel(const FName& LevelPath)
 
 	LoadingWidget->SetVisibility(ESlateVisibility::Hidden);
 }
+
+void UWWGameInstance::UnLoadLevel(const FName& LevelPath)
+{
+	FLatentActionInfo Info;
+	Info.CallbackTarget = this;
+	Info.ExecutionFunction = TEXT("HideLoadingWidget");
+
+	UGameplayStatics::UnloadStreamLevel(GetWorld(), LevelPath, Info, true);
+
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateUObject(this, &UWWGameInstance::HideLoadingWidget), 1, false, 10);
+}
+
+

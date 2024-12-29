@@ -53,6 +53,7 @@ void UANS_WizardSkill3JumpWindow::BranchingPointNotifyTick(FBranchingPointNotify
 	FVector CharacterLocation = Character->GetActorLocation();
 	CharacterLocation.Z = CurrentHeight;
 	Character->SetActorLocation(CharacterLocation, true);
+	Character->SetMaxHeightInAir(CurrentHeight);
 }
 
 void UANS_WizardSkill3JumpWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& BranchingPointPayload)

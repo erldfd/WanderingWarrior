@@ -48,7 +48,7 @@ TArray<FItemDataRow*> UItemData::GetItemDataFromPathInConstructor(const FString&
 
 	for (int i = 0; i < TempDataRowArrayNum; i++)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ItemData, GetItemDataFromPathInConstructor, %s"), &TempDataRowArray[i]->Name);
+		//UE_LOG(LogTemp, Warning, TEXT("ItemData, GetItemDataFromPathInConstructor, %s"), &TempDataRowArray[i]->Name);
 	}
 	
 	return TempDataRowArray;

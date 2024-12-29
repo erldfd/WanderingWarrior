@@ -126,14 +126,14 @@ void USkillComponentBase::DamageParryAttack()
 void USkillComponentBase::UpdateAndDisplayDamagedEnemyWidgets(float HPRatio, const FText& EnemyName)
 {
 	AWWPlayerController* PlayerController = Cast<AWWPlayerController>(GetOwner()->GetInstigatorController());
-	if (PlayerController == false)
+	if (PlayerController == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("USkillComponentBase::UpdateAndDisplayDamagedEnemyWidgets, PlayerController == false"));
 		return;
 	}
 
 	UInGameWidget* PlayerInGameWidget = PlayerController->GetInGameWidget();
-	if (PlayerInGameWidget == false)
+	if (PlayerInGameWidget == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("USkillComponentBase::UpdateAndDisplayDamagedEnemyWidgets, PlayerInGameWidget == false"));
 		return;

@@ -74,6 +74,8 @@ public:
 	bool GetIsPlayer();
 	void SetIsPlayer(bool bNewIsPlayer);
 
+	void ChangeCollisionProfile(const FName& ProfileName);
+
 public:
 
 	virtual void DoChargeAttack();

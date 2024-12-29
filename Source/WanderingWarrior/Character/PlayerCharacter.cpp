@@ -165,9 +165,9 @@ void APlayerCharacter::BeginPlay()
 	InventoryComponent->ObtainItem(1, EInventory::CharacterInventory, GameInstance->GetWeaponData(EWeaponName::BlackSword));
 
 	InventoryComponent->ObtainItem(2, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
-	InventoryComponent->ObtainItem(2, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
-	InventoryComponent->ObtainItem(2, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
-	InventoryComponent->ObtainItem(2, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
+	InventoryComponent->ObtainItem(3, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
+	InventoryComponent->ObtainItem(4, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
+	InventoryComponent->ObtainItem(5, EInventory::CharacterInventory, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
 	InventoryComponent->ObtainItem(1, EInventory::CharacterQuickSlot, GameInstance->GetMiscItemData(EMiscItemName::HPPotion));
 }
 

@@ -19,6 +19,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/EngineTypes.h"
+#include "Engine/DamageEvents.h"
 #include "DrawDebugHelpers.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
@@ -47,7 +48,7 @@ AWWCharacter::AWWCharacter() : InputForwardValue(0), InputRightValue(0), bWIllSw
 
 	CharacterMeshComponent->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
+	//GetCapsuleComponent()->SetCollisionProfileName(TEXT("CharacterOverlapOnly"));
 	GetMesh()->SetGenerateOverlapEvents(true);
 	MaxHeightInAir = 100000;
 }
@@ -243,7 +244,13 @@ void AWWCharacter::Tick(float DeltaTime)
 
 	if (GetActorLocation().Z > MaxHeightInAir)
 	{
-		GetCharacterMovement()->Velocity.Z = -10;
+		FVector Location = GetActorLocation();
+		Location.Z = MaxHeightInAir;
+
+		SetActorLocation(Location);
+
+		//GetCharacterMovement()->Velocity.Z -= 980.0f * DeltaTime;
+		UE_LOG(LogTemp, Warning, TEXT("Gravity Scale : %f, Z? : %f"), GetCharacterMovement()->GravityScale, GetCharacterMovement()->GetGravityZ())
 	}
 
 	bool bIsPlayingHitMontage = AnimInstance->GetIsPlayingCharacterHitMontage();
@@ -253,7 +260,12 @@ void AWWCharacter::Tick(float DeltaTime)
 
 	if (AnimInstance->GetIsDead() && bIsInAir == false)
 	{
-		SetActorEnableCollision(false);
+		FTimerHandle timerHandle;
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, FTimerDelegate::CreateLambda([&]() {
+
+			SetActorEnableCollision(false);
+
+			}), 1, false, 1);
 	}
 
 	if (bIsKnockbackStarted)
@@ -326,8 +338,8 @@ void AWWCharacter::Attack()
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(1, 3, FColor::Cyan,
-				FString::Printf(TEXT("AWWCharacter::Attack, IsDead : %d, bIsSkillStarted : %d, bIsGuarding : %d, bIsGuardHitStart : %d, bBeingStunned : %d"),
-					bIsDead, bIsSkillStarted, bIsGuarding, bIsGuardHitStart, bBeingStunned));
+				FString::Printf(TEXT("AWWCharacter::Attack, IsDead : %d, bIsSkillStarted : %d, bIsGuarding : %d, bIsGuardHitStart : %d, bBeingStunned : %d, bIsPlayingCharacterHit : %d"),
+					bIsDead, bIsSkillStarted, bIsGuarding, bIsGuardHitStart, bBeingStunned, bIsPlayingCharacterHit));
 		}
 
 		UE_LOG(LogTemp, Warning, TEXT("AWWCharacter::Attack, %d %d %d %d %d"), bIsDead, bIsSkillStarted,
@@ -571,6 +583,11 @@ bool AWWCharacter::GetIsPlayer()
 void AWWCharacter::SetIsPlayer(bool bNewIsPlayer)
 {
 	bIsPlayer = bNewIsPlayer;
+}
+
+void AWWCharacter::ChangeCollisionProfile(const FName& ProfileName)
+{
+	GetCapsuleComponent()->SetCollisionProfileName(ProfileName);
 }
 
 void AWWCharacter::StartKnockback(FVector Velocity, float Duration)
